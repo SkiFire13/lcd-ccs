@@ -33,3 +33,8 @@ conv (ccs-vp.const n args) = ccs.const (conv-n n args)
 conv (ccs-vp.rename f p) = ccs.rename (\ (conv-c c v) -> conv-c (f c) v) (conv p)
 conv (ccs-vp.hide f p) = ccs.hide (\ (conv-c c v) -> f c) (conv p)
 conv (ccs-vp.if b p) = ccs.indet (\ s -> if isYes (s ≟ b) then conv p else ccs.deadlock)
+
+conv-red : ccs-vp.ReducOp {C} {N} {X} {V} {n-fv} -> ccs.ChanOp {Conv-C} {Conv-N}
+conv-red (ccs-vp.send c v) = ccs.send (conv-c c v)
+conv-red (ccs-vp.recv c v) = ccs.recv (conv-c c v)
+conv-red ccs-vp.tau = ccs.tau
