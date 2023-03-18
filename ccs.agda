@@ -1,7 +1,7 @@
 module ccs (C N : Set) where
 -- C = Channel, N = Name (Constant)
 
-open import Data.Unit
+open import Data.Bool
 open import Data.Empty
 
 data ChanOp : Set where
@@ -19,10 +19,10 @@ map-chan-op f (send c) = send (f c)
 map-chan-op f (recv c) = recv (f c)
 map-chan-op f tau = tau
 
-filter-chan-op : (C -> Set) -> ChanOp -> Set
+filter-chan-op : (C -> Bool) -> ChanOp -> Bool
 filter-chan-op f (send c) = f c
 filter-chan-op f (recv c) = f c
-filter-chan-op f tau = ⊤
+filter-chan-op f tau = true
 
 data Prog : Set₁ where
   chan    : ChanOp -> Prog -> Prog
@@ -30,7 +30,7 @@ data Prog : Set₁ where
   indet   : {S : Set} -> (S -> Prog) -> Prog
   const   : N -> Prog
   rename  : (C -> C) -> Prog -> Prog
-  hide    : (C -> Set) -> Prog -> Prog
+  hide    : (C -> Bool) -> Prog -> Prog
 
 deadlock = indet ⊥-elim
 
@@ -46,5 +46,5 @@ data Reduces : Prog -> ChanOp -> Prog -> Set₁ where
   indet   : forall {S} {c q f} {s : S} -> Reduces (f s) c q -> Reduces (indet f) c q
   const   : forall {c p n} -> Reduces (F n) c p -> Reduces (const n) c p
   rename  : forall {c p q r} -> Reduces p c q -> Reduces (rename r p) (map-chan-op r c) (rename r q)
-  hide    : forall {c p q f} {_ : filter-chan-op f c} -> Reduces p c q -> Reduces (hide f p) c (hide f q)
+  hide    : forall {c p q f} {_ : T (filter-chan-op f c)} -> Reduces p c q -> Reduces (hide f p) c (hide f q)
  
