@@ -1,4 +1,4 @@
-module ccs (C N : Set) where
+module ccs {C N : Set} where
 -- C = Channel, N = Name (Constant)
 
 open import Data.Bool

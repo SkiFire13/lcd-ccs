@@ -1,7 +1,7 @@
 open import Data.Bool
 open import Data.Empty
 
-module ccs-vp3 (C N X V : Set) (n-fv : N -> X -> Bool) where
+module ccs-vp3 {C N X V : Set} {n-fv : N -> X -> Bool} where
 
 data Prog : Set₁ where
   chan-send : C -> V -> Prog -> Prog
