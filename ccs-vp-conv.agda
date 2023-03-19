@@ -2,7 +2,7 @@ open import Data.Bool
 open import Relation.Binary.PropositionalEquality
 open import Relation.Nullary.Decidable
 
-module ccs-vp3-conv
+module ccs-vp-conv
   {C N X V : Set}
   {n-fv : N -> X -> Bool}
   where
@@ -20,7 +20,7 @@ record Conv-N : Set where
     args : (x : X) -> {_ : T (n-fv name x)} -> V
 
 import ccs as ccs-real
-import ccs-vp3 as ccs-vp-real
+import ccs-vp as ccs-vp-real
 module ccs = ccs-real {Conv-C} {Conv-N}
 module ccs-vp = ccs-vp-real {C} {N} {X} {V} {n-fv}
 
