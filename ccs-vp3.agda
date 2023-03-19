@@ -52,4 +52,4 @@ data Reduces : Prog -> ReducOp -> Prog -> Set₁ where
   const     : forall {c p n f} -> Reduces (n-to-prog n f) c p -> Reduces (const n f) c p
   rename    : forall {c p q r} -> Reduces p c q -> Reduces (rename r p) (map-reduc-op r c) (rename r q)
   hide      : forall {c p q f} {_ : T (filter-reduc-op f c)} -> Reduces p c q -> Reduces (hide f p) c (hide f q)
-  if        : forall {c p q b} {_ : T b} -> Reduces p c q -> Reduces (if b p) c q
+  if        : forall {c p q} -> Reduces p c q -> Reduces (if true p) c q
