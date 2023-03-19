@@ -46,4 +46,3 @@ data Reduces : Prog -> ChanOp -> Prog -> Set₁ where
   const   : forall {c p n} -> Reduces (penv n) c p -> Reduces (const n) c p
   rename  : forall {c p q r} -> Reduces p c q -> Reduces (rename r p) (map-chan-op r c) (rename r q)
   hide    : forall {c p q f} {z : T (filter-chan-op f c)} -> Reduces p c q -> Reduces (hide f p) c (hide f q)
- 
