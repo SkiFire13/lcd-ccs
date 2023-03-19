@@ -2,13 +2,9 @@ open import Data.Bool
 open import Relation.Binary.PropositionalEquality
 open import Relation.Nullary.Decidable
 
-import ccs
-import ccs-vp3 as ccs-vp
-
 module ccs-vp3-conv
   {C N X V : Set}
   {n-fv : N -> X -> Bool}
-  {penv : (n : N) -> ((x : X) -> {_ : T (n-fv n x)} -> V) -> ccs-vp.Prog {C} {N} {X} {V} {n-fv}}
   where
 
 record Conv-C : Set where
@@ -23,6 +19,14 @@ record Conv-N : Set where
     name : N
     args : (x : X) -> {_ : T (n-fv name x)} -> V
 
+import ccs as ccs-real
+import ccs-vp3 as ccs-vp-real
+module ccs = ccs-real {Conv-C} {Conv-N}
+module ccs-vp = ccs-vp-real {C} {N} {X} {V} {n-fv}
+
+variable
+  penv : (n : N) -> ((x : X) -> {_ : T (n-fv n x)} -> V) -> ccs-vp.Prog
+
 conv : ccs-vp.Prog -> ccs.Prog
 conv (ccs-vp.chan-send c v p) = ccs.chan (ccs.send (conv-c c v)) (conv p)
 conv (ccs-vp.chan-recv c f) = ccs.indet {S = V} (\ v -> ccs.chan (ccs.recv (conv-c c v)) (conv (f v)))
@@ -34,7 +38,7 @@ conv (ccs-vp.rename f p) = ccs.rename (\ (conv-c c v) -> conv-c (f c) v) (conv p
 conv (ccs-vp.hide f p) = ccs.hide (\ (conv-c c _) -> f c) (conv p)
 conv (ccs-vp.if b p) = ccs.indet (\ s -> if isYes (s ≟ b) then conv p else ccs.deadlock)
 
-conv-red : ccs-vp.ReducOp {C} {N} {X} {V} {n-fv} -> ccs.ChanOp {Conv-C} {Conv-N}
+conv-red : ccs-vp.ReducOp -> ccs.ChanOp
 conv-red (ccs-vp.send c v) = ccs.send (conv-c c v)
 conv-red (ccs-vp.recv c v) = ccs.recv (conv-c c v)
 conv-red ccs-vp.tau = ccs.tau
@@ -55,7 +59,7 @@ conv-eqv (ccs-vp.rename {c} r) with c
 ... | ccs-vp.send _ _ = ccs.rename (conv-eqv r)
 ... | ccs-vp.recv _ _ = ccs.rename (conv-eqv r)
 ... | ccs-vp.tau      = ccs.rename (conv-eqv r)
-conv-eqv (ccs-vp.hide {c = c} {f = f} {z = z} r) with c
+conv-eqv (ccs-vp.hide {c} {z = z} r) with c
 ... | ccs-vp.send _ _ = ccs.hide {z = z} (conv-eqv r)
 ... | ccs-vp.recv _ _ = ccs.hide {z = z} (conv-eqv r)
 ... | ccs-vp.tau      = ccs.hide {z = z} (conv-eqv r)
