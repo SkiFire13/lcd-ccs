@@ -38,7 +38,7 @@ filter-reduc-op f (recv c _) = f c
 filter-reduc-op f tau = true
 
 variable
-  n-to-prog : (n : N) -> ((x : X) -> {_ : T (n-fv n x)} -> V) -> Prog
+  penv : (n : N) -> ((x : X) -> {_ : T (n-fv n x)} -> V) -> Prog
 
 data Reduces : Prog -> ReducOp -> Prog -> Set₁ where
   chan-send : forall {c v p} -> Reduces (chan-send c v p) (send c v) p
@@ -49,7 +49,7 @@ data Reduces : Prog -> ReducOp -> Prog -> Set₁ where
   par-B     : forall {c pl pr pl' pr'} -> Reduces pl c pl' -> Reduces pr (flip-reduc-op c) pr'
               -> Reduces (par pl pr) tau (par pl' pr')
   indet     : forall {c q S f} {s : S} -> Reduces (f s) c q -> Reduces (indet f) c q
-  const     : forall {c p n f} -> Reduces (n-to-prog n f) c p -> Reduces (const n f) c p
+  const     : forall {c p n f} -> Reduces (penv n f) c p -> Reduces (const n f) c p
   rename    : forall {c p q r} -> Reduces p c q -> Reduces (rename r p) (map-reduc-op r c) (rename r q)
-  hide      : forall {c p q f} {_ : T (filter-reduc-op f c)} -> Reduces p c q -> Reduces (hide f p) c (hide f q)
+  hide      : forall {c p q f} {z : T (filter-reduc-op f c)} -> Reduces p c q -> Reduces (hide f p) c (hide f q)
   if        : forall {c p q} -> Reduces p c q -> Reduces (if true p) c q

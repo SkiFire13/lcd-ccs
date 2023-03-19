@@ -35,8 +35,7 @@ data Prog : Set₁ where
 deadlock = indet ⊥-elim
 
 variable
-  F : N -> Prog
--- F = Function (from constant to the associated program)
+  penv : N -> Prog
 data Reduces : Prog -> ChanOp -> Prog -> Set₁ where
   chan    : forall {c p} -> Reduces (chan c p) c p
   par-L   : forall {c pl pr p'} -> Reduces pl c p' -> Reduces (par pl pr) c (par p' pr)
@@ -44,7 +43,7 @@ data Reduces : Prog -> ChanOp -> Prog -> Set₁ where
   par-B   : forall {c pl pr pl' pr'} -> Reduces pl c pl' -> Reduces pr (flip-chan-op c) pr'
             -> Reduces (par pl pr) tau (par pl' pr')
   indet   : forall {S} {c q f} {s : S} -> Reduces (f s) c q -> Reduces (indet f) c q
-  const   : forall {c p n} -> Reduces (F n) c p -> Reduces (const n) c p
+  const   : forall {c p n} -> Reduces (penv n) c p -> Reduces (const n) c p
   rename  : forall {c p q r} -> Reduces p c q -> Reduces (rename r p) (map-chan-op r c) (rename r q)
-  hide    : forall {c p q f} {_ : T (filter-chan-op f c)} -> Reduces p c q -> Reduces (hide f p) c (hide f q)
+  hide    : forall {c p q f} {z : T (filter-chan-op f c)} -> Reduces p c q -> Reduces (hide f p) c (hide f q)
  
