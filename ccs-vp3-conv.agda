@@ -64,3 +64,10 @@ conv-reduces (ccs-vp.hide {c} {z = z} r) with c
 ... | ccs-vp.recv _ _ = ccs.hide {z = z} (conv-reduces r)
 ... | ccs-vp.tau      = ccs.hide {z = z} (conv-reduces r)
 conv-reduces (ccs-vp.if r) = ccs.indet {s = true} (conv-reduces r)
+
+unconv-reduces : forall {p1 c p2} -> ccs.Reduces (conv-prog p1) (conv-reduc-op c) (conv-prog p2) -> ccs-vp.Reduces p1 c p2
+unconv-reduces {op1} {oc} {op2} = helper {op1} {oc} {op2} refl refl refl
+  where
+  helper : forall {p1 rc p2} {cp1 cc cp2} -> cp1 ≡ conv-prog p1 -> cp2 ≡ conv-prog p2 -> cc ≡ conv-reduc-op rc
+            -> ccs.Reduces cp1 cc cp2 -> ccs-vp.Reduces p1 rc p2
+  helper {p1} {rc} {p2} {cp1} {cc} {cp2} e1 e2 e3 r = {!   !}
