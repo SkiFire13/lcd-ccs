@@ -34,15 +34,13 @@ data Prog : Set₁ where
 
 deadlock = indet ⊥-elim
 
-variable
-  penv : N -> Prog
-data Reduces : Prog -> ChanOp -> Prog -> Set₁ where
+data Reduces {penv : N -> Prog} : Prog -> ChanOp -> Prog -> Set₁ where
   chan    : forall {c p} -> Reduces (chan c p) c p
-  par-L   : forall {c pl pr p'} -> Reduces pl c p' -> Reduces (par pl pr) c (par p' pr)
-  par-R   : forall {c pl pr p'} -> Reduces pr c p' -> Reduces (par pl pr) c (par pl p')
-  par-B   : forall {c pl pr pl' pr'} -> Reduces pl c pl' -> Reduces pr (flip-chan-op c) pr'
+  par-L   : forall {c pl pr p'} -> Reduces {penv} pl c p' -> Reduces (par pl pr) c (par p' pr)
+  par-R   : forall {c pl pr p'} -> Reduces {penv} pr c p' -> Reduces (par pl pr) c (par pl p')
+  par-B   : forall {c pl pr pl' pr'} -> Reduces {penv} pl c pl' -> Reduces {penv} pr (flip-chan-op c) pr'
             -> Reduces (par pl pr) tau (par pl' pr')
-  indet   : forall {S} {c q f} {s : S} -> Reduces (f s) c q -> Reduces (indet f) c q
-  const   : forall {c p n} -> Reduces (penv n) c p -> Reduces (const n) c p
-  rename  : forall {c p q r} -> Reduces p c q -> Reduces (rename r p) (map-chan-op r c) (rename r q)
-  hide    : forall {c p q f} {z : T (filter-chan-op f c)} -> Reduces p c q -> Reduces (hide f p) c (hide f q)
+  indet   : forall {S} {c q f} {s : S} -> Reduces {penv} (f s) c q -> Reduces (indet f) c q
+  const   : forall {c p n} -> Reduces {penv} (penv n) c p -> Reduces (const n) c p
+  rename  : forall {c p q r} -> Reduces {penv} p c q -> Reduces (rename r p) (map-chan-op r c) (rename r q)
+  hide    : forall {c p q f} {z : T (filter-chan-op f c)} -> Reduces {penv} p c q -> Reduces (hide f p) c (hide f q)

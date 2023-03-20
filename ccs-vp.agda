@@ -37,19 +37,16 @@ filter-reduc-op f (send c _) = f c
 filter-reduc-op f (recv c _) = f c
 filter-reduc-op f tau = true
 
-variable
-  penv : (n : N) -> ((x : X) -> {_ : T (n-fv n x)} -> V) -> Prog
-
-data Reduces : Prog -> ReducOp -> Prog -> Set₁ where
+data Reduces {penv : (n : N) -> ((x : X) -> {_ : T (n-fv n x)} -> V) -> Prog} : Prog -> ReducOp -> Prog -> Set₁ where
   chan-send : forall {c v p} -> Reduces (chan-send c v p) (send c v) p
   chan-recv : forall {c v f} -> Reduces (chan-recv c f) (recv c v) (f v)
   chan-tau  : forall {p} -> Reduces (chan-tau p) tau p
-  par-L     : forall {c pl pr p'} -> Reduces pl c p' -> Reduces (par pl pr) c (par p' pr)
-  par-R     : forall {c pl pr p'} -> Reduces pr c p' -> Reduces (par pl pr) c (par pl p')
-  par-B     : forall {c pl pr pl' pr'} -> Reduces pl c pl' -> Reduces pr (flip-reduc-op c) pr'
+  par-L     : forall {c pl pr p'} -> Reduces {penv} pl c p' -> Reduces (par pl pr) c (par p' pr)
+  par-R     : forall {c pl pr p'} -> Reduces {penv} pr c p' -> Reduces (par pl pr) c (par pl p')
+  par-B     : forall {c pl pr pl' pr'} -> Reduces {penv} pl c pl' -> Reduces {penv} pr (flip-reduc-op c) pr'
               -> Reduces (par pl pr) tau (par pl' pr')
-  indet     : forall {c q S f} {s : S} -> Reduces (f s) c q -> Reduces (indet f) c q
-  const     : forall {c p n f} -> Reduces (penv n f) c p -> Reduces (const n f) c p
-  rename    : forall {c p q r} -> Reduces p c q -> Reduces (rename r p) (map-reduc-op r c) (rename r q)
-  hide      : forall {c p q f} {z : T (filter-reduc-op f c)} -> Reduces p c q -> Reduces (hide f p) c (hide f q)
-  if        : forall {c p q} -> Reduces p c q -> Reduces (if true p) c q
+  indet     : forall {c q S f} {s : S} -> Reduces {penv} (f s) c q -> Reduces (indet f) c q
+  const     : forall {c p n f} -> Reduces {penv} (penv n f) c p -> Reduces (const n f) c p
+  rename    : forall {c p q r} -> Reduces {penv} p c q -> Reduces (rename r p) (map-reduc-op r c) (rename r q)
+  hide      : forall {c p q f} {z : T (filter-reduc-op f c)} -> Reduces {penv} p c q -> Reduces (hide f p) c (hide f q)
+  if        : forall {c p q} -> Reduces {penv} p c q -> Reduces (if true p) c q
