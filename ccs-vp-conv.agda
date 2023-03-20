@@ -2,6 +2,7 @@ open import Data.Bool
 open import Relation.Binary.PropositionalEquality
 open import Relation.Nullary.Decidable
 open import Data.Empty
+open import Data.Unit
 
 import ccs as ccs-real
 import ccs-vp as ccs-vp-real
@@ -42,7 +43,7 @@ conv-prog (ccs-vp.indet f) = ccs.indet \ s -> conv-prog (f s)
 conv-prog (ccs-vp.const n args) = ccs.const (conv-n n args)
 conv-prog (ccs-vp.rename f p) = ccs.rename (conv-rename f) (conv-prog p)
 conv-prog (ccs-vp.hide f p) = ccs.hide (conv-hide f) (conv-prog p)
-conv-prog (ccs-vp.if b p) = if b then conv-prog p else ccs.deadlock
+conv-prog (ccs-vp.if b p) = ccs.indet {S = if b then ⊤ else ⊥} (\ _ -> conv-prog p)
 
 conv-penv : ((conv-n n env) : Conv-N) -> ccs.Prog
 conv-penv (conv-n n env) = conv-prog (penv n env)
@@ -72,7 +73,7 @@ conv-reduces (ccs-vp.hide {c} {z = z} r) with c
 ... | ccs-vp.send _ _ = ccs.hide {z = z} (conv-reduces r)
 ... | ccs-vp.recv _ _ = ccs.hide {z = z} (conv-reduces r)
 ... | ccs-vp.tau      = ccs.hide {z = z} (conv-reduces r)
-conv-reduces (ccs-vp.if r) = conv-reduces r
+conv-reduces (ccs-vp.if r) = ccs-real.indet (conv-reduces r)
 
 unconv-reduces : forall {p1 c p2} -> ccs.Reduces {conv-penv} (conv-prog p1) (conv-reduc-op c) (conv-prog p2) -> ccs-vp.Reduces {penv} p1 c p2
 unconv-reduces {op1} {oc} {op2} = helper {op1} {oc} {op2} refl refl refl
