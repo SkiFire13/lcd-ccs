@@ -3,6 +3,7 @@ open import Relation.Binary.PropositionalEquality
 open import Relation.Nullary.Decidable
 open import Data.Empty
 open import Data.Unit
+open import Function.Base
 
 import ccs as ccs-real
 import ccs-vp as ccs-vp-real
@@ -11,6 +12,7 @@ module ccs-vp-conv
   {C N X V : Set}
   {n-fv : N -> X -> Bool}
   {penv : (n : N) -> ((x : X) -> {_ : T (n-fv n x)} -> V) -> ccs-vp-real.Prog {C} {N} {X} {V} {n-fv}}
+  {v-proof : V}
   where
 
 record Conv-C : Set where
@@ -88,10 +90,10 @@ conv-reduces (ccs-vp.if r) = ccs-real.indet (conv-reduces r)
 -- IDEA : Wrap V/Bool when desugaring to indet
 
 conv-rename-eq : forall {f1} {f2} -> conv-rename f1 ≡ conv-rename f2 -> f1 ≡ f2
-conv-rename-eq {f1} {f2} eq = {!   !}
+conv-rename-eq {f1} {f2} eq = cong (\ f c -> Conv-C.chan (f (conv-c c v-proof))) eq
 
 conv-hide-eq : forall {f1} {f2} -> conv-hide f1 ≡ conv-hide f2 -> f1 ≡ f2
-conv-hide-eq {f1} {f2} eq = {!   !}
+conv-hide-eq {f1} {f2} eq = cong (\ f c -> f (conv-c c v-proof)) eq
 
 conv-prog-eq : forall {p q} -> conv-prog p ≡ conv-prog q -> p ≡ q
 conv-prog-eq {ccs-vp-real.chan-send x x₁ p} {ccs-vp-real.chan-send x₂ x₃ q} eq with ccs.chan-eq-c eq | conv-prog-eq (ccs.chan-eq-p eq)
@@ -110,7 +112,7 @@ conv-prog-eq {ccs-vp-real.const n x} {ccs-vp-real.const n₁ x₁} eq with ccs.c
 ... | refl = refl
 conv-prog-eq {ccs-vp-real.rename x p} {ccs-vp-real.rename x₁ q} eq with conv-rename-eq (ccs.rename-eq-f eq) | conv-prog-eq (ccs.rename-eq-p eq)
 ... | refl | refl = refl
-conv-prog-eq {ccs-vp-real.hide x p} {ccs-vp-real.hide x₁ q} eq  with conv-hide-eq (ccs.hide-eq-f eq) | conv-prog-eq (ccs.hide-eq-p eq)
+conv-prog-eq {ccs-vp-real.hide x p} {ccs-vp-real.hide x₁ q} eq with conv-hide-eq (ccs.hide-eq-f eq) | conv-prog-eq (ccs.hide-eq-p eq)
 ... | refl | refl = refl
 conv-prog-eq {ccs-vp-real.if x p} {ccs-vp-real.chan-recv x₁ x₂} eq with x | ccs.indet-eq-S eq
 conv-prog-eq {ccs-vp-real.if false p} {ccs-vp-real.chan-recv x₁ x₂} eq | true | refl = {!  !}
@@ -160,4 +162,4 @@ unconv-reduces {op1} {oc} {op2} = helper {op1} {oc} {op2} refl refl refl
   -- helper {ccs-vp.chan-recv _ _} refl refl refl (ccs.indet ccs.chan) = ccs-vp.chan-recv
   -- helper {ccs-vp.rename _ _} refl refl refl (ccs.rename r) = ccs-vp.rename (unconv-reduces r)
   -- helper {ccs-vp.hide _ _} refl refl refl (ccs.hide r) = ccs-vp.hide (unconv-reduces r)
-   
+     
