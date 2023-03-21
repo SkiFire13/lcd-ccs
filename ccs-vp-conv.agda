@@ -97,13 +97,11 @@ unconv-reduces {op1} {oc} {op2} = helper {op1} {oc} {op2} refl refl refl
   helper {ccs-vp.if true _} refl refl refl (ccs.indet r) = ccs-vp.if (unconv-reduces r)
   helper {ccs-vp.const _ _} refl refl refl (ccs.const r) = ccs-vp.const (unconv-reduces r)
   
-  
-  helper {ccs-vp.chan-send _ _ _} refl refl refl ccs.chan = ccs-vp.chan-send
-  helper {ccs-vp.chan-recv _ _} refl refl refl ccs.chan = ccs-vp.chan-recv
+  helper {ccs-vp.chan-send _ _ _} {ccs-vp.send _ _} refl refl refl ccs.chan = ccs-vp.chan-send
   helper {ccs-vp.chan-tau _} refl refl refl ccs.chan = ccs-vp.chan-tau
   helper {ccs-vp.par _ _} refl refl refl (ccs.par-L r) = ccs-vp.par-L (unconv-reduces r)
   helper {ccs-vp.par _ _} refl refl refl (ccs.par-R r) = ccs-vp.par-R (unconv-reduces r)
   helper {ccs-vp.par _ _} refl refl refl (ccs.par-B r1 r2) = ccs-vp.par-L (unconv-reduces r1) (unconv-reduces r2)
-  helper {ccs-vp.chan-recv _ _} refl refl refl (ccs.indet r) = unconv-reduces r
+  helper {ccs-vp.chan-recv _ _} refl refl refl (ccs.indet ccs.chan) = ccs-vp.chan-recv
   helper {ccs-vp.rename _ _} refl refl refl (ccs.rename r) = ccs-vp.rename (unconv-reduces r)
   helper {ccs-vp.hide _ _} refl refl refl (ccs.hide r) = ccs-vp.hide (unconv-reduces r)
