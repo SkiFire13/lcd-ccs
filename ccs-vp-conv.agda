@@ -85,6 +85,41 @@ conv-reduces (ccs-vp.hide {c} {z = z} r) with c
 ... | ccs-vp.tau      = ccs.hide {z = z} (conv-reduces r)
 conv-reduces (ccs-vp.if r) = ccs-real.indet (conv-reduces r)
 
+-- IDEA : Wrap V/Bool when desugaring to indet
+
+conv-rename-eq : forall {f1} {f2} -> conv-rename f1 ≡ conv-rename f2 -> f1 ≡ f2
+conv-rename-eq {f1} {f2} eq = {!   !}
+
+conv-hide-eq : forall {f1} {f2} -> conv-hide f1 ≡ conv-hide f2 -> f1 ≡ f2
+conv-hide-eq {f1} {f2} eq = {!   !}
+
+conv-prog-eq : forall {p q} -> conv-prog p ≡ conv-prog q -> p ≡ q
+conv-prog-eq {ccs-vp-real.chan-send x x₁ p} {ccs-vp-real.chan-send x₂ x₃ q} eq with ccs.chan-eq-c eq | conv-prog-eq (ccs.chan-eq-p eq)
+... | refl | refl = refl
+conv-prog-eq {ccs-vp-real.chan-recv x x₁} {ccs-vp-real.chan-recv x₂ x₃} eq = {!  !}
+conv-prog-eq {ccs-vp-real.chan-recv x x₁} {ccs-vp-real.indet x₂} eq = {!   !}
+conv-prog-eq {ccs-vp-real.chan-recv x x₁} {ccs-vp-real.if x₂ q} eq = {!   !}
+conv-prog-eq {ccs-vp-real.chan-tau p} {ccs-vp-real.chan-tau q} eq with ccs.chan-eq-c eq | conv-prog-eq (ccs.chan-eq-p eq)
+... | refl | refl = refl
+conv-prog-eq {ccs-vp-real.par p p₁} {ccs-vp-real.par q q₁} eq with conv-prog-eq (ccs.par-eq-l eq) | conv-prog-eq (ccs.par-eq-r eq)
+... | refl | refl = refl
+conv-prog-eq {ccs-vp-real.indet x} {ccs-vp-real.chan-recv x₁ x₂} eq = {!   !}
+conv-prog-eq {ccs-vp-real.indet x} {ccs-vp-real.indet x₁} eq = {!   !}
+conv-prog-eq {ccs-vp-real.indet x} {ccs-vp-real.if x₁ q} eq = {!   !}
+conv-prog-eq {ccs-vp-real.const n x} {ccs-vp-real.const n₁ x₁} eq with ccs.const-eq-n eq
+... | refl = refl
+conv-prog-eq {ccs-vp-real.rename x p} {ccs-vp-real.rename x₁ q} eq with conv-rename-eq (ccs.rename-eq-f eq) | conv-prog-eq (ccs.rename-eq-p eq)
+... | refl | refl = refl
+conv-prog-eq {ccs-vp-real.hide x p} {ccs-vp-real.hide x₁ q} eq  with conv-hide-eq (ccs.hide-eq-f eq) | conv-prog-eq (ccs.hide-eq-p eq)
+... | refl | refl = refl
+conv-prog-eq {ccs-vp-real.if x p} {ccs-vp-real.chan-recv x₁ x₂} eq with x | ccs.indet-eq-S eq
+conv-prog-eq {ccs-vp-real.if false p} {ccs-vp-real.chan-recv x₁ x₂} eq | true | refl = {!  !}
+conv-prog-eq {ccs-vp-real.if true p} {ccs-vp-real.chan-recv x₁ x₂} eq | true | refl = {!   !}
+conv-prog-eq {ccs-vp-real.if false p} {ccs-vp-real.chan-recv x₁ x₂} eq | false | refl = {!   !}
+conv-prog-eq {ccs-vp-real.if true p} {ccs-vp-real.chan-recv x₁ x₂} eq | false | refl = {!   !}
+conv-prog-eq {ccs-vp-real.if x p} {ccs-vp-real.indet x₁} eq = {!   !}
+conv-prog-eq {ccs-vp-real.if x p} {ccs-vp-real.if x₁ q} eq = {!   !}
+
 unconv-reduces : forall {p1 c p2} -> ccs.Reduces {conv-penv} (conv-prog p1) (conv-reduc-op c) (conv-prog p2) -> ccs-vp.Reduces {penv} p1 c p2
 unconv-reduces {op1} {oc} {op2} = helper {op1} {oc} {op2} refl refl refl
   where
@@ -94,16 +129,24 @@ unconv-reduces {op1} {oc} {op2} = helper {op1} {oc} {op2} refl refl refl
   helper {ccs-vp-real.chan-tau p1} {ccs-vp-real.send x x₁} {p2} {.(conv-prog (ccs-vp.chan-tau p1))} {.ccs.tau} {.(conv-prog p1)} refl e2 () ccs-real.chan
   helper {ccs-vp-real.chan-send x₂ x₃ p1} {ccs-vp-real.recv x x₁} {p2} {.(conv-prog (ccs-vp.chan-send x₂ x₃ p1))} {.(ccs.send (conv-c x₂ x₃))} {.(conv-prog p1)} refl e2 () ccs-real.chan
   helper {ccs-vp-real.chan-tau p1} {ccs-vp-real.recv x x₁} {p2} {.(conv-prog (ccs-vp.chan-tau p1))} {.ccs.tau} {.(conv-prog p1)} refl e2 () ccs-real.chan
-  helper {p1} {ccs-vp.tau} {p2} {.(ccs.chan cc cp2)} {cc} {cp2} e1 e2 e3 ccs.chan = {!  !}
-  helper {ccs-vp.par p1 p3} {rc} {ccs-vp.par p2 p4} {.(ccs.par (conv-prog p1) (conv-prog p3))} {.(conv-reduc-op rc)} {.(ccs.par _ (conv-prog p3))} refl e2 refl (ccs.par-L r) = {! !}
+  helper {p1} {ccs-vp.tau} {p2} {.(ccs.chan cc cp2)} {cc} {cp2} e1 e2 e3 ccs.chan = {! !}
+  helper {ccs-vp.par p1 p3} {rc} {ccs-vp.par p2 p4} {.(ccs.par (conv-prog p1) (conv-prog p3))} {.(conv-reduc-op rc)} {.(ccs.par _ (conv-prog p3))} refl e2 refl (ccs.par-L r) with ccs.par-eq-l e2 | ccs.par-eq-r e2
+  ... | refl | eq = {!  !}
   helper {ccs-vp.par p1 p3} {rc} {ccs-vp.par p2 p4} {.(ccs.par (conv-prog p1) (conv-prog p3))} {.(conv-reduc-op rc)} {.(ccs.par (conv-prog p1) _)} refl e2 refl (ccs.par-R r) = {! !}
-  helper {ccs-vp.par p1 p3} {rc} {ccs-vp.par p2 p4} {.(ccs.par (conv-prog p1) (conv-prog p3))} {.ccs.tau} {.(ccs.par (conv-prog p2) (conv-prog p4))} refl refl e3 (ccs.par-B r r₁) = {!  !}
+  helper {ccs-vp-real.par p1 p3} {ccs-vp-real.tau} {ccs-vp-real.par p2 p4} {.(ccs-real.par (conv-prog p1) (conv-prog p3))} {.ccs-real.tau} {.(ccs-real.par (conv-prog p2) (conv-prog p4))} refl refl refl (ccs-real.par-B {c} r r₁) with c
+  ... | ccs.send _ = ccs-vp.par-B (unconv-reduces r) (unconv-reduces r₁)
+  ... | ccs.recv _ = ccs-vp.par-B (unconv-reduces r) (unconv-reduces r₁)
+  ... | ccs.tau    = ccs-vp.par-B (unconv-reduces r) (unconv-reduces r₁)
   helper {ccs-vp-real.chan-recv x x₁} {ccs-vp-real.recv x₂ x₃} {p2} {.(ccs.indet (conv-recv x x₁))} {.(conv-reduc-op (ccs-vp.recv x₂ x₃))} {.(conv-prog p2)} refl refl refl (ccs-real.indet r) = {!  !}
   helper {ccs-vp.indet f} {rc} {p2} {.(ccs.indet (conv-indet f))} {.(conv-reduc-op rc)} {.(conv-prog p2)} refl refl refl (ccs.indet r) = ccs-vp.indet (unconv-reduces r)
   helper {ccs-vp.if true p1} {rc} {p2} {.(ccs.indet (conv-if p1))} {.(conv-reduc-op rc)} {.(conv-prog p2)} refl refl refl (ccs.indet r) = ccs-vp.if (unconv-reduces r)
   helper {ccs-vp.const n x} {rc} {p2} {.(ccs.const (conv-n n x))} {.(conv-reduc-op rc)} {.(conv-prog p2)} refl refl refl (ccs.const r) = ccs-vp.const (unconv-reduces r)
-  helper {ccs-vp.rename x p1} {rc} {p2} {.(ccs.rename (conv-rename x) (conv-prog p1))} {.(ccs.map-chan-op (conv-rename x) _)} {.(ccs.rename (conv-rename x) _)} refl e2 e3 (ccs.rename r) = {!  !}
-  helper {ccs-vp.hide x p1} {rc} {p2} {.(ccs.hide (conv-hide x) (conv-prog p1))} {.(conv-reduc-op rc)} {.(ccs.hide (conv-hide x) _)} refl e2 refl (ccs.hide r) = {!  !}
+  helper {ccs-vp-real.rename x p1} {ccs-vp-real.send x₂ x₃} {ccs-vp-real.rename x₁ p2} {.(ccs-real.rename (conv-rename x) (conv-prog p1))} {.(ccs-real.send (conv-c (x chan) value))} {.(ccs-real.rename (conv-rename x) _)} refl e2 e3 (ccs-real.rename {ccs-real.send (conv-c chan value)} r) = {!  !}
+  helper {ccs-vp-real.rename x p1} {ccs-vp-real.recv x₂ x₃} {ccs-vp-real.rename x₁ p2} {.(ccs-real.rename (conv-rename x) (conv-prog p1))} {.(ccs-real.recv (conv-c (x chan) value))} {.(ccs-real.rename (conv-rename x) _)} refl e2 e3 (ccs-real.rename {ccs-real.recv (conv-c chan value)} r) = {!  !}
+  helper {ccs-vp-real.rename x p1} {ccs-vp-real.tau} {ccs-vp-real.rename x₁ p2} {.(ccs-real.rename (conv-rename x) (conv-prog p1))} {.ccs-real.tau} {.(ccs-real.rename (conv-rename x) _)} refl e2 e3 (ccs-real.rename {ccs-real.tau} r) = {!  !}
+  helper {ccs-vp-real.hide x p1} {rc} {ccs-vp-real.hide x₁ p2} {.(ccs-real.hide (conv-hide x) (conv-prog p1))} {.(conv-reduc-op rc)} {.(ccs-real.hide (conv-hide x) _)} refl e2 refl (ccs-real.hide {q = _} {z = z} r) with (ccs.filter-chan-op (conv-hide x) (conv-reduc-op rc))
+  helper {ccs-vp-real.hide x p1} {rc} {ccs-vp-real.hide x₁ p2} {.(conv-prog (ccs-vp-real.hide x p1))} {.(conv-reduc-op rc)} {ccs-real.hide .(conv-hide x) _} refl e2 refl (ccs-real.hide {q = q} {z = tt} r) | true = {!   !}
+  helper {ccs-vp-real.hide x p1} {rc} {ccs-vp-real.hide x₁ p2} {.(conv-prog (ccs-vp-real.hide x p1))} {.(conv-reduc-op rc)} {ccs-real.hide .(conv-hide x) _} refl e2 refl (ccs-real.hide {q = q} {z = ()} r) | false
  
   -- helper {ccs-vp.indet _} refl refl refl (ccs.indet r) = ccs-vp.indet (unconv-reduces r)
   -- helper {ccs-vp.if true _} refl refl refl (ccs.indet r) = ccs-vp.if (unconv-reduces r)
@@ -117,3 +160,4 @@ unconv-reduces {op1} {oc} {op2} = helper {op1} {oc} {op2} refl refl refl
   -- helper {ccs-vp.chan-recv _ _} refl refl refl (ccs.indet ccs.chan) = ccs-vp.chan-recv
   -- helper {ccs-vp.rename _ _} refl refl refl (ccs.rename r) = ccs-vp.rename (unconv-reduces r)
   -- helper {ccs-vp.hide _ _} refl refl refl (ccs.hide r) = ccs-vp.hide (unconv-reduces r)
+   
