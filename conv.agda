@@ -14,35 +14,39 @@ module conv
   {penv : (n : N) -> ((x : X) -> {_ : T (n-fv n x)} -> V) -> ccs-vp.Proc {C} {N} {X} {V} {n-fv}}
   where
 
+-- The type of the channels (C) in the converted CCS
 record Conv-C : Set where
   constructor conv-c
   field
     chan : C
     value : V
 
+-- The type of the program constants (or, their names N) in the converted CCS
 record Conv-N : Set where
   constructor conv-n
   field
     name : N
     args : (x : X) -> {_ : T (n-fv name x)} -> V
 
+-- Now that we defined the needed types, open the modules with the correct values for the arguments
+open ccs {Conv-C} {Conv-N} renaming (Reduces to ccs-Reduces)
+open ccs-vp {C} {N} {X} {V} {n-fv} renaming (Reduces to ccs-vp-Reduces)
 
-open ccs {Conv-C} {Conv-N}
-open ccs-vp {C} {N} {X} {V} {n-fv}
-
+-- Convert a CCS-VP process to a normal CCS Process
+-- the implementation is below, after a couple of helper co-recursive functions
 conv-proc : ccs-vp.Proc -> ccs.Proc
 
 conv-recv : C -> (V -> ccs-vp.Proc) -> V -> ccs.Proc
-conv-recv c f v = chan (recv (conv-c c v)) (conv-proc (f v))
+conv-recv c f = \ v -> chan (recv (conv-c c v)) (conv-proc (f v))
 
 conv-indet : {S : Set} -> (S -> ccs-vp.Proc) -> S -> ccs.Proc
-conv-indet f s = conv-proc (f s)
+conv-indet f = \ s -> conv-proc (f s)
 
 conv-rename : (C -> C) -> Conv-C -> Conv-C
-conv-rename f (conv-c c v) = conv-c (f c) v
+conv-rename f = \ (conv-c c v) -> conv-c (f c) v
 
 conv-hide : (C -> Bool) -> Conv-C -> Bool
-conv-hide f (conv-c c _) = f c
+conv-hide f = \ (conv-c c _) -> f c
 
 conv-proc (chan-send c v p) = chan (send (conv-c c v)) (conv-proc p)
 conv-proc (chan-recv c f) = indet (conv-recv c f)
@@ -54,19 +58,21 @@ conv-proc (rename f p) = rename (conv-rename f) (conv-proc p)
 conv-proc (hide f p) = hide (conv-hide f) (conv-proc p)
 conv-proc (if b p) = if b then (conv-proc p) else ccs.deadlock
 
+-- The converted process environment
 conv-penv : ((conv-n n env) : Conv-N) -> ccs.Proc
 conv-penv (conv-n n env) = conv-proc (penv n env)
 
+-- Convert reduction operations in CCS-VP into channel operations in CCS
 conv-reduc-op : ReducOp -> ChanOp
 conv-reduc-op (send c v) = send (conv-c c v)
 conv-reduc-op (recv c v) = recv (conv-c c v)
 conv-reduc-op tau = tau
 
-ccs-Reduces = ccs.Reduces {Conv-C} {Conv-N} {conv-penv}
-ccs-vp-Reduces = ccs-vp.Reduces {C} {N} {X} {V} {n-fv} {penv}
-
-conv-reduces : forall {p1 c p2} -> ccs-vp-Reduces p1 c p2
-                -> ccs-Reduces (conv-proc p1) (conv-reduc-op c) (conv-proc p2)
+-- Convert a reduction relation from CCS-VP to CCS, or in other words,
+-- prove that if there's a reduction relation between two CCS-VP processes
+-- then there's a corresponding relation between the converted processess too.
+conv-reduces : forall {p1 c p2} -> ccs-vp-Reduces {penv} p1 c p2
+                -> ccs-Reduces {conv-penv} (conv-proc p1) (conv-reduc-op c) (conv-proc p2)
 conv-reduces chan-send = chan
 conv-reduces chan-recv = indet chan
 conv-reduces chan-tau = chan
@@ -88,17 +94,24 @@ conv-reduces (hide {c} {z = z} r) with c
 ... | tau      = hide {z = z} (conv-reduces r)
 conv-reduces (if r) = conv-reduces r
 
-unconv-need-exists : ¬ (forall {p1 c p2} -> ccs-Reduces (conv-proc p1) (conv-reduc-op c) (conv-proc p2)
-                      -> ccs-vp-Reduces p1 c p2)
+-- Prove that the converse of `conv-reduces` is not true, that is if there's
+-- a reduction relation between two CCS processes then it's not guaranteed that
+-- there's a reduction relation between CCS-VP processes that can be converted into them. 
+unconv-need-exists : ¬ (forall {p1 c p2} -> ccs-Reduces {conv-penv} (conv-proc p1) (conv-reduc-op c) (conv-proc p2)
+                      -> ccs-vp-Reduces {penv} p1 c p2)
 unconv-need-exists f with f {chan-tau ccs-vp.deadlock} {tau} {if true ccs-vp.deadlock} chan
 ... | ()
 
-unconv-reduces : forall {p1 c cp2} -> ccs-Reduces (conv-proc p1) (conv-reduc-op c) cp2
-                  -> ∃[ p2 ] (cp2 ≡ conv-proc p2 × ccs-vp-Reduces p1 c p2)
+-- Prove the less-strong version of the previous (false) theorem, that is
+-- if a CCS-VP process converted to CCS has a relation with another CCS process
+-- then there exists a corresponding relation between the initial CCS-VP process
+-- and some other CCS-VP process that can be converted in the initial second CCS process.
+unconv-reduces : forall {p1 c cp2} -> ccs-Reduces {conv-penv} (conv-proc p1) (conv-reduc-op c) cp2
+                  -> ∃[ p2 ] (cp2 ≡ conv-proc p2 × ccs-vp-Reduces {penv} p1 c p2)
 unconv-reduces = helper refl refl
   where
-  helper : forall {p1 c q1 cc cp2} -> q1 ≡ conv-proc p1 -> cc ≡ conv-reduc-op c -> ccs-Reduces q1 cc cp2
-            -> ∃[ p2 ] (cp2 ≡ conv-proc p2 × ccs-vp-Reduces p1 c p2)
+  helper : forall {p1 c q1 cc cp2} -> q1 ≡ conv-proc p1 -> cc ≡ conv-reduc-op c -> ccs-Reduces {conv-penv} q1 cc cp2
+            -> ∃[ p2 ] (cp2 ≡ conv-proc p2 × ccs-vp-Reduces {penv} p1 c p2)
   helper {chan-send _ _ p1} {send _ _} refl refl chan = p1 , refl , chan-send
   helper {chan-recv _ f} {recv _ v} refl refl (indet chan) = f v , refl , chan-recv
   helper {chan-tau p1} {tau} refl refl chan = p1 , refl , chan-tau
@@ -124,8 +137,8 @@ unconv-reduces = helper refl refl
     unconv-map-eq {recv (conv-c c v)} {recv _ _} refl = recv c v , refl , refl
     unconv-map-eq {tau} {tau} refl = tau , refl , refl
     rename-helper : forall {f p1 c cc cp2} -> cc ≡ conv-reduc-op c
-                -> ccs-Reduces (rename (conv-rename f) (conv-proc p1)) cc cp2
-                -> ∃[ p2 ] (cp2 ≡ conv-proc p2 × ccs-vp-Reduces (rename f p1) c p2)
+                -> ccs-Reduces {conv-penv} (rename (conv-rename f) (conv-proc p1)) cc cp2
+                -> ∃[ p2 ] (cp2 ≡ conv-proc p2 × ccs-vp-Reduces {penv} (rename f p1) c p2)
     rename-helper {f} {p1} e (rename r) with unconv-map-eq e
     ... | c' , refl , refl with unconv-reduces {p1} r
     ... | p' , refl , r' = rename f p' , refl , rename r'

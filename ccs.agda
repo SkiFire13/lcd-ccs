@@ -1,14 +1,17 @@
-module ccs {C N : Set} where
--- C = Channel, N = Name (Constant)
-
 open import Data.Bool
 open import Data.Empty
 
+-- C = Set of the Channels
+-- N = Set of the Names of the constant processes
+module ccs {C N : Set} where
+
+-- A channel operation
 data ChanOp : Set where
   send  : C -> ChanOp
   recv  : C -> ChanOp
   tau   : ChanOp
 
+-- A CCS Process
 data Proc : Set₁ where
   chan    : ChanOp -> Proc -> Proc
   par     : Proc -> Proc -> Proc
@@ -17,8 +20,10 @@ data Proc : Set₁ where
   rename  : (C -> C) -> Proc -> Proc
   hide    : (C -> Bool) -> Proc -> Proc
 
+-- The "desugaring" of the deadlock CCS Process
 deadlock = indet ⊥-elim
 
+-- Utility functions used in `Reduces`
 flip-chan-op : ChanOp -> ChanOp
 flip-chan-op (send c) = recv c
 flip-chan-op (recv c) = send c
@@ -34,6 +39,10 @@ filter-chan-op f (send c) = f c
 filter-chan-op f (recv c) = f c
 filter-chan-op f tau = true
 
+-- A relation of reduction between two CCS processes with a channel operation.
+-- It is also parameterized over the process environment (`penv`), that is the
+-- mapping from the name of constants to their process.
+-- (For technical reasons this can't be included in the process type itself)
 data Reduces {penv : N -> Proc} : Proc -> ChanOp -> Proc -> Set₁ where
   chan    : forall {c p} -> Reduces (chan c p) c p
   par-L   : forall {c pl pr p'} -> Reduces {penv} pl c p' -> Reduces (par pl pr) c (par p' pr)
