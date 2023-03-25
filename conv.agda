@@ -125,7 +125,7 @@ unconv-reduces = helper refl refl
     unconv-map-eq {tau} {tau} refl = tau , refl , refl
     rename-helper : forall {x p1 c cc q2} -> cc ≡ conv-reduc-op c
                 -> ccs-Reduces (rename (conv-rename x) (conv-prog p1)) cc q2
-                -> Σ[ p2 ∈ ccs-vp.Prog ] q2 ≡ conv-prog p2 × ccs-vp-Reduces (rename x p1) c p2
+                -> ∃[ p2 ] (q2 ≡ conv-prog p2 × ccs-vp-Reduces (rename x p1) c p2)
     rename-helper {x} {p1} e3 (rename r) with unconv-map-eq e3
     ... | c' , refl , refl with unconv-reduces {p1} r
     ... | p' , refl , r' = rename x p' , refl , rename r'
