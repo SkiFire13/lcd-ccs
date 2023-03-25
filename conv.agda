@@ -93,12 +93,12 @@ unconv-need-exists : ¬ (forall {p1 c p2} -> ccs-Reduces (conv-prog p1) (conv-re
 unconv-need-exists f with f {chan-tau ccs-vp.deadlock} {tau} {if true ccs-vp.deadlock} chan
 ... | ()
 
-unconv-reduces : forall {p1 c q2} -> ccs-Reduces (conv-prog p1) (conv-reduc-op c) q2
-                  -> ∃[ p2 ] (q2 ≡ conv-prog p2 × ccs-vp-Reduces p1 c p2)
+unconv-reduces : forall {p1 c cp2} -> ccs-Reduces (conv-prog p1) (conv-reduc-op c) cp2
+                  -> ∃[ p2 ] (cp2 ≡ conv-prog p2 × ccs-vp-Reduces p1 c p2)
 unconv-reduces = helper refl refl
   where
-  helper : forall {p1 c q1 cc q2} -> q1 ≡ conv-prog p1 -> cc ≡ conv-reduc-op c -> ccs-Reduces q1 cc q2
-            -> ∃[ p2 ] (q2 ≡ conv-prog p2 × ccs-vp-Reduces p1 c p2)
+  helper : forall {p1 c q1 cc cp2} -> q1 ≡ conv-prog p1 -> cc ≡ conv-reduc-op c -> ccs-Reduces q1 cc cp2
+            -> ∃[ p2 ] (cp2 ≡ conv-prog p2 × ccs-vp-Reduces p1 c p2)
   helper {chan-send _ _ p1} {send _ _} refl refl chan = p1 , refl , chan-send
   helper {chan-recv _ f} {recv _ v} refl refl (indet chan) = f v , refl , chan-recv
   helper {chan-tau p1} {tau} refl refl chan = p1 , refl , chan-tau
@@ -112,32 +112,32 @@ unconv-reduces = helper refl refl
   ... | pl' , refl , rl | pr' , refl , rr = par pl' pr' , refl , par-B rl rr
   helper {par pl pr} {tau} refl refl (par-B {tau} r1 r2) with unconv-reduces {pl} r1 | unconv-reduces {pr} r2
   ... | pl' , refl , rl | pr' , refl , rr = par pl' pr' , refl , par-B rl rr
-  helper {indet x} {c} refl refl (indet {s = s} r) with unconv-reduces {x s} {c} r
+  helper {indet f} {c} refl refl (indet {s = s} r) with unconv-reduces {f s} {c} r
   ... | p' , refl , r' = p' , refl , indet {s = s} r'
-  helper {const n x} {c} refl refl (const r) with unconv-reduces {penv n x} r
+  helper {const n args} {c} refl refl (const r) with unconv-reduces {penv n args} r
   ... | p' , refl , r' = p' , refl , const r'
-  helper {rename x p1} {c} refl refl r = rename-helper refl r
+  helper {rename f p1} {c} refl refl r = rename-helper refl r
     where
-    unconv-map-eq : forall {cc c x} -> map-chan-op (conv-rename x) cc ≡ conv-reduc-op c
-                      -> ∃[ c' ] (cc ≡ conv-reduc-op c' × c ≡ map-reduc-op x c')
+    unconv-map-eq : forall {cc c f} -> map-chan-op (conv-rename f) cc ≡ conv-reduc-op c
+                      -> ∃[ c' ] (cc ≡ conv-reduc-op c' × c ≡ map-reduc-op f c')
     unconv-map-eq {send (conv-c c v)} {send _ _} refl = send c v , refl , refl
     unconv-map-eq {recv (conv-c c v)} {recv _ _} refl = recv c v , refl , refl
     unconv-map-eq {tau} {tau} refl = tau , refl , refl
-    rename-helper : forall {x p1 c cc q2} -> cc ≡ conv-reduc-op c
-                -> ccs-Reduces (rename (conv-rename x) (conv-prog p1)) cc q2
-                -> ∃[ p2 ] (q2 ≡ conv-prog p2 × ccs-vp-Reduces (rename x p1) c p2)
-    rename-helper {x} {p1} e3 (rename r) with unconv-map-eq e3
+    rename-helper : forall {f p1 c cc cp2} -> cc ≡ conv-reduc-op c
+                -> ccs-Reduces (rename (conv-rename f) (conv-prog p1)) cc cp2
+                -> ∃[ p2 ] (cp2 ≡ conv-prog p2 × ccs-vp-Reduces (rename f p1) c p2)
+    rename-helper {f} {p1} e (rename r) with unconv-map-eq e
     ... | c' , refl , refl with unconv-reduces {p1} r
-    ... | p' , refl , r' = rename x p' , refl , rename r'
-  helper {hide x p1} {c} refl refl (hide {z = z} r) with unconv-reduces {p1} r
-  ... | p' , refl , r' = hide x p' , refl , hide {z = unconv-z {x} {c} z} r'
+    ... | p' , refl , r' = rename f p' , refl , rename r'
+  helper {hide f p1} {c} refl refl (hide {z = z} r) with unconv-reduces {p1} r
+  ... | p' , refl , r' = hide f p' , refl , hide {z = unconv-z {f} {c} z} r'
     where
-    unconv-z : forall {x c} -> T (filter-chan-op (conv-hide x) (conv-reduc-op c)) -> T (filter-reduc-op x c)
-    unconv-z {x} {send c _} t with x c
+    unconv-z : forall {f c} -> T (filter-chan-op (conv-hide f) (conv-reduc-op c)) -> T (filter-reduc-op f c)
+    unconv-z {f} {send c _} _ with f c
     ... | true = tt
-    unconv-z {x} {recv c _} t with x c
+    unconv-z {f} {recv c _} _ with f c
     ... | true = tt
-    unconv-z {x} {tau} t = tt
+    unconv-z {f} {tau} _ = tt
   helper {if false p1} refl refl (indet {s = ()} r)
   helper {if true p1} refl refl r with unconv-reduces {p1} r
   ... | p' , refl , r' = p' , refl , if r'
