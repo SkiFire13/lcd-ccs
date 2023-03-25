@@ -9,13 +9,13 @@ data ChanOp : Set where
   recv  : C -> ChanOp
   tau   : ChanOp
 
-data Prog : Set₁ where
-  chan    : ChanOp -> Prog -> Prog
-  par     : Prog -> Prog -> Prog
-  indet   : {S : Set} -> (S -> Prog) -> Prog
-  const   : N -> Prog
-  rename  : (C -> C) -> Prog -> Prog
-  hide    : (C -> Bool) -> Prog -> Prog
+data Proc : Set₁ where
+  chan    : ChanOp -> Proc -> Proc
+  par     : Proc -> Proc -> Proc
+  indet   : {S : Set} -> (S -> Proc) -> Proc
+  const   : N -> Proc
+  rename  : (C -> C) -> Proc -> Proc
+  hide    : (C -> Bool) -> Proc -> Proc
 
 deadlock = indet ⊥-elim
 
@@ -34,7 +34,7 @@ filter-chan-op f (send c) = f c
 filter-chan-op f (recv c) = f c
 filter-chan-op f tau = true
 
-data Reduces {penv : N -> Prog} : Prog -> ChanOp -> Prog -> Set₁ where
+data Reduces {penv : N -> Proc} : Proc -> ChanOp -> Proc -> Set₁ where
   chan    : forall {c p} -> Reduces (chan c p) c p
   par-L   : forall {c pl pr p'} -> Reduces {penv} pl c p' -> Reduces (par pl pr) c (par p' pr)
   par-R   : forall {c pl pr p'} -> Reduces {penv} pr c p' -> Reduces (par pl pr) c (par pl p')

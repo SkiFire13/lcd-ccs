@@ -3,16 +3,16 @@ open import Data.Empty
 
 module ccs-vp {C N X V : Set} {n-fv : N -> X -> Bool} where
 
-data Prog : Set₁ where
-  chan-send : C -> V -> Prog -> Prog
-  chan-recv : C -> (V -> Prog) -> Prog
-  chan-tau  : Prog -> Prog
-  par       : Prog -> Prog -> Prog
-  indet     : {S : Set} -> (S -> Prog) -> Prog
-  const     : (n : N) -> ((x : X) -> {_ : T (n-fv n x)} -> V) -> Prog
-  rename    : (C -> C) -> Prog -> Prog
-  hide      : (C -> Bool) -> Prog -> Prog
-  if        : Bool -> Prog -> Prog
+data Proc : Set₁ where
+  chan-send : C -> V -> Proc -> Proc
+  chan-recv : C -> (V -> Proc) -> Proc
+  chan-tau  : Proc -> Proc
+  par       : Proc -> Proc -> Proc
+  indet     : {S : Set} -> (S -> Proc) -> Proc
+  const     : (n : N) -> ((x : X) -> {_ : T (n-fv n x)} -> V) -> Proc
+  rename    : (C -> C) -> Proc -> Proc
+  hide      : (C -> Bool) -> Proc -> Proc
+  if        : Bool -> Proc -> Proc
 
 deadlock = indet ⊥-elim
 
@@ -36,7 +36,7 @@ filter-reduc-op f (send c _) = f c
 filter-reduc-op f (recv c _) = f c
 filter-reduc-op f tau = true
 
-data Reduces {penv : (n : N) -> ((x : X) -> {_ : T (n-fv n x)} -> V) -> Prog} : Prog -> ReducOp -> Prog -> Set₁ where
+data Reduces {penv : (n : N) -> ((x : X) -> {_ : T (n-fv n x)} -> V) -> Proc} : Proc -> ReducOp -> Proc -> Set₁ where
   chan-send : forall {c v p} -> Reduces (chan-send c v p) (send c v) p
   chan-recv : forall {c v f} -> Reduces (chan-recv c f) (recv c v) (f v)
   chan-tau  : forall {p} -> Reduces (chan-tau p) tau p
