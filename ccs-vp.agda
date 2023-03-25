@@ -14,7 +14,6 @@ data Prog : Set₁ where
   hide      : (C -> Bool) -> Prog -> Prog
   if        : Bool -> Prog -> Prog
 
-deadlock : Prog
 deadlock = indet ⊥-elim
 
 data ReducOp : Set where

@@ -1,15 +1,14 @@
 open import Data.Bool
 open import Relation.Binary.PropositionalEquality
-open import Relation.Nullary.Decidable
+open import Relation.Nullary
 open import Data.Empty
 open import Data.Unit
 open import Data.Product
-open import Function.Base
 
 import ccs as ccs-real
 import ccs-vp as ccs-vp-real
 
-module ccs-vp-conv
+module conv
   {C N X V : Set}
   {n-fv : N -> X -> Bool}
   {penv : (n : N) -> ((x : X) -> {_ : T (n-fv n x)} -> V) -> ccs-vp-real.Prog {C} {N} {X} {V} {n-fv}}
@@ -62,7 +61,8 @@ conv-reduc-op (ccs-vp.send c v) = ccs.send (conv-c c v)
 conv-reduc-op (ccs-vp.recv c v) = ccs.recv (conv-c c v)
 conv-reduc-op ccs-vp.tau = ccs.tau
 
-conv-reduces : forall {p1 c p2} -> ccs-vp.Reduces {penv} p1 c p2 -> ccs.Reduces {conv-penv} (conv-prog p1) (conv-reduc-op c) (conv-prog p2)
+conv-reduces : forall {p1 c p2} -> ccs-vp.Reduces {penv} p1 c p2
+                -> ccs.Reduces {conv-penv} (conv-prog p1) (conv-reduc-op c) (conv-prog p2)
 conv-reduces ccs-vp.chan-send = ccs.chan
 conv-reduces ccs-vp.chan-recv = ccs.indet ccs.chan
 conv-reduces ccs-vp.chan-tau = ccs.chan
@@ -84,62 +84,59 @@ conv-reduces (ccs-vp.hide {c} {z = z} r) with c
 ... | ccs-vp.tau      = ccs.hide {z = z} (conv-reduces r)
 conv-reduces (ccs-vp.if r) = conv-reduces r
 
-unconv-need-exists : (forall {p1 c p2} -> ccs.Reduces {conv-penv} (conv-prog p1) (conv-reduc-op c) (conv-prog p2)
-                      -> ccs-vp.Reduces {penv} p1 c p2) -> ⊥
-unconv-need-exists f = impossible (f ccs.chan)
-  where
-  impossible : ccs-vp.Reduces {penv} (ccs-vp.chan-tau ccs-vp.deadlock) ccs-vp.tau (ccs-vp.if true ccs-vp.deadlock) -> ⊥
-  impossible ()
-
-unconv-z : forall {x c} -> T (ccs.filter-chan-op (conv-hide x) (conv-reduc-op c)) -> T (ccs-vp.filter-reduc-op x c)
-unconv-z {x} {ccs-vp-real.send c _} t with x c
-... | true = tt
-unconv-z {x} {ccs-vp-real.recv c _} t with x c
-... | true = tt
-unconv-z {x} {ccs-vp-real.tau} t = tt
-
-unconv-map-eq : forall {cc c x} -> ccs.map-chan-op (conv-rename x) cc ≡ conv-reduc-op c
-                  -> Σ[ c' ∈ ccs-vp.ReducOp ] cc ≡ conv-reduc-op c' × c ≡ ccs-vp.map-reduc-op x c'
-unconv-map-eq {ccs.send (conv-c c v)} {ccs-vp.send _ _} refl = ccs-vp.send c v , refl , refl
-unconv-map-eq {ccs.recv (conv-c c v)} {ccs-vp.recv _ _} refl = ccs-vp.recv c v , refl , refl
-unconv-map-eq {ccs.tau} {ccs-vp.tau} refl = ccs-vp.tau , refl , refl
+unconv-need-exists : ¬ (forall {p1 c p2} -> ccs.Reduces {conv-penv} (conv-prog p1) (conv-reduc-op c) (conv-prog p2)
+                      -> ccs-vp.Reduces {penv} p1 c p2)
+unconv-need-exists f with f {ccs-vp.chan-tau ccs-vp.deadlock} {ccs-vp.tau} {ccs-vp.if true ccs-vp.deadlock} ccs.chan
+... | ()
 
 unconv-reduces : forall {p1 c q2} -> ccs.Reduces {conv-penv} (conv-prog p1) (conv-reduc-op c) q2
-                  -> Σ[ p2 ∈ ccs-vp.Prog ] q2 ≡ conv-prog p2 × ccs-vp.Reduces {penv} p1 c p2
-unconv-reduces {op1} {oc} {oq2} or = helper {op1} {oc} {_} {_} {oq2} refl refl or
+                  -> ∃[ p2 ] (q2 ≡ conv-prog p2 × ccs-vp.Reduces {penv} p1 c p2)
+unconv-reduces = helper refl refl
   where
   helper : forall {p1 c q1 cc q2} -> q1 ≡ conv-prog p1 -> cc ≡ conv-reduc-op c -> ccs.Reduces {conv-penv} q1 cc q2
-            -> Σ[ p2 ∈ ccs-vp.Prog ] q2 ≡ conv-prog p2 × ccs-vp.Reduces {penv} p1 c p2
+            -> ∃[ p2 ] (q2 ≡ conv-prog p2 × ccs-vp.Reduces {penv} p1 c p2)
   helper {ccs-vp.chan-send _ _ p1} {ccs-vp.send _ _} refl refl ccs.chan = p1 , refl , ccs-vp.chan-send
   helper {ccs-vp.chan-recv _ f} {ccs-vp.recv _ v} refl refl (ccs.indet ccs.chan) = f v , refl , ccs-vp.chan-recv
   helper {ccs-vp.chan-tau p1} {ccs-vp.tau} refl refl ccs.chan = p1 , refl , ccs-vp.chan-tau
-  helper {ccs-vp.par p1 p2} {c} refl e2 (ccs.par-L r) with helper {p1} {c} refl e2 r
-  ... | p' , refl , r' = ccs-vp.par p' p2 , refl , ccs-vp.par-L r'
-  helper {ccs-vp.par p1 p2} {c} refl e2 (ccs.par-R r) with helper {p2} {c} refl e2 r
-  ... | p' , refl , r' = ccs-vp.par p1 p' , refl , ccs-vp.par-R r'
-  helper {ccs-vp.par p1 p2} {ccs-vp.tau} refl refl (ccs.par-B {ccs.send _} r1 r2) with
-    unconv-reduces {p1} r1 | unconv-reduces {p2} r2
+  helper {ccs-vp.par pl pr} {c} refl e2 (ccs.par-L r) with helper {pl} {c} refl e2 r
+  ... | p' , refl , r' = ccs-vp.par p' pr , refl , ccs-vp.par-L r'
+  helper {ccs-vp.par pl pr} {c} refl e2 (ccs.par-R r) with helper {pr} {c} refl e2 r
+  ... | p' , refl , r' = ccs-vp.par pl p' , refl , ccs-vp.par-R r'
+  helper {ccs-vp.par pl pr} {ccs-vp.tau} refl refl (ccs.par-B {ccs.send _} r1 r2) with
+    unconv-reduces {pl} r1 | unconv-reduces {pr} r2
   ... | pl' , refl , rl | pr' , refl , rr = ccs-vp.par pl' pr' , refl , ccs-vp.par-B rl rr
-  helper {ccs-vp.par p1 p2} {ccs-vp.tau} refl refl (ccs.par-B {ccs.recv _} r1 r2) with
-    unconv-reduces {p1} r1 | unconv-reduces {p2} r2
+  helper {ccs-vp.par pl pr} {ccs-vp.tau} refl refl (ccs.par-B {ccs.recv _} r1 r2) with
+    unconv-reduces {pl} r1 | unconv-reduces {pr} r2
   ... | pl' , refl , rl | pr' , refl , rr = ccs-vp.par pl' pr' , refl , ccs-vp.par-B rl rr
-  helper {ccs-vp.par p1 p2} {ccs-vp.tau} refl refl (ccs.par-B {ccs.tau} r1 r2) with
-    unconv-reduces {p1} r1 | unconv-reduces {p2} r2
+  helper {ccs-vp.par pl pr} {ccs-vp.tau} refl refl (ccs.par-B {ccs.tau} r1 r2) with
+    unconv-reduces {pl} r1 | unconv-reduces {pr} r2
   ... | pl' , refl , rl | pr' , refl , rr = ccs-vp.par pl' pr' , refl , ccs-vp.par-B rl rr
   helper {ccs-vp.indet x} {c} refl refl (ccs.indet {s = s} r) with unconv-reduces {x s} {c} r
   ... | p' , refl , r' = p' , refl , ccs-vp.indet {s = s} r'
   helper {ccs-vp.const n x} {c} refl refl (ccs.const r) with unconv-reduces {penv n x} r
   ... | p' , refl , r' = p' , refl , ccs-vp.const r'
-  helper {ccs-vp.rename x p1} {c} refl refl r = helper' refl refl refl r
+  helper {ccs-vp.rename x p1} {c} refl refl r = rename-helper refl r
     where
-    helper' : forall {x p1 c mc f cc q2} -> mc ≡ ccs.map-chan-op f cc -> f ≡ conv-rename x -> cc ≡ conv-reduc-op c
-                -> ccs.Reduces {conv-penv} (ccs.rename f (conv-prog p1)) cc q2
+    unconv-map-eq : forall {cc c x} -> ccs.map-chan-op (conv-rename x) cc ≡ conv-reduc-op c
+                      -> ∃[ c' ] (cc ≡ conv-reduc-op c' × c ≡ ccs-vp.map-reduc-op x c')
+    unconv-map-eq {ccs.send (conv-c c v)} {ccs-vp.send _ _} refl = ccs-vp.send c v , refl , refl
+    unconv-map-eq {ccs.recv (conv-c c v)} {ccs-vp.recv _ _} refl = ccs-vp.recv c v , refl , refl
+    unconv-map-eq {ccs.tau} {ccs-vp.tau} refl = ccs-vp.tau , refl , refl
+    rename-helper : forall {x p1 c cc q2} -> cc ≡ conv-reduc-op c
+                -> ccs.Reduces {conv-penv} (ccs.rename (conv-rename x) (conv-prog p1)) cc q2
                 -> Σ[ p2 ∈ ccs-vp.Prog ] q2 ≡ conv-prog p2 × ccs-vp.Reduces {penv} (ccs-vp.rename x p1) c p2
-    helper' {x} {p1} refl refl e3 (ccs.rename r) with unconv-map-eq e3
+    rename-helper {x} {p1} e3 (ccs.rename r) with unconv-map-eq e3
     ... | c' , refl , refl with unconv-reduces {p1} r
     ... | p' , refl , r' = ccs-vp.rename x p' , refl , ccs-vp.rename r'
   helper {ccs-vp.hide x p1} {c} refl refl (ccs.hide {z = z} r) with unconv-reduces {p1} r
   ... | p' , refl , r' = ccs-vp.hide x p' , refl , ccs-vp.hide {z = unconv-z {x} {c} z} r'
+    where
+    unconv-z : forall {x c} -> T (ccs.filter-chan-op (conv-hide x) (conv-reduc-op c)) -> T (ccs-vp.filter-reduc-op x c)
+    unconv-z {x} {ccs-vp.send c _} t with x c
+    ... | true = tt
+    unconv-z {x} {ccs-vp.recv c _} t with x c
+    ... | true = tt
+    unconv-z {x} {ccs-vp.tau} t = tt
   helper {ccs-vp.if false p1} refl refl (ccs.indet {s = ()} r)
   helper {ccs-vp.if true p1} refl refl r with unconv-reduces {p1} r
   ... | p' , refl , r' = p' , refl , ccs-vp.if r'
