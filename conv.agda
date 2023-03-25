@@ -5,13 +5,13 @@ open import Data.Empty
 open import Data.Unit
 open import Data.Product
 
-import ccs as ccs-real
-import ccs-vp as ccs-vp-real
+import ccs
+import ccs-vp
 
 module conv
   {C N X V : Set}
   {n-fv : N -> X -> Bool}
-  {penv : (n : N) -> ((x : X) -> {_ : T (n-fv n x)} -> V) -> ccs-vp-real.Prog {C} {N} {X} {V} {n-fv}}
+  {penv : (n : N) -> ((x : X) -> {_ : T (n-fv n x)} -> V) -> ccs-vp.Prog {C} {N} {X} {V} {n-fv}}
   where
 
 record Conv-C : Set where
@@ -27,11 +27,8 @@ record Conv-N : Set where
     args : (x : X) -> {_ : T (n-fv name x)} -> V
 
 
-module ccs = ccs-real {Conv-C} {Conv-N}
-module ccs-vp = ccs-vp-real {C} {N} {X} {V} {n-fv}
-
-open ccs
-open ccs-vp
+open ccs {Conv-C} {Conv-N}
+open ccs-vp {C} {N} {X} {V} {n-fv}
 
 conv-prog : ccs-vp.Prog -> ccs.Prog
 
@@ -60,13 +57,16 @@ conv-prog (if b p) = if b then (conv-prog p) else ccs.deadlock
 conv-penv : ((conv-n n env) : Conv-N) -> ccs.Prog
 conv-penv (conv-n n env) = conv-prog (penv n env)
 
-conv-reduc-op : ccs-vp.ReducOp -> ccs.ChanOp
+conv-reduc-op : ReducOp -> ChanOp
 conv-reduc-op (send c v) = send (conv-c c v)
 conv-reduc-op (recv c v) = recv (conv-c c v)
 conv-reduc-op tau = tau
 
-conv-reduces : forall {p1 c p2} -> ccs-vp.Reduces {penv} p1 c p2
-                -> ccs.Reduces {conv-penv} (conv-prog p1) (conv-reduc-op c) (conv-prog p2)
+ccs-Reduces = ccs.Reduces {Conv-C} {Conv-N} {conv-penv}
+ccs-vp-Reduces = ccs-vp.Reduces {C} {N} {X} {V} {n-fv} {penv}
+
+conv-reduces : forall {p1 c p2} -> ccs-vp-Reduces p1 c p2
+                -> ccs-Reduces (conv-prog p1) (conv-reduc-op c) (conv-prog p2)
 conv-reduces chan-send = chan
 conv-reduces chan-recv = indet chan
 conv-reduces chan-tau = chan
@@ -88,17 +88,17 @@ conv-reduces (hide {c} {z = z} r) with c
 ... | tau      = hide {z = z} (conv-reduces r)
 conv-reduces (if r) = conv-reduces r
 
-unconv-need-exists : ¬ (forall {p1 c p2} -> ccs.Reduces {conv-penv} (conv-prog p1) (conv-reduc-op c) (conv-prog p2)
-                      -> ccs-vp.Reduces {penv} p1 c p2)
+unconv-need-exists : ¬ (forall {p1 c p2} -> ccs-Reduces (conv-prog p1) (conv-reduc-op c) (conv-prog p2)
+                      -> ccs-vp-Reduces p1 c p2)
 unconv-need-exists f with f {chan-tau ccs-vp.deadlock} {tau} {if true ccs-vp.deadlock} chan
 ... | ()
 
-unconv-reduces : forall {p1 c q2} -> ccs.Reduces {conv-penv} (conv-prog p1) (conv-reduc-op c) q2
-                  -> ∃[ p2 ] (q2 ≡ conv-prog p2 × ccs-vp.Reduces {penv} p1 c p2)
+unconv-reduces : forall {p1 c q2} -> ccs-Reduces (conv-prog p1) (conv-reduc-op c) q2
+                  -> ∃[ p2 ] (q2 ≡ conv-prog p2 × ccs-vp-Reduces p1 c p2)
 unconv-reduces = helper refl refl
   where
-  helper : forall {p1 c q1 cc q2} -> q1 ≡ conv-prog p1 -> cc ≡ conv-reduc-op c -> ccs.Reduces {conv-penv} q1 cc q2
-            -> ∃[ p2 ] (q2 ≡ conv-prog p2 × ccs-vp.Reduces {penv} p1 c p2)
+  helper : forall {p1 c q1 cc q2} -> q1 ≡ conv-prog p1 -> cc ≡ conv-reduc-op c -> ccs-Reduces q1 cc q2
+            -> ∃[ p2 ] (q2 ≡ conv-prog p2 × ccs-vp-Reduces p1 c p2)
   helper {chan-send _ _ p1} {send _ _} refl refl chan = p1 , refl , chan-send
   helper {chan-recv _ f} {recv _ v} refl refl (indet chan) = f v , refl , chan-recv
   helper {chan-tau p1} {tau} refl refl chan = p1 , refl , chan-tau
@@ -124,8 +124,8 @@ unconv-reduces = helper refl refl
     unconv-map-eq {recv (conv-c c v)} {recv _ _} refl = recv c v , refl , refl
     unconv-map-eq {tau} {tau} refl = tau , refl , refl
     rename-helper : forall {x p1 c cc q2} -> cc ≡ conv-reduc-op c
-                -> ccs.Reduces {conv-penv} (rename (conv-rename x) (conv-prog p1)) cc q2
-                -> Σ[ p2 ∈ ccs-vp.Prog ] q2 ≡ conv-prog p2 × ccs-vp.Reduces {penv} (rename x p1) c p2
+                -> ccs-Reduces (rename (conv-rename x) (conv-prog p1)) cc q2
+                -> Σ[ p2 ∈ ccs-vp.Prog ] q2 ≡ conv-prog p2 × ccs-vp-Reduces (rename x p1) c p2
     rename-helper {x} {p1} e3 (rename r) with unconv-map-eq e3
     ... | c' , refl , refl with unconv-reduces {p1} r
     ... | p' , refl , r' = rename x p' , refl , rename r'
