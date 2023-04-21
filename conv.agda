@@ -72,7 +72,7 @@ conv-act tau = tau
 -- prove that if there's a reduction relation between two CCS-VP processes
 -- then there's a corresponding relation between the converted processess too.
 conv-reduc : forall {p1 c p2} -> vp-Reduc {penv} p1 c p2
-               -> ccs-Reduc {conv-penv} (conv-proc p1) (conv-act c) (conv-proc p2)
+             -> ccs-Reduc {conv-penv} (conv-proc p1) (conv-act c) (conv-proc p2)
 conv-reduc chan-send = chan
 conv-reduc chan-recv = indet chan
 conv-reduc chan-tau  = chan
@@ -111,8 +111,8 @@ unconv-need-exists f with f {chan-tau vp.deadlock} {tau} {if true vp.deadlock} c
 -- then there exists a corresponding relation between the initial CCS-VP process
 -- and some other CCS-VP process that can be converted in the initial second CCS process.
 unconv-reduc : forall {p1 c cp2} 
-                 -> ccs-Reduc {conv-penv} (conv-proc p1) (conv-act c) cp2
-                 -> ∃[ p2 ] (cp2 ≡ conv-proc p2 × vp-Reduc {penv} p1 c p2)
+               -> ccs-Reduc {conv-penv} (conv-proc p1) (conv-act c) cp2
+               -> ∃[ p2 ] (cp2 ≡ conv-proc p2 × vp-Reduc {penv} p1 c p2)
 unconv-reduc = helper refl refl
   where
   -- This helper is needed because Agda prefers plain variables when pattern matching rather
