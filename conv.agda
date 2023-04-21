@@ -29,8 +29,8 @@ record Conv-N : Set where
     args : (x : X) -> {_ : T (n-fv name x)} -> V
 
 -- Now that we defined the needed types, open the modules with the correct values for the arguments
-open ccs {Conv-C} {Conv-N} renaming (Reduces to ccs-Reduces; Act to ccs-Act)
-open vp {C} {N} {X} {V} {n-fv} renaming (Reduces to vp-Reduces; Act to vp-Act)
+open ccs {Conv-C} {Conv-N} renaming (Reduc to ccs-Reduc; Act to ccs-Act)
+open vp {C} {N} {X} {V} {n-fv} renaming (Reduc to vp-Reduc; Act to vp-Act)
 
 -- Convert a CCS-VP process to a normal CCS Process
 -- the implementation is below, after a couple of helper co-recursive functions
@@ -71,36 +71,36 @@ conv-act tau = tau
 -- Convert a reduction relation from CCS-VP to CCS, or in other words,
 -- prove that if there's a reduction relation between two CCS-VP processes
 -- then there's a corresponding relation between the converted processess too.
-conv-reduces : forall {p1 c p2} -> vp-Reduces {penv} p1 c p2
-               -> ccs-Reduces {conv-penv} (conv-proc p1) (conv-act c) (conv-proc p2)
-conv-reduces chan-send = chan
-conv-reduces chan-recv = indet chan
-conv-reduces chan-tau  = chan
-conv-reduces (par-L r) = par-L (conv-reduces r)
-conv-reduces (par-R r) = par-R (conv-reduces r)
-conv-reduces (par-B {c} rl rr) with c
-... | send _ _         = par-B (conv-reduces rl) (conv-reduces rr)
-... | recv _ _         = par-B (conv-reduces rl) (conv-reduces rr)
-... | tau              = par-B (conv-reduces rl) (conv-reduces rr)
-conv-reduces (indet r) = indet (conv-reduces r)
-conv-reduces (const r) = const (conv-reduces r)
-conv-reduces (rename {c} r) with c
-... | send _ _         = rename (conv-reduces r)
-... | recv _ _         = rename (conv-reduces r)
-... | tau              = rename (conv-reduces r)
-conv-reduces (hide {c} {z = z} r) with c
-... | send _ _         = hide {z = z} (conv-reduces r)
-... | recv _ _         = hide {z = z} (conv-reduces r)
-... | tau              = hide {z = z} (conv-reduces r)
-conv-reduces (if r)    = conv-reduces r
+conv-reduc : forall {p1 c p2} -> vp-Reduc {penv} p1 c p2
+               -> ccs-Reduc {conv-penv} (conv-proc p1) (conv-act c) (conv-proc p2)
+conv-reduc chan-send = chan
+conv-reduc chan-recv = indet chan
+conv-reduc chan-tau  = chan
+conv-reduc (par-L r) = par-L (conv-reduc r)
+conv-reduc (par-R r) = par-R (conv-reduc r)
+conv-reduc (par-B {c} rl rr) with c
+... | send _ _       = par-B (conv-reduc rl) (conv-reduc rr)
+... | recv _ _       = par-B (conv-reduc rl) (conv-reduc rr)
+... | tau            = par-B (conv-reduc rl) (conv-reduc rr)
+conv-reduc (indet r) = indet (conv-reduc r)
+conv-reduc (const r) = const (conv-reduc r)
+conv-reduc (rename {c} r) with c
+... | send _ _       = rename (conv-reduc r)
+... | recv _ _       = rename (conv-reduc r)
+... | tau            = rename (conv-reduc r)
+conv-reduc (hide {c} {z = z} r) with c
+... | send _ _       = hide {z = z} (conv-reduc r)
+... | recv _ _       = hide {z = z} (conv-reduc r)
+... | tau            = hide {z = z} (conv-reduc r)
+conv-reduc (if r)    = conv-reduc r
 
--- Prove that the converse of `conv-reduces` is not true, that is if there's
+-- Prove that the converse of `conv-reduc` is not true, that is if there's
 -- a reduction relation between two CCS processes then it's not guaranteed that
 -- there's a reduction relation between CCS-VP processes that can be converted into them. 
 NaiveUnconv : Set₁
 NaiveUnconv = forall {p1 c p2} 
-  -> ccs-Reduces {conv-penv} (conv-proc p1) (conv-act c) (conv-proc p2)
-  -> vp-Reduces {penv} p1 c p2
+  -> ccs-Reduc {conv-penv} (conv-proc p1) (conv-act c) (conv-proc p2)
+  -> vp-Reduc {penv} p1 c p2
 
 unconv-need-exists : ¬ NaiveUnconv
 unconv-need-exists f with f {chan-tau vp.deadlock} {tau} {if true vp.deadlock} chan
@@ -110,18 +110,18 @@ unconv-need-exists f with f {chan-tau vp.deadlock} {tau} {if true vp.deadlock} c
 -- if a CCS-VP process converted to CCS has a relation with another CCS process
 -- then there exists a corresponding relation between the initial CCS-VP process
 -- and some other CCS-VP process that can be converted in the initial second CCS process.
-unconv-reduces : forall {p1 c cp2} 
-                 -> ccs-Reduces {conv-penv} (conv-proc p1) (conv-act c) cp2
-                 -> ∃[ p2 ] (cp2 ≡ conv-proc p2 × vp-Reduces {penv} p1 c p2)
-unconv-reduces = helper refl refl
+unconv-reduc : forall {p1 c cp2} 
+                 -> ccs-Reduc {conv-penv} (conv-proc p1) (conv-act c) cp2
+                 -> ∃[ p2 ] (cp2 ≡ conv-proc p2 × vp-Reduc {penv} p1 c p2)
+unconv-reduc = helper refl refl
   where
   -- This helper is needed because Agda prefers plain variables when pattern matching rather
   -- the possible return values of a function.
   helper : forall {p1 c q1 cc cp2} 
            -> q1 ≡ conv-proc p1
            -> cc ≡ conv-act c
-           -> ccs-Reduces {conv-penv} q1 cc cp2
-           -> ∃[ p2 ] (cp2 ≡ conv-proc p2 × vp-Reduces {penv} p1 c p2)
+           -> ccs-Reduc {conv-penv} q1 cc cp2
+           -> ∃[ p2 ] (cp2 ≡ conv-proc p2 × vp-Reduc {penv} p1 c p2)
   helper {chan-send _ _ p1} {send _ _} refl refl chan = p1 , refl , chan-send
   helper {chan-recv _ f} {recv _ v} refl refl (indet chan) = f v , refl , chan-recv
   helper {chan-tau p1} {tau} refl refl chan = p1 , refl , chan-tau
@@ -132,17 +132,17 @@ unconv-reduces = helper refl refl
   helper {par pl pr} {c} refl e2 (par-R r) with helper {pr} {c} refl e2 r
   ... | p' , refl , r' = par pl p' , refl , par-R r'
 
-  helper {par pl pr} {tau} refl refl (par-B {send _} r1 r2) with unconv-reduces {pl} r1 | unconv-reduces {pr} r2
+  helper {par pl pr} {tau} refl refl (par-B {send _} r1 r2) with unconv-reduc {pl} r1 | unconv-reduc {pr} r2
   ... | pl' , refl , rl | pr' , refl , rr = par pl' pr' , refl , par-B rl rr
-  helper {par pl pr} {tau} refl refl (par-B {recv _} r1 r2) with unconv-reduces {pl} r1 | unconv-reduces {pr} r2
+  helper {par pl pr} {tau} refl refl (par-B {recv _} r1 r2) with unconv-reduc {pl} r1 | unconv-reduc {pr} r2
   ... | pl' , refl , rl | pr' , refl , rr = par pl' pr' , refl , par-B rl rr
-  helper {par pl pr} {tau} refl refl (par-B {tau} r1 r2) with unconv-reduces {pl} r1 | unconv-reduces {pr} r2
+  helper {par pl pr} {tau} refl refl (par-B {tau} r1 r2) with unconv-reduc {pl} r1 | unconv-reduc {pr} r2
   ... | pl' , refl , rl | pr' , refl , rr = par pl' pr' , refl , par-B rl rr
   
-  helper {indet f} {c} refl refl (indet {s = s} r) with unconv-reduces {f s} {c} r
+  helper {indet f} {c} refl refl (indet {s = s} r) with unconv-reduc {f s} {c} r
   ... | p' , refl , r' = p' , refl , indet {s = s} r'
   
-  helper {const n args} {c} refl refl (const r) with unconv-reduces {penv n args} r
+  helper {const n args} {c} refl refl (const r) with unconv-reduc {penv n args} r
   ... | p' , refl , r' = p' , refl , const r'
   
   helper {rename f p1} {c} refl refl r = rename-helper refl r
@@ -155,13 +155,13 @@ unconv-reduces = helper refl refl
     unconv-map-eq {tau} {tau} refl = tau , refl , refl
     -- Like `helper`, this function is only needed to introduce the additional `cc` variable.
     rename-helper : forall {f p1 c cc cp2} -> cc ≡ conv-act c
-                    -> ccs-Reduces {conv-penv} (rename (conv-rename f) (conv-proc p1)) cc cp2
-                    -> ∃[ p2 ] (cp2 ≡ conv-proc p2 × vp-Reduces {penv} (rename f p1) c p2)
+                    -> ccs-Reduc {conv-penv} (rename (conv-rename f) (conv-proc p1)) cc cp2
+                    -> ∃[ p2 ] (cp2 ≡ conv-proc p2 × vp-Reduc {penv} (rename f p1) c p2)
     rename-helper {f} {p1} e (rename r) with unconv-map-eq e
-    ... | c' , refl , refl with unconv-reduces {p1} r
+    ... | c' , refl , refl with unconv-reduc {p1} r
     ... | p' , refl , r' = rename f p' , refl , rename r'
   
-  helper {hide f p1} {c} refl refl (hide {z = z} r) with unconv-reduces {p1} r
+  helper {hide f p1} {c} refl refl (hide {z = z} r) with unconv-reduc {p1} r
   ... | p' , refl , r' = hide f p' , refl , hide {z = unconv-z {f} {c} z} r'
     where
     -- This function is here only to give Agda a hint on which type we want to do unification.
@@ -173,5 +173,6 @@ unconv-reduces = helper refl refl
     unconv-z {f} {tau} _ = tt
   
   helper {if false p1} refl refl (indet {s = ()} r)
-  helper {if true p1} refl refl r with unconv-reduces {p1} r
+  helper {if true p1} refl refl r with unconv-reduc {p1} r
   ... | p' , refl , r' = p' , refl , if r'
+ 
