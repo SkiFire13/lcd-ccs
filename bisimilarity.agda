@@ -43,28 +43,28 @@ q-to-p (∼-to-~ (bisimilar p q R x)) a q' r =
   in p' , r' , ∼-to-~ (bisimilar q' p' R x')
 
 ~-to-∼ : forall {p q} -> p ~ q -> p ∼ q
-~-to-∼ {p} {q} r = let
+~-to-∼ {p} {q} b = let
     bisimulation = record {
         subset = _~_ ;
         p-to-q = p-to-q ;
         q-to-p = q-to-p
       }
-  in bisimilar p q bisimulation r
+  in bisimilar p q bisimulation b
 
 ~-Reflexive : Reflexive _~_
 p-to-q (~-Reflexive {p}) _ p' r = p' , r , ~-Reflexive
 q-to-p (~-Reflexive {p}) _ p' r = p' , r , ~-Reflexive
 
 ~-Symmetric : Symmetric _~_
-p-to-q (~-Symmetric {p} {q} r) = r .q-to-p
-q-to-p (~-Symmetric {p} {q} r) = r .p-to-q
+p-to-q (~-Symmetric {p} {q} b) = b .q-to-p
+q-to-p (~-Symmetric {p} {q} b) = b .p-to-q
 
 ~-Transitive : Transitive _~_
-p-to-q (~-Transitive {p} {q} {s} r1 r2) a p' rp =
-  let q' , rq , r' = r1 .p-to-q a p' rp
-      s' , rs , r'' = r2 .p-to-q a q' rq
-  in s' , rs , ~-Transitive r' r''
-q-to-p (~-Transitive {p} {q} {s} r1 r2) a s' r =
-  let q' , rq , r' = r2 .q-to-p a s' r
-      p' , rp , r'' = r1 .q-to-p a q' rq
-  in p' , rp , ~-Transitive r' r''
+p-to-q (~-Transitive {p} {q} {s} b1 b2) a p' rp =
+  let q' , rq , bq' = b1 .p-to-q a p' rp
+      s' , rs , bs' = b2 .p-to-q a q' rq
+  in s' , rs , ~-Transitive bq' bs'
+q-to-p (~-Transitive {p} {q} {s} b1 b2) a s' rp =
+  let q' , rq , bq' = b2 .q-to-p a s' rp
+      p' , rp , bp' = b1 .q-to-p a q' rq
+  in p' , rp , ~-Transitive bq' bp'
