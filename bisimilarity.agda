@@ -15,17 +15,13 @@ BisimulationProperty R p q = (a : Act) -> (p' : Proc) -> Reduc p a p'
 
 record Bisimulation : Set₂ where
   field
-    subset : Proc -> Proc -> Set₁
-    p-to-q : forall {p q} -> subset p q -> BisimulationProperty subset p q
-    q-to-p : forall {p q} -> subset p q -> BisimulationProperty subset q p
+    R : Proc -> Proc -> Set₁
+    p-to-q : forall {p q} -> R p q -> BisimulationProperty R p q
+    q-to-p : forall {p q} -> R p q -> BisimulationProperty R q p
 open Bisimulation
 
 data _∼_ : Proc -> Proc -> Set₂ where
-  bisimilar : (p : Proc)
-              -> (q : Proc)
-              -> (R : Bisimulation)
-              -> R .subset p q
-              -> p ∼ q
+  bisimilar : (p : Proc) -> (q : Proc) -> (b : Bisimulation) -> b .R p q -> p ∼ q
 
 record _~_ (p : Proc) (q : Proc) : Set₁ where
   coinductive
@@ -45,7 +41,7 @@ q-to-p (∼-to-~ (bisimilar p q R x)) a q' r =
 ~-to-∼ : forall {p q} -> p ~ q -> p ∼ q
 ~-to-∼ {p} {q} b = let
     bisimulation = record {
-        subset = _~_ ;
+        R = _~_ ;
         p-to-q = p-to-q ;
         q-to-p = q-to-p
       }
