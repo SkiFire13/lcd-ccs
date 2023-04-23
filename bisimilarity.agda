@@ -58,3 +58,13 @@ q-to-p (~-Reflexive {p}) _ p' r = p' , r , ~-Reflexive
 ~-Symmetric : Symmetric _~_
 p-to-q (~-Symmetric {p} {q} r) = r .q-to-p
 q-to-p (~-Symmetric {p} {q} r) = r .p-to-q
+
+~-Transitive : Transitive _~_
+p-to-q (~-Transitive {p} {q} {s} r1 r2) a p' rp =
+  let q' , rq , r' = r1 .p-to-q a p' rp
+      s' , rs , r'' = r2 .p-to-q a q' rq
+  in s' , rs , ~-Transitive r' r''
+q-to-p (~-Transitive {p} {q} {s} r1 r2) a s' r =
+  let q' , rq , r' = r2 .q-to-p a s' r
+      p' , rp , r'' = r1 .q-to-p a q' rq
+  in p' , rp , ~-Transitive r' r''
