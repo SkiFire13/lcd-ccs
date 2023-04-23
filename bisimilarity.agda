@@ -1,5 +1,6 @@
 open import Data.Bool
 open import Data.Product
+open import Relation.Binary.Definitions
 
 import ccs
 import ccs.proc
@@ -52,3 +53,11 @@ q-to-p (∼-to-~ (bisimilar p q R x)) a q' r =
         q-to-p = q-to-p
       }
   in bisimilar p q bisimulation r
+
+~-Reflexive : Reflexive _~_
+p-to-q (~-Reflexive {p}) _ p' r = p' , r , ~-Reflexive
+q-to-p (~-Reflexive {p}) _ p' r = p' , r , ~-Reflexive
+
+~-Symmetric : Symmetric _~_
+p-to-q (~-Symmetric {p} {q} r) = r .q-to-p
+q-to-p (~-Symmetric {p} {q} r) = r .p-to-q
