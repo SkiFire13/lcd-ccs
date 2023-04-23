@@ -1,4 +1,5 @@
 open import Data.Bool
+open import Data.Unit
 
 module conv.proc {C N X V : Set} {n-fv : N -> X -> Bool} where
 
