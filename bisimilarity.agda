@@ -13,9 +13,6 @@ BisimulationProperty : (Proc -> Proc -> Set₁) -> Proc -> Proc -> Set₁
 BisimulationProperty R p q = (a : Act) -> (p' : Proc) -> Reduc p a p'
                              -> ∃[ q' ] (Reduc q a q' × R p' q')
 
-subset-to-prop₂ : {A : Set₁} -> (A -> A -> Bool) -> (A -> A -> Set)
-subset-to-prop₂ f = \ x y -> T (f x y)
-
 record Bisimulation : Set₂ where
   field
     subset : Proc -> Proc -> Set₁
