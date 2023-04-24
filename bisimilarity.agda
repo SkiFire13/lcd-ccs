@@ -1,7 +1,9 @@
 open import Data.Bool
 open import Data.Product
 open import Relation.Binary.Definitions
+open import Relation.Binary.Morphism.Definitions
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
+open import Relation.Binary.Structures
 
 import ccs
 import ccs.proc
@@ -47,23 +49,27 @@ q-to-p (∼-to-~ (bisimilar p q R x)) a q' r =
   p-to-q (bis) = p-to-q
   q-to-p (bis) = q-to-p
 
-~-Reflexive : Reflexive _~_
-p-to-q (~-Reflexive {p}) _ p' r = p' , r , ~-Reflexive
-q-to-p (~-Reflexive {p}) _ p' r = p' , r , ~-Reflexive
+reflexive : Reflexive _~_
+p-to-q (reflexive {p}) _ p' r = p' , r , reflexive
+q-to-p (reflexive {p}) _ p' r = p' , r , reflexive
 
-~-Symmetric : Symmetric _~_
-p-to-q (~-Symmetric {p} {q} p~q) = p~q .q-to-p
-q-to-p (~-Symmetric {p} {q} p~q) = p~q .p-to-q
+sym : Symmetric _~_
+p-to-q (sym {p} {q} p~q) = p~q .q-to-p
+q-to-p (sym {p} {q} p~q) = p~q .p-to-q
 
-~-Transitive : Transitive _~_
-p-to-q (~-Transitive {p} {q} {s} p~q q~s) a p' rp =
+trans : Transitive _~_
+p-to-q (trans {p} {q} {s} p~q q~s) a p' rp =
   let q' , rq , p'~q' = p~q .p-to-q a p' rp
       s' , rs , q'~s' = q~s .p-to-q a q' rq
-  in s' , rs , ~-Transitive p'~q' q'~s'
-q-to-p (~-Transitive {p} {q} {s} p~q q~s) a s' rp =
-  let q' , rq , s'~q' = q~s .q-to-p a s' rp
-      p' , rp , q'~p' = p~q .q-to-p a q' rq
-  in p' , rp , ~-Transitive s'~q' q'~p'
+  in s' , rs , trans p'~q' q'~s'
+q-to-p (trans {p} {q} {s} p~q q~s) = p-to-q (trans (sym q~s) (sym p~q))
+
+isEquivalence : IsEquivalence _~_
+isEquivalence = record {
+    refl  = reflexive ;
+    sym   = sym ;
+    trans = trans
+  }
 
 data Context : Set₁ where
   chan    : Act -> Context -> Context
@@ -83,16 +89,16 @@ subst (rename f c) p = rename f (subst c p)
 subst (hide f c) p = hide f (subst c p)
 subst replace p = p
 
-~-cong : forall {c p q} -> p ~ q -> subst c p ~ subst c q
-q-to-p (~-cong p~q) = p-to-q (~-cong (~-Symmetric p~q))
-p-to-q (~-cong p~q) = helper refl refl p~q
+cong : forall {c} -> Homomorphic₂ Proc Proc _~_ _~_ (subst c)
+q-to-p (cong p~q) = p-to-q (cong (sym p~q))
+p-to-q (cong p~q) = helper refl refl p~q
   where
   helper : forall {c p q ps qs} -> ps ≡ subst c p -> qs ≡ subst c q -> p ~ q
                   -> BisimulationProperty _~_ ps qs
 
-  helper {chan a c} {_} {q} refl refl p~q _ _ chan = subst c q , chan , ~-cong p~q
+  helper {chan a c} {_} {q} refl refl p~q _ _ chan = subst c q , chan , cong p~q
 
-  helper {par c1 c2} refl refl p~q = helper-par-p-to-q (~-cong {c1} p~q) (~-cong {c2} p~q)
+  helper {par c1 c2} refl refl p~q = helper-par-p-to-q (cong {c1} p~q) (cong {c2} p~q)
     where
     helper-par : forall {pl pr ql qr} -> pl ~ ql -> pr ~ qr -> par pl pr ~ par ql qr
 
@@ -110,20 +116,20 @@ p-to-q (~-cong p~q) = helper refl refl p~q
       in par ql' qr' , par-B rl' rr' , helper-par pl'~ql' pr'~qr'
 
     p-to-q (helper-par pl~ql pr~qr) = helper-par-p-to-q pl~ql pr~qr
-    q-to-p (helper-par pl~ql pr~qr) = p-to-q (helper-par (~-Symmetric pl~ql) (~-Symmetric pr~qr))
+    q-to-p (helper-par pl~ql pr~qr) = p-to-q (helper-par (sym pl~ql) (sym pr~qr))
 
   helper {indet f} refl refl p~q a p' (indet {s = s} r) =
-    let q' , r' , p'~q' = (~-cong {f s} p~q) .p-to-q a p' r
+    let q' , r' , p'~q' = (cong {f s} p~q) .p-to-q a p' r
     in q' , indet {s = s} r' , p'~q'
 
-  helper {const _} refl refl _ = ~-Reflexive .p-to-q
+  helper {const _} refl refl _ = reflexive .p-to-q
 
   helper {rename f c} refl refl p~q _ (rename .f p') (rename {a} r) =
-    let q' , r' , p'~q' = (~-cong {c} p~q) .p-to-q a p' r
-    in rename f q' , rename {a} r' , ~-cong p'~q'
+    let q' , r' , p'~q' = (cong {c} p~q) .p-to-q a p' r
+    in rename f q' , rename {a} r' , cong p'~q'
 
   helper {hide f c} refl refl p~q a (hide .f p') (hide {z = z} r) =
-    let q' , r' , p'~q' = (~-cong {c} p~q) .p-to-q a p' r
-    in hide f q' , hide {z = z} r' , ~-cong p'~q'
+    let q' , r' , p'~q' = (cong {c} p~q) .p-to-q a p' r
+    in hide f q' , hide {z = z} r' , cong p'~q'
 
   helper {replace} refl refl p~q = p~q .p-to-q
