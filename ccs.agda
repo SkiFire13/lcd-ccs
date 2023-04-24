@@ -9,5 +9,5 @@ import ccs.proc
 module ccs {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
 
 open import ccs.proc {C} {N} public
-open import ccs.reduc {C} {N} {penv} public
-open import ccs.weak-reduc {C} {N} {penv} public
+open import ccs.trans {C} {N} {penv} public
+open import ccs.weak-trans {C} {N} {penv} public

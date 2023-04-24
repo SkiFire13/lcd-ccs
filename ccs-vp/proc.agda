@@ -18,15 +18,15 @@ data Proc : Set₁ where
 -- The "desugaring" of the deadlock CCS-VP Process
 deadlock = indet ⊥-elim
 
--- A reduction operation. This is a bit different than the CCS's Act 
+-- A CCS VP action. This is a bit different than the CCS's Act
 -- in that Processes don't contain channel operations (they are codified in different ways)
--- and this is only used in `Reduc`.
+-- and this is only used in `Trans`.
 data Act : Set where
   send : C -> V -> Act
   recv : C -> V -> Act
   tau  : Act
 
--- Utility functions used in `Reduc`
+-- Utility functions used in `Trans`
 flip-act : Act -> Act
 flip-act (send c v) = recv c v
 flip-act (recv c v) = send c v

@@ -1,7 +1,7 @@
 open import Data.Bool
 open import Data.Product
 open import Relation.Binary.Definitions using (Reflexive; Symmetric; Transitive)
-open import Relation.Binary.Morphism.Definitions
+open import Relation.Binary.Morphism.Definitions using (Homomorphic₂)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 open import Relation.Binary.Structures using (IsEquivalence)
 
@@ -14,7 +14,7 @@ open import bisimilarity.context {C} {N} {penv}
 
 -- (Half) the property of a strong bisimulation
 BisimulationProperty : (Proc -> Proc -> Set₁) -> Proc -> Proc -> Set₁
-BisimulationProperty R p q = forall {a p'} -> Reduc p a p' -> ∃[ q' ] (Reduc q a q' × R p' q')
+BisimulationProperty R p q = forall {a p'} -> Trans p a p' -> ∃[ q' ] (Trans q a q' × R p' q')
 
 -- Definition of a strong bisimulation
 record Bisimulation : Set₂ where
@@ -77,7 +77,7 @@ IsEquivalence.sym (isEquivalence) = sym
 IsEquivalence.trans (isEquivalence) = trans
 
 -- Prove that ~ is a congruence
-cong : forall {c} -> Homomorphic₂ Proc Proc _~_ _~_ (subst c)
+cong : forall {c} -> Homomorphic₂ Proc Proc _~_ _~_ (subst c) -- forall {c p q} -> p ~ q -> subst c p ~ subst c q
 q-to-p (cong p~q) = p-to-q (cong (sym p~q))
 p-to-q (cong p~q) = helper refl refl p~q
   where

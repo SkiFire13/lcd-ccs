@@ -21,7 +21,7 @@ data Proc : Set₁ where
 -- The "desugaring" of the deadlock CCS Process
 deadlock = indet ⊥-elim
 
--- Utility functions used in `Reduc`
+-- Utility functions used in `Trans`
 flip-act : Act -> Act
 flip-act (send c) = recv c
 flip-act (recv c) = send c

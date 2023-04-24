@@ -1,9 +1,9 @@
 open import Data.Bool
 open import Data.Product
-open import Relation.Binary.Definitions
-open import Relation.Binary.Morphism.Definitions
+open import Relation.Binary.Definitions using (Reflexive; Symmetric; Transitive)
+open import Relation.Binary.Morphism.Definitions using (Homomorphic₂)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
-open import Relation.Binary.Structures
+open import Relation.Binary.Structures using (IsEquivalence)
 
 import ccs.proc
 
@@ -13,7 +13,7 @@ open import ccs {C} {N} {penv}
 
 -- (Half) the property of a weak bisimulation
 BisimulationProperty : (Proc -> Proc -> Set₁) -> Proc -> Proc -> Set₁
-BisimulationProperty R p q = forall {a p'} -> Reduc p a p' -> ∃[ q' ] (WeakReduc q a q' × R p' q')
+BisimulationProperty R p q = forall {a p'} -> Trans p a p' -> ∃[ q' ] (WeakTrans q a q' × R p' q')
 
 -- Definition of a weak bisimulation
 record Bisimulation : Set₂ where
@@ -55,15 +55,15 @@ q-to-p (≈ᵣ-to-≈ (bisimilar p q R x)) {p' = q'} r =
 -- From now on everything will use the coinductive definition
 
 -- Utils to prove transitivity
-p-to-q-tau : forall {p q p'} -> p ≈ q -> TauSeq p p' -> ∃[ q' ] (WeakReduc q tau q' × p' ≈ q')
+p-to-q-tau : forall {p q p'} -> p ≈ q -> TauSeq p p' -> ∃[ q' ] (WeakTrans q tau q' × p' ≈ q')
 p-to-q-tau {q = q} p≈q self = q , tau self , p≈q
 p-to-q-tau {q = q} p≈q (cons r s') =
   let q1 , r1 , p'≈q1 = p≈q .p-to-q r
       q2 , r2 , p'≈q2 = p-to-q-tau p'≈q1 s'
   in q2 , join-tau r1 r2 , p'≈q2
 p-to-q-weak : forall {p q} -> p ≈ q
-              -> forall {a p'} -> WeakReduc p a p'
-              -> ∃[ q' ] (WeakReduc q a q' × p' ≈ q')
+              -> forall {a p'} -> WeakTrans p a p'
+              -> ∃[ q' ] (WeakTrans q a q' × p' ≈ q')
 p-to-q-weak p≈q (send s1 r s2) =
   let q1 , r1 , p'≈q1 = p-to-q-tau p≈q s1
       q2 , r2 , p'≈q2 = p'≈q1 .p-to-q r
@@ -77,8 +77,8 @@ p-to-q-weak p≈q (recv s1 r s2) =
 p-to-q-weak p≈q (tau s) = p-to-q-tau p≈q s
 
 reflexive : Reflexive _≈_ -- forall {p q} -> p ≈ p
-p-to-q (reflexive {p}) {p' = p'} r = p' , reduc-to-weak r , reflexive
-q-to-p (reflexive {p}) {p' = p'} r = p' , reduc-to-weak r , reflexive
+p-to-q (reflexive {p}) {p' = p'} r = p' , trans-to-weak r , reflexive
+q-to-p (reflexive {p}) {p' = p'} r = p' , trans-to-weak r , reflexive
 
 sym : Symmetric _≈_ -- forall {p q} -> p ≈ q -> q ≈ p
 p-to-q (sym {p} {q} p≈q) = p≈q .q-to-p

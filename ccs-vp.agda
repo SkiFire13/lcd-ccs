@@ -18,4 +18,4 @@ import ccs-vp.proc
 module ccs-vp {C N X V : Set} {n-fv : N -> X -> Bool} {penv : ccs-vp.proc.PEnv {C} {N} {X} {V} {n-fv}} where
 
 open import ccs-vp.proc {C} {N} {X} {V} {n-fv} public
-open import ccs-vp.reduc {C} {N} {X} {V} {n-fv} {penv} public
+open import ccs-vp.trans {C} {N} {X} {V} {n-fv} {penv} public
