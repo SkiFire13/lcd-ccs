@@ -1,9 +1,9 @@
 open import Data.Bool
 open import Data.Product
-open import Relation.Binary.Definitions
+open import Relation.Binary.Definitions using (Reflexive; Symmetric; Transitive)
 open import Relation.Binary.Morphism.Definitions
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
-open import Relation.Binary.Structures
+open import Relation.Binary.Structures using (IsEquivalence)
 
 import ccs.proc
 
