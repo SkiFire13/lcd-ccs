@@ -35,4 +35,3 @@ data Reduc : Proc -> Act -> Proc -> Set₁ where
             -> {z : T (filter-act f a)}
             -> Reduc p a q
             -> Reduc (hide f p) a (hide f q)
- 
