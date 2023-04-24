@@ -90,11 +90,12 @@ p-to-q (~-cong p~q) = helper refl refl p~q
   helper : forall {c p q ps qs} -> ps ≡ subst c p -> qs ≡ subst c q -> p ~ q
                   -> BisimulationProperty _~_ ps qs
 
-  helper {chan a c} {p} {q} refl refl p~q _ _ chan = subst c q , chan , ~-cong p~q
+  helper {chan a c} {_} {q} refl refl p~q _ _ chan = subst c q , chan , ~-cong p~q
 
-  helper {par c1 c2} {p} {q} refl refl p~q = helper-par-p-to-q (~-cong {c1} p~q) (~-cong {c2} p~q)
+  helper {par c1 c2} refl refl p~q = helper-par-p-to-q (~-cong {c1} p~q) (~-cong {c2} p~q)
     where
     helper-par : forall {pl pr ql qr} -> pl ~ ql -> pr ~ qr -> par pl pr ~ par ql qr
+
     helper-par-p-to-q : forall {pl pr ql qr} -> pl ~ ql -> pr ~ qr
                         -> BisimulationProperty _~_ (par pl pr) (par ql qr)
     helper-par-p-to-q {qr = qr} pl~ql pr~qr a _ (par-L {p' = p'} r) =
@@ -109,9 +110,9 @@ p-to-q (~-cong p~q) = helper refl refl p~q
       in par ql' qr' , par-B rl' rr' , helper-par pl'~ql' pr'~qr'
 
     p-to-q (helper-par pl~ql pr~qr) = helper-par-p-to-q pl~ql pr~qr
-    q-to-p (helper-par pl~ql pr~qr) = helper-par-p-to-q (~-Symmetric pl~ql) (~-Symmetric pr~qr)
-  
-  helper {indet f} {p} {q} refl refl p~q a p' (indet {s = s} r) =
+    q-to-p (helper-par pl~ql pr~qr) = p-to-q (helper-par (~-Symmetric pl~ql) (~-Symmetric pr~qr))
+
+  helper {indet f} refl refl p~q a p' (indet {s = s} r) =
     let q' , r' , p'~q' = (~-cong {f s} p~q) .p-to-q a p' r
     in q' , indet {s = s} r' , p'~q'
 
