@@ -17,7 +17,7 @@ record Conv-N : Set where
     name : N
     args : (x : X) -> {_ : T (n-fv name x)} -> V
 
--- Open later to shadow `chan`
+-- open import later to shadow `chan`
 open import ccs.proc {Conv-C} {Conv-N} as ccs
 open import ccs-vp.proc {C} {N} {X} {V} {n-fv} as vp
 

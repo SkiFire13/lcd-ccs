@@ -1,12 +1,11 @@
 open import Data.Sum
 
 import ccs.proc
-import ccs.reduc
 
 module ccs.weak-reduc {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
 
-open ccs.proc {C} {N}
-open ccs.reduc {C} {N} {penv}
+open import ccs.proc {C} {N}
+open import ccs.reduc {C} {N} {penv}
 
 -- A (potentially empty) sequence of tau reductions
 data TauSeq : Proc -> Proc -> Set₁ where

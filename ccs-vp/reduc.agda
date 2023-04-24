@@ -5,7 +5,7 @@ import ccs-vp.proc
 
 module ccs-vp.reduc {C N X V : Set} {n-fv : N -> X -> Bool} {penv : ccs-vp.proc.PEnv {C} {N} {X} {V} {n-fv}} where
 
-open ccs-vp.proc {C} {N} {X} {V} {n-fv}
+open import ccs-vp.proc {C} {N} {X} {V} {n-fv}
 
 -- A relation of reduction between two CCS-VP processes with a reduction operation.
 data Reduc : Proc -> Act -> Proc -> Set₁ where

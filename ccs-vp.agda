@@ -17,5 +17,5 @@ import ccs-vp.proc
 --        given the values for the variables to be binded.
 module ccs-vp {C N X V : Set} {n-fv : N -> X -> Bool} {penv : ccs-vp.proc.PEnv {C} {N} {X} {V} {n-fv}} where
 
-open ccs-vp.proc {C} {N} {X} {V} {n-fv} public
+open import ccs-vp.proc {C} {N} {X} {V} {n-fv} public
 open import ccs-vp.reduc {C} {N} {X} {V} {n-fv} {penv} public

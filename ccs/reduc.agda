@@ -5,7 +5,7 @@ import ccs.proc
 
 module ccs.reduc {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
 
-open ccs.proc {C} {N}
+open import ccs.proc {C} {N}
 
 -- A relation of reduction between two CCS processes with a channel operation.
 data Reduc : Proc -> Act -> Proc -> Set₁ where
