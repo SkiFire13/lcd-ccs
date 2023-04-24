@@ -15,9 +15,9 @@ open import ccs-vp {C} {N} {X} {V} {n-fv} {penv} as vp
 conv-reduc : forall {p1 a p2}
              -> vp.Reduc p1 a p2
              -> ccs.Reduc (conv-proc p1) (conv-act a) (conv-proc p2)
-conv-reduc chan-send = chan
-conv-reduc chan-recv = indet chan
-conv-reduc chan-tau  = chan
+conv-reduc send      = chan
+conv-reduc recv      = indet chan
+conv-reduc tau       = chan
 conv-reduc (par-L r) = par-L (conv-reduc r)
 conv-reduc (par-R r) = par-R (conv-reduc r)
 conv-reduc (par-B {a} rl rr) with a

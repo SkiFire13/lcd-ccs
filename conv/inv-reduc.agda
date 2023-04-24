@@ -22,7 +22,7 @@ NaiveInvConv = forall {p1 a p2}
               -> vp.Reduc p1 a p2
 
 inv-conv-need-exists : ¬ NaiveInvConv
-inv-conv-need-exists f with f {chan-tau vp.deadlock} {tau} {if true vp.deadlock} chan
+inv-conv-need-exists f with f {tau vp.deadlock} {tau} {if true vp.deadlock} chan
 ... | ()
 
 -- Prove some guarantees about composing functions on channel/reduction operation that Agda can't prove.
@@ -59,9 +59,9 @@ inv-conv-reduc = helper refl refl
            -> ca ≡ conv-act a
            -> ccs.Reduc cp1 ca cp2
            -> ∃[ p2 ] (cp2 ≡ conv-proc p2 × vp.Reduc p1 a p2)
-  helper {chan-send _ _ p} {send _ _} refl refl chan = p , refl , chan-send
-  helper {chan-recv _ f} {recv _ v} refl refl (indet chan) = f v , refl , chan-recv
-  helper {chan-tau p} {tau} refl refl chan = p , refl , chan-tau
+  helper {send _ _ p} {send _ _} refl refl chan = p , refl , send
+  helper {recv _ f} {recv _ v} refl refl (indet chan) = f v , refl , recv
+  helper {tau p} {tau} refl refl chan = p , refl , tau
   
   helper {par pl pr} refl eq (par-L rl) with helper {pl} refl eq rl
   ... | pl' , refl , rl' = par pl' pr , refl , par-L rl'

@@ -5,9 +5,9 @@ module ccs-vp.proc {C N X V : Set} {n-fv : N -> X -> Bool} where
 
 -- A CCS-VP Process
 data Proc : Set₁ where
-  chan-send : C -> V -> Proc -> Proc
-  chan-recv : C -> (V -> Proc) -> Proc
-  chan-tau  : Proc -> Proc
+  send : C -> V -> Proc -> Proc
+  recv : C -> (V -> Proc) -> Proc
+  tau  : Proc -> Proc
   par       : Proc -> Proc -> Proc
   indet     : {S : Set} -> (S -> Proc) -> Proc
   const     : (n : N) -> ((x : X) -> {_ : T (n-fv n x)} -> V) -> Proc
