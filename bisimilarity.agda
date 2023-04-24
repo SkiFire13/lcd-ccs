@@ -84,16 +84,15 @@ subst (hide f c) p = hide f (subst c p)
 subst replace p = p
 
 ~-cong : forall {c p q} -> p ~ q -> subst c p ~ subst c q
-~-cong = helper refl refl
+q-to-p (~-cong p~q) = p-to-q (~-cong (~-Symmetric p~q))
+p-to-q (~-cong p~q) = helper refl refl p~q
   where
-  helper : forall {c p q ps qs} -> ps ≡ subst c p -> qs ≡ subst c q -> p ~ q -> ps ~ qs
+  helper : forall {c p q ps qs} -> ps ≡ subst c p -> qs ≡ subst c q -> p ~ q
+                  -> BisimulationProperty _~_ ps qs
 
-  helper-p-to-q : forall {c p q ps qs} -> ps ≡ subst c p -> qs ≡ subst c q -> p ~ q
-                  -> BisimulationProperty _~_  ps qs
+  helper {chan a c} {p} {q} refl refl p~q _ _ chan = subst c q , chan , ~-cong p~q
 
-  helper-p-to-q {chan a c} {p} {q} refl refl p~q _ _ chan = subst c q , chan , ~-cong p~q
-
-  helper-p-to-q {par c1 c2} {p} {q} refl refl p~q = helper-par-p-to-q (~-cong {c1} p~q) (~-cong {c2} p~q)
+  helper {par c1 c2} {p} {q} refl refl p~q = helper-par-p-to-q (~-cong {c1} p~q) (~-cong {c2} p~q)
     where
     helper-par : forall {pl pr ql qr} -> pl ~ ql -> pr ~ qr -> par pl pr ~ par ql qr
     helper-par-p-to-q : forall {pl pr ql qr} -> pl ~ ql -> pr ~ qr
@@ -112,21 +111,18 @@ subst replace p = p
     p-to-q (helper-par pl~ql pr~qr) = helper-par-p-to-q pl~ql pr~qr
     q-to-p (helper-par pl~ql pr~qr) = helper-par-p-to-q (~-Symmetric pl~ql) (~-Symmetric pr~qr)
   
-  helper-p-to-q {indet f} {p} {q} refl refl p~q a p' (indet {s = s} r) =
+  helper {indet f} {p} {q} refl refl p~q a p' (indet {s = s} r) =
     let q' , r' , p'~q' = (~-cong {f s} p~q) .p-to-q a p' r
     in q' , indet {s = s} r' , p'~q'
 
-  helper-p-to-q {const _} refl refl _ = ~-Reflexive .p-to-q
+  helper {const _} refl refl _ = ~-Reflexive .p-to-q
 
-  helper-p-to-q {rename f c} refl refl p~q _ (rename .f p') (rename {a} r) =
+  helper {rename f c} refl refl p~q _ (rename .f p') (rename {a} r) =
     let q' , r' , p'~q' = (~-cong {c} p~q) .p-to-q a p' r
     in rename f q' , rename {a} r' , ~-cong p'~q'
 
-  helper-p-to-q {hide f c} refl refl p~q a (hide .f p') (hide {z = z} r) =
+  helper {hide f c} refl refl p~q a (hide .f p') (hide {z = z} r) =
     let q' , r' , p'~q' = (~-cong {c} p~q) .p-to-q a p' r
     in hide f q' , hide {z = z} r' , ~-cong p'~q'
 
-  helper-p-to-q {replace} refl refl p~q = p~q .p-to-q
-
-  p-to-q (helper refl refl p~q) = helper-p-to-q refl refl p~q
-  q-to-p (helper refl refl p~q) = p-to-q (helper refl refl (~-Symmetric p~q))
+  helper {replace} refl refl p~q = p~q .p-to-q
