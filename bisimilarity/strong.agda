@@ -87,24 +87,20 @@ p-to-q (cong p~q) = helper refl refl p~q
 
   helper {chan a c} {q = q} refl refl p~q chan = subst c q , chan , cong p~q
 
-  helper {par c1 c2} refl refl p~q = helper-par (cong {c1} p~q) (cong {c2} p~q) .p-to-q
+  helper {par c1 c2} refl refl p~q = p-to-q (helper-par (cong {c1} p~q) (cong {c2} p~q))
     where
     helper-par : forall {pl pr ql qr} -> pl ~ ql -> pr ~ qr -> par pl pr ~ par ql qr
     q-to-p (helper-par pl~ql pr~qr) = p-to-q (helper-par (sym pl~ql) (sym pr~qr))
-    p-to-q (helper-par pl~ql pr~qr) = helper-par-p-to-q pl~ql pr~qr
-      where
-      helper-par-p-to-q : forall {pl pr ql qr} -> pl ~ ql -> pr ~ qr
-                          -> BisimulationProperty _~_ (par pl pr) (par ql qr)
-      helper-par-p-to-q {qr = qr} pl~ql pr~qr (par-L {p' = p'} r) =
-        let q' , r' , p'~q' = pl~ql .p-to-q r
-        in par q' qr , par-L r' , helper-par p'~q' pr~qr
-      helper-par-p-to-q {ql = ql} pl~ql pr~qr (par-R {p' = p'} r) =
-        let q' , r' , p'~q' = pr~qr .p-to-q r
-        in par ql q' , par-R r' , helper-par pl~ql p'~q'
-      helper-par-p-to-q pl~ql pr~qr (par-B {a} {pl' = pl'} {pr' = pr'} rl rr) =
-        let ql' , rl' , pl'~ql' = pl~ql .p-to-q rl
-            qr' , rr' , pr'~qr' = pr~qr .p-to-q rr
-        in par ql' qr' , par-B rl' rr' , helper-par pl'~ql' pr'~qr'
+    p-to-q (helper-par {qr = qr} pl~ql pr~qr) (par-L {p' = p'} r) =
+      let q' , r' , p'~q' = pl~ql .p-to-q r
+      in par q' qr , par-L r' , helper-par p'~q' pr~qr
+    p-to-q (helper-par {ql = ql} pl~ql pr~qr) (par-R {p' = p'} r) =
+      let q' , r' , p'~q' = pr~qr .p-to-q r
+      in par ql q' , par-R r' , helper-par pl~ql p'~q'
+    p-to-q (helper-par pl~ql pr~qr) (par-B {a} {pl' = pl'} {pr' = pr'} rl rr) =
+      let ql' , rl' , pl'~ql' = pl~ql .p-to-q rl
+          qr' , rr' , pr'~qr' = pr~qr .p-to-q rr
+      in par ql' qr' , par-B rl' rr' , helper-par pl'~ql' pr'~qr'
 
   helper {indet f} refl refl p~q (indet {s = s} r) =
     let q' , r' , p'~q' = (cong {f s} p~q) .p-to-q r
