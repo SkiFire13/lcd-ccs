@@ -8,7 +8,7 @@ open import Relation.Binary.Structures
 import ccs
 import ccs.proc
 
-module bisimilarity {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
+module bisimilarity.strong {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
 
 open ccs {C} {N} {penv}
 
