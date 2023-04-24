@@ -12,9 +12,11 @@ module bisimilarity.strong {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
 
 open ccs {C} {N} {penv}
 
+-- (Half) the property of a strong bisimulation
 BisimulationProperty : (Proc -> Proc -> Set₁) -> Proc -> Proc -> Set₁
 BisimulationProperty R p q = forall {a p'} -> Reduc p a p' -> ∃[ q' ] (Reduc q a q' × R p' q')
 
+-- Definition of a strong bisimulation
 record Bisimulation : Set₂ where
   field
     R : Proc -> Proc -> Set₁
@@ -22,9 +24,11 @@ record Bisimulation : Set₂ where
     q-to-p : forall {p q} -> R p q -> BisimulationProperty R q p
 open Bisimulation
 
+-- Definition of strong bisimilarity 
 data _∼_ : Proc -> Proc -> Set₂ where
   bisimilar : (p : Proc) -> (q : Proc) -> (b : Bisimulation) -> b .R p q -> p ∼ q
 
+-- Strong bisimilarity defined coinductively
 record _~_ (p : Proc) (q : Proc) : Set₁ where
   coinductive
   field
@@ -32,6 +36,7 @@ record _~_ (p : Proc) (q : Proc) : Set₁ where
     q-to-p : BisimulationProperty _~_ q p
 open _~_
 
+-- Strong bisimilarity (defined with a relation) implies strong bisimilarity (coinductive)
 ∼-to-~ : forall {p q} -> p ∼ q -> p ~ q
 p-to-q (∼-to-~ (bisimilar p q R x)) {p' = p'} r =
   let q' , r' , x' = R .p-to-q x r
@@ -39,7 +44,7 @@ p-to-q (∼-to-~ (bisimilar p q R x)) {p' = p'} r =
 q-to-p (∼-to-~ (bisimilar p q R x)) {p' = q'} r =
   let p' , r' , x' = R .q-to-p x r
   in p' , r' , ∼-to-~ (bisimilar q' p' R x')
-
+-- Strong bisimilarity (coinductive) implies strong bisimilarity (defined with a relation)
 ~-to-∼ : forall {p q} -> p ~ q -> p ∼ q
 ~-to-∼ {p} {q} p~q = bisimilar p q bis p~q
   where
@@ -48,26 +53,32 @@ q-to-p (∼-to-~ (bisimilar p q R x)) {p' = q'} r =
   p-to-q (bis) = p-to-q
   q-to-p (bis) = q-to-p
 
-reflexive : Reflexive _~_
+-- From now on everything will use the coinductive definition
+
+reflexive : Reflexive _~_ -- forall {p q} -> p ~ p
 p-to-q (reflexive {p}) {p' = p'} r = p' , r , reflexive
 q-to-p (reflexive {p}) {p' = p'} r = p' , r , reflexive
 
-sym : Symmetric _~_
+sym : Symmetric _~_ -- forall {p q} -> p ~ q -> q ~ p
 p-to-q (sym {p} {q} p~q) = p~q .q-to-p
 q-to-p (sym {p} {q} p~q) = p~q .p-to-q
 
-trans : Transitive _~_
+trans : Transitive _~_ -- forall {p q s} -> p ~ q -> q ~ s -> p ~ s
 p-to-q (trans {p} {q} {s} p~q q~s) rp =
   let q' , rq , p'~q' = p~q .p-to-q rp
       s' , rs , q'~s' = q~s .p-to-q rq
   in s' , rs , trans p'~q' q'~s'
 q-to-p (trans {p} {q} {s} p~q q~s) = p-to-q (trans (sym q~s) (sym p~q))
 
+-- Agda's equivalence class, just to assert that ~ is effectively an equivalence
 isEquivalence : IsEquivalence _~_
 IsEquivalence.refl (isEquivalence) = reflexive
 IsEquivalence.sym (isEquivalence) = sym
 IsEquivalence.trans (isEquivalence) = trans
 
+-- A process context
+-- TODO: force one and only one replacement
+-- TODO: decide what to do with `indet`
 data Context : Set₁ where
   chan    : Act -> Context -> Context
   par     : Context -> Context -> Context
@@ -77,6 +88,7 @@ data Context : Set₁ where
   hide    : (C -> Bool) -> Context -> Context
   replace : Context
 
+-- Substitute a process inside a context
 subst : Context -> Proc -> Proc
 subst (chan a c) p = chan a (subst c p)
 subst (par c1 c2) p = par (subst c1 p) (subst c2 p)
@@ -86,10 +98,12 @@ subst (rename f c) p = rename f (subst c p)
 subst (hide f c) p = hide f (subst c p)
 subst replace p = p
 
+-- Prove that ~ is a congruence
 cong : forall {c} -> Homomorphic₂ Proc Proc _~_ _~_ (subst c)
 q-to-p (cong p~q) = p-to-q (cong (sym p~q))
 p-to-q (cong p~q) = helper refl refl p~q
   where
+  -- Prove only one half of the bisimulation property, the other can be proved through symmetry
   helper : forall {c p q ps qs} -> ps ≡ subst c p -> qs ≡ subst c q -> p ~ q
            -> BisimulationProperty _~_ ps qs
 
