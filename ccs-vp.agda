@@ -2,7 +2,6 @@ open import Data.Bool
 open import Data.Empty
 
 import ccs-vp.proc
-import ccs-vp.reduc
 
 -- C = Set of the Channels
 -- N = Set of the Names of the constant processes
@@ -19,4 +18,4 @@ import ccs-vp.reduc
 module ccs-vp {C N X V : Set} {n-fv : N -> X -> Bool} {penv : ccs-vp.proc.PEnv {C} {N} {X} {V} {n-fv}} where
 
 open ccs-vp.proc {C} {N} {X} {V} {n-fv} public
-open ccs-vp.reduc {C} {N} {X} {V} {n-fv} {penv} public
+open import ccs-vp.reduc {C} {N} {X} {V} {n-fv} {penv} public
