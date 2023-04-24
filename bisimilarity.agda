@@ -65,11 +65,9 @@ p-to-q (trans {p} {q} {s} p~q q~s) a p' rp =
 q-to-p (trans {p} {q} {s} p~q q~s) = p-to-q (trans (sym q~s) (sym p~q))
 
 isEquivalence : IsEquivalence _~_
-isEquivalence = record {
-    refl  = reflexive ;
-    sym   = sym ;
-    trans = trans
-  }
+IsEquivalence.refl (isEquivalence) = reflexive
+IsEquivalence.sym (isEquivalence) = sym
+IsEquivalence.trans (isEquivalence) = trans
 
 data Context : Set₁ where
   chan    : Act -> Context -> Context
@@ -94,29 +92,28 @@ q-to-p (cong p~q) = p-to-q (cong (sym p~q))
 p-to-q (cong p~q) = helper refl refl p~q
   where
   helper : forall {c p q ps qs} -> ps ≡ subst c p -> qs ≡ subst c q -> p ~ q
-                  -> BisimulationProperty _~_ ps qs
+           -> BisimulationProperty _~_ ps qs
 
-  helper {chan a c} {_} {q} refl refl p~q _ _ chan = subst c q , chan , cong p~q
+  helper {chan a c} {q = q} refl refl p~q _ _ chan = subst c q , chan , cong p~q
 
-  helper {par c1 c2} refl refl p~q = helper-par-p-to-q (cong {c1} p~q) (cong {c2} p~q)
+  helper {par c1 c2} refl refl p~q = helper-par (cong {c1} p~q) (cong {c2} p~q) .p-to-q
     where
     helper-par : forall {pl pr ql qr} -> pl ~ ql -> pr ~ qr -> par pl pr ~ par ql qr
-
-    helper-par-p-to-q : forall {pl pr ql qr} -> pl ~ ql -> pr ~ qr
-                        -> BisimulationProperty _~_ (par pl pr) (par ql qr)
-    helper-par-p-to-q {qr = qr} pl~ql pr~qr a _ (par-L {p' = p'} r) =
-      let q' , r' , p'~q' = pl~ql .p-to-q a p' r
-      in par q' qr , par-L r' , helper-par p'~q' pr~qr
-    helper-par-p-to-q {ql = ql} pl~ql pr~qr a _ (par-R {p' = p'} r) =
-      let q' , r' , p'~q' = pr~qr .p-to-q a p' r
-      in par ql q' , par-R r' , helper-par pl~ql p'~q'
-    helper-par-p-to-q pl~ql pr~qr _ _ (par-B {a} {pl' = pl'} {pr' = pr'} rl rr) =
-      let ql' , rl' , pl'~ql' = pl~ql .p-to-q a pl' rl
-          qr' , rr' , pr'~qr' = pr~qr .p-to-q (flip-act a) pr' rr
-      in par ql' qr' , par-B rl' rr' , helper-par pl'~ql' pr'~qr'
-
-    p-to-q (helper-par pl~ql pr~qr) = helper-par-p-to-q pl~ql pr~qr
     q-to-p (helper-par pl~ql pr~qr) = p-to-q (helper-par (sym pl~ql) (sym pr~qr))
+    p-to-q (helper-par pl~ql pr~qr) = helper-par-p-to-q pl~ql pr~qr
+      where
+      helper-par-p-to-q : forall {pl pr ql qr} -> pl ~ ql -> pr ~ qr
+                          -> BisimulationProperty _~_ (par pl pr) (par ql qr)
+      helper-par-p-to-q {qr = qr} pl~ql pr~qr a _ (par-L {p' = p'} r) =
+        let q' , r' , p'~q' = pl~ql .p-to-q a p' r
+        in par q' qr , par-L r' , helper-par p'~q' pr~qr
+      helper-par-p-to-q {ql = ql} pl~ql pr~qr a _ (par-R {p' = p'} r) =
+        let q' , r' , p'~q' = pr~qr .p-to-q a p' r
+        in par ql q' , par-R r' , helper-par pl~ql p'~q'
+      helper-par-p-to-q pl~ql pr~qr _ _ (par-B {a} {pl' = pl'} {pr' = pr'} rl rr) =
+        let ql' , rl' , pl'~ql' = pl~ql .p-to-q a pl' rl
+            qr' , rr' , pr'~qr' = pr~qr .p-to-q (flip-act a) pr' rr
+        in par ql' qr' , par-B rl' rr' , helper-par pl'~ql' pr'~qr'
 
   helper {indet f} refl refl p~q a p' (indet {s = s} r) =
     let q' , r' , p'~q' = (cong {f s} p~q) .p-to-q a p' r
