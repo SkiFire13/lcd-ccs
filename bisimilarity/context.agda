@@ -19,6 +19,11 @@ data Context : Set₁ where
   hide    : (C -> Bool) -> Context -> Context
   replace : Context
 
+-- A context that when substituted always evaluates to a deadlock process
+-- TODO: remove this and replace its usages with a Proc deadlock
+deadlock : Context
+deadlock = indet ⊥-elim
+
 -- Substitute a process inside a context
 subst : Context -> Proc -> Proc
 subst (chan a c) p = chan a (subst c p)
@@ -29,9 +34,7 @@ subst (rename f c) p = rename f (subst c p)
 subst (hide f c) p = hide f (subst c p)
 subst replace p = p
 
-deadlock : Context
-deadlock = indet ⊥-elim
-
+-- Compose two processes in relation to subst
 compose : Context -> Context -> Context
 compose (chan a c) c2 = chan a (compose c c2)
 compose (par cl cr) c2 = par (compose cl c2) (compose cr c2)
