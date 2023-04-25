@@ -37,12 +37,12 @@ open _≈_
 
 -- Weak bisimilarity (defined with a relation) implies weak bisimilarity (coinductive)
 ≈ᵣ-to-≈ : forall {p q} -> p ≈ᵣ q -> p ≈ q
-p-to-q (≈ᵣ-to-≈ (bisimilar p q R x)) {p' = p'} r =
-  let q' , r' , x' = R .p-to-q {p} {q} x r
-  in q' , r' , ≈ᵣ-to-≈ (bisimilar p' q' R x')
-q-to-p (≈ᵣ-to-≈ (bisimilar p q R x)) {p' = q'} r =
-  let p' , r' , x' = R .q-to-p {p} {q} x r
-  in p' , r' , ≈ᵣ-to-≈ (bisimilar q' p' R x')
+p-to-q (≈ᵣ-to-≈ (bisimilar p q R x)) {p' = p'} t =
+  let q' , t' , x' = R .p-to-q {p} {q} x t
+  in q' , t' , ≈ᵣ-to-≈ (bisimilar p' q' R x')
+q-to-p (≈ᵣ-to-≈ (bisimilar p q R x)) {p' = q'} t =
+  let p' , t' , x' = R .q-to-p {p} {q} x t
+  in p' , t' , ≈ᵣ-to-≈ (bisimilar q' p' R x')
 -- Weak bisimilarity (coinductive) implies weak bisimilarity (defined with a relation)
 ≈-to-≈ᵣ : forall {p q} -> p ≈ q -> p ≈ᵣ q
 ≈-to-≈ᵣ {p} {q} p≈q = bisimilar p q bis p≈q
@@ -84,20 +84,19 @@ p-to-q (≈-to-≈ₛ p≈q) t =
   where
   p-to-q-tau : forall {p q p'} -> p ≈ q -> TauSeq p p' -> ∃[ q' ] (WeakTrans q tau q' × p' ≈ q')
   p-to-q-tau {q = q} p≈q self = q , tau self , p≈q
-  p-to-q-tau {q = q} p≈q (cons r s') =
-    let q1 , r1 , p'≈q1 = p≈q .p-to-q r
+  p-to-q-tau {q = q} p≈q (cons t s') =
+    let q1 , r1 , p'≈q1 = p≈q .p-to-q t
         q2 , r2 , p'≈q2 = p-to-q-tau p'≈q1 s'
     in q2 , join-tau r1 r2 , p'≈q2
-  p-to-q-weak : forall {p q} -> p ≈ q -> forall {a p'} -> WeakTrans p a p'
-                -> ∃[ q' ] (WeakTrans q a q' × p' ≈ q')
-  p-to-q-weak p≈q (send s1 r s2) =
+  p-to-q-weak : forall {p q a p'} -> p ≈ q -> WeakTrans p a p' -> ∃[ q' ] (WeakTrans q a q' × p' ≈ q')
+  p-to-q-weak p≈q (send s1 t s2) =
     let q1 , r1 , p'≈q1 = p-to-q-tau p≈q s1
-        q2 , r2 , p'≈q2 = p'≈q1 .p-to-q r
+        q2 , r2 , p'≈q2 = p'≈q1 .p-to-q t
         q3 , r3 , p'≈q3 = p-to-q-tau p'≈q2 s2
     in q3 , join r1 r2 r3 , p'≈q3
-  p-to-q-weak p≈q (recv s1 r s2) =
+  p-to-q-weak p≈q (recv s1 t s2) =
     let q1 , r1 , p'≈q1 = p-to-q-tau p≈q s1
-        q2 , r2 , p'≈q2 = p'≈q1 .p-to-q r
+        q2 , r2 , p'≈q2 = p'≈q1 .p-to-q t
         q3 , r3 , p'≈q3 = p-to-q-tau p'≈q2 s2
     in q3 , join r1 r2 r3 , p'≈q3
   p-to-q-weak p≈q (tau s) = p-to-q-tau p≈q s
@@ -105,8 +104,8 @@ p-to-q (≈-to-≈ₛ p≈q) t =
 -- Properties of weak bisimilarity
 
 reflexive : Reflexive _≈_ -- forall {p q} -> p ≈ p
-p-to-q (reflexive {p}) {p' = p'} r = p' , trans-to-weak r , reflexive
-q-to-p (reflexive {p}) {p' = p'} r = p' , trans-to-weak r , reflexive
+p-to-q (reflexive {p}) {p' = p'} t = p' , trans-to-weak t , reflexive
+q-to-p (reflexive {p}) {p' = p'} t = p' , trans-to-weak t , reflexive
 
 sym : Symmetric _≈_ -- forall {p q} -> p ≈ q -> q ≈ p
 p-to-q (sym {p} {q} p≈q) = p≈q .q-to-p

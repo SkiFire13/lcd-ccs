@@ -38,12 +38,12 @@ open _~_
 
 -- Strong bisimilarity (defined with a relation) implies strong bisimilarity (coinductive)
 ∼-to-~ : forall {p q} -> p ∼ q -> p ~ q
-p-to-q (∼-to-~ (bisimilar p q R x)) {p' = p'} r =
-  let q' , r' , x' = R .p-to-q x r
-  in q' , r' , ∼-to-~ (bisimilar p' q' R x')
-q-to-p (∼-to-~ (bisimilar p q R x)) {p' = q'} r =
-  let p' , r' , x' = R .q-to-p x r
-  in p' , r' , ∼-to-~ (bisimilar q' p' R x')
+p-to-q (∼-to-~ (bisimilar p q R x)) {p' = p'} t =
+  let q' , t' , x' = R .p-to-q x t
+  in q' , t' , ∼-to-~ (bisimilar p' q' R x')
+q-to-p (∼-to-~ (bisimilar p q R x)) {p' = q'} t =
+  let p' , t' , x' = R .q-to-p x t
+  in p' , t' , ∼-to-~ (bisimilar q' p' R x')
 -- Strong bisimilarity (coinductive) implies strong bisimilarity (defined with a relation)
 ~-to-∼ : forall {p q} -> p ~ q -> p ∼ q
 ~-to-∼ {p} {q} p~q = bisimilar p q bis p~q
@@ -59,8 +59,8 @@ q-to-p (∼-to-~ (bisimilar p q R x)) {p' = q'} r =
 -- Properties of strong bisimilarity
 
 reflexive : Reflexive _~_ -- forall {p q} -> p ~ p
-p-to-q (reflexive {p}) {p' = p'} r = p' , r , reflexive
-q-to-p (reflexive {p}) {p' = p'} r = p' , r , reflexive
+p-to-q (reflexive {p}) {p' = p'} t = p' , t , reflexive
+q-to-p (reflexive {p}) {p' = p'} t = p' , t , reflexive
 
 sym : Symmetric _~_ -- forall {p q} -> p ~ q -> q ~ p
 p-to-q (sym {p} {q} p~q) = p~q .q-to-p
@@ -94,29 +94,29 @@ p-to-q (cong p~q) = helper refl refl p~q
     where
     helper-par : forall {pl pr ql qr} -> pl ~ ql -> pr ~ qr -> par pl pr ~ par ql qr
     q-to-p (helper-par pl~ql pr~qr) = p-to-q (helper-par (sym pl~ql) (sym pr~qr))
-    p-to-q (helper-par {qr = qr} pl~ql pr~qr) (par-L {p' = p'} r) =
-      let q' , r' , p'~q' = pl~ql .p-to-q r
-      in par q' qr , par-L r' , helper-par p'~q' pr~qr
-    p-to-q (helper-par {ql = ql} pl~ql pr~qr) (par-R {p' = p'} r) =
-      let q' , r' , p'~q' = pr~qr .p-to-q r
-      in par ql q' , par-R r' , helper-par pl~ql p'~q'
-    p-to-q (helper-par pl~ql pr~qr) (par-B {a} {pl' = pl'} {pr' = pr'} rl rr) =
-      let ql' , rl' , pl'~ql' = pl~ql .p-to-q rl
-          qr' , rr' , pr'~qr' = pr~qr .p-to-q rr
-      in par ql' qr' , par-B rl' rr' , helper-par pl'~ql' pr'~qr'
+    p-to-q (helper-par {qr = qr} pl~ql pr~qr) (par-L {p' = p'} t) =
+      let q' , t' , p'~q' = pl~ql .p-to-q t
+      in par q' qr , par-L t' , helper-par p'~q' pr~qr
+    p-to-q (helper-par {ql = ql} pl~ql pr~qr) (par-R {p' = p'} t) =
+      let q' , t' , p'~q' = pr~qr .p-to-q t
+      in par ql q' , par-R t' , helper-par pl~ql p'~q'
+    p-to-q (helper-par pl~ql pr~qr) (par-B {a} {pl' = pl'} {pr' = pr'} tl tr) =
+      let ql' , tl' , pl'~ql' = pl~ql .p-to-q tl
+          qr' , tr' , pr'~qr' = pr~qr .p-to-q tr
+      in par ql' qr' , par-B tl' tr' , helper-par pl'~ql' pr'~qr'
 
-  helper {indet f} refl refl p~q (indet {s = s} r) =
-    let q' , r' , p'~q' = (cong {f s} p~q) .p-to-q r
-    in q' , indet {s = s} r' , p'~q'
+  helper {indet f} refl refl p~q (indet {s = s} t) =
+    let q' , t' , p'~q' = (cong {f s} p~q) .p-to-q t
+    in q' , indet {s = s} t' , p'~q'
 
   helper {const _} refl refl _ = reflexive .p-to-q
 
-  helper {rename f c} refl refl p~q (rename {a} r) =
-    let q' , r' , p'~q' = (cong {c} p~q) .p-to-q r
-    in rename f q' , rename {a} r' , cong p'~q'
+  helper {rename f c} refl refl p~q (rename {a = a} t) =
+    let q' , t' , p'~q' = (cong {c} p~q) .p-to-q t
+    in rename f q' , rename {a = a} t' , cong p'~q'
 
-  helper {hide f c} refl refl p~q (hide {z = z} r) =
-    let q' , r' , p'~q' = (cong {c} p~q) .p-to-q r
-    in hide f q' , hide {z = z} r' , cong p'~q'
+  helper {hide f c} refl refl p~q (hide {z = z} t) =
+    let q' , t' , p'~q' = (cong {c} p~q) .p-to-q t
+    in hide f q' , hide {z = z} t' , cong p'~q'
 
   helper {replace} refl refl p~q = p~q .p-to-q

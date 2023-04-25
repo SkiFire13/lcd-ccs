@@ -3,19 +3,19 @@ open import Data.Empty
 
 module ccs-vp.proc {C N X V : Set} {n-fv : N -> X -> Bool} where
 
--- A CCS-VP Process
+-- A CCS VP Process
 data Proc : Set₁ where
-  send : C -> V -> Proc -> Proc
-  recv : C -> (V -> Proc) -> Proc
-  tau  : Proc -> Proc
-  par       : Proc -> Proc -> Proc
-  indet     : {S : Set} -> (S -> Proc) -> Proc
-  const     : (n : N) -> ((x : X) -> {_ : T (n-fv n x)} -> V) -> Proc
-  rename    : (C -> C) -> Proc -> Proc
-  hide      : (C -> Bool) -> Proc -> Proc
-  if        : Bool -> Proc -> Proc
+  send   : C -> V -> Proc -> Proc
+  recv   : C -> (V -> Proc) -> Proc
+  tau    : Proc -> Proc
+  par    : Proc -> Proc -> Proc
+  indet  : {S : Set} -> (S -> Proc) -> Proc
+  const  : (n : N) -> ((x : X) -> {_ : T (n-fv n x)} -> V) -> Proc
+  rename : (C -> C) -> Proc -> Proc
+  hide   : (C -> Bool) -> Proc -> Proc
+  if     : Bool -> Proc -> Proc
 
--- The "desugaring" of the deadlock CCS-VP Process
+-- The "desugaring" of the deadlock CCS VP Process
 deadlock = indet ⊥-elim
 
 -- A CCS VP action. This is a bit different than the CCS's Act

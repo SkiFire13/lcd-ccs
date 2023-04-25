@@ -21,7 +21,7 @@ record Conv-N : Set where
 open import ccs.proc {Conv-C} {Conv-N} as ccs
 open import ccs-vp.proc {C} {N} {X} {V} {n-fv} as vp
 
--- Convert a CCS-VP process to a normal CCS Process
+-- Convert a CCS VP process to a normal CCS Process
 -- the implementation is below, after a couple of helper co-recursive functions
 conv-proc : vp.Proc -> ccs.Proc
 
@@ -47,7 +47,7 @@ conv-proc (rename f p) = rename (conv-rename f) (conv-proc p)
 conv-proc (hide f p)   = hide (conv-hide f) (conv-proc p)
 conv-proc (if b p)     = if b then (conv-proc p) else ccs.deadlock
 
--- Convert transition operations in CCS-VP into channel operations in CCS
+-- Convert transition operations in CCS VP into channel operations in CCS
 conv-act : vp.Act -> ccs.Act
 conv-act (send c v) = send (conv-c c v)
 conv-act (recv c v) = recv (conv-c c v)
