@@ -1,7 +1,6 @@
 open import Data.Bool
 open import Data.Product
 open import Relation.Binary.Definitions using (Reflexive; Symmetric; Transitive)
-open import Relation.Binary.Morphism.Definitions using (Homomorphic₂)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 open import Relation.Binary.Structures using (IsEquivalence)
 
@@ -80,8 +79,7 @@ IsEquivalence.sym (isEquivalence) = sym
 IsEquivalence.trans (isEquivalence) = trans
 
 -- Prove that ~ is a congruence
--- forall {C[] p q} -> p ~ q -> subst C[] p ~ subst C[] q
-cong : forall {C[]} -> Homomorphic₂ Proc Proc _~_ _~_ (subst C[])
+cong : forall {C[] p q} -> p ~ q -> subst C[] p ~ subst C[] q
 q-to-p (cong p~q) = p-to-q (cong (sym p~q))
 p-to-q (cong p~q) = helper refl refl p~q
   where

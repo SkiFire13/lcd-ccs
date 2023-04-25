@@ -1,7 +1,6 @@
 open import Data.Bool
 open import Data.Product
 open import Relation.Binary.Definitions using (Reflexive; Symmetric; Transitive)
-open import Relation.Binary.Morphism.Definitions using (Homomorphic₂)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 open import Relation.Binary.Structures using (IsEquivalence)
 open import Relation.Nullary
@@ -128,8 +127,7 @@ IsEquivalence.sym (isEquivalence) = sym
 IsEquivalence.trans (isEquivalence) = trans
 
 -- Prove that ≈ is not a congruence
--- forall {c} -> ¬ (forall {C[] p q} -> p ≈ q -> subst C[] p ≈ subst C[] q)
-≈-not-cong : {c : C} -> ¬ forall {C[]} -> Homomorphic₂ Proc Proc _≈_ _≈_ (subst C[])
+≈-not-cong : {c : C} -> ¬ forall {C[] p q} -> p ≈ q -> subst C[] p ≈ subst C[] q
 ≈-not-cong {c} cong with cong {C[]} τd≈d .p-to-q (Trans.indet {s = true} chan)
   where
   τd≈d : chan tau ccs.deadlock ≈ ccs.deadlock
