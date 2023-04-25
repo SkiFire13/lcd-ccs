@@ -16,20 +16,20 @@ record Bisimulation : Set₂ where
 open Bisimulation
 
 -- Definition of strong bisimilarity 
-data _∼_ : Proc -> Proc -> Set₂ where
-  bisimilar : (p : Proc) -> (q : Proc) -> (b : Bisimulation) -> b .R p q -> p ∼ q
+data _~ᵣ_ : Proc -> Proc -> Set₂ where
+  bisimilar : (p : Proc) -> (q : Proc) -> (b : Bisimulation) -> b .R p q -> p ~ᵣ q
 
 -- Strong bisimilarity (defined with a relation) implies strong bisimilarity (coinductive)
-∼-to-~ : forall {p q} -> p ∼ q -> p ~ q
-p-to-q (∼-to-~ (bisimilar p q R x)) {p' = p'} t =
+~ᵣ-to-~ : forall {p q} -> p ~ᵣ q -> p ~ q
+p-to-q (~ᵣ-to-~ (bisimilar p q R x)) {p' = p'} t =
   let q' , t' , x' = R .p-to-q x t
-  in q' , t' , ∼-to-~ (bisimilar p' q' R x')
-q-to-p (∼-to-~ (bisimilar p q R x)) {p' = q'} t =
+  in q' , t' , ~ᵣ-to-~ (bisimilar p' q' R x')
+q-to-p (~ᵣ-to-~ (bisimilar p q R x)) {p' = q'} t =
   let p' , t' , x' = R .q-to-p x t
-  in p' , t' , ∼-to-~ (bisimilar q' p' R x')
+  in p' , t' , ~ᵣ-to-~ (bisimilar q' p' R x')
 -- Strong bisimilarity (coinductive) implies strong bisimilarity (defined with a relation)
-~-to-∼ : forall {p q} -> p ~ q -> p ∼ q
-~-to-∼ {p} {q} p~q = bisimilar p q bis p~q
+~-to-~ᵣ : forall {p q} -> p ~ q -> p ~ᵣ q
+~-to-~ᵣ {p} {q} p~q = bisimilar p q bis p~q
   where
   bis : Bisimulation
   R (bis) = _~_
