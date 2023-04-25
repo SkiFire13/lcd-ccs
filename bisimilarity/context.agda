@@ -22,7 +22,7 @@ data Context : Set₁ where
 -- Substitute a process inside a context
 subst : Context -> Proc -> Proc
 subst (chan a c) p = chan a (subst c p)
-subst (par c1 c2) p = par (subst c1 p) (subst c2 p)
+subst (par cl cr) p = par (subst cl p) (subst cr p)
 subst (indet f) p = indet (\ s -> subst (f s) p)
 subst (const n) p = const n
 subst (rename f c) p = rename f (subst c p)
@@ -31,3 +31,12 @@ subst replace p = p
 
 deadlock : Context
 deadlock = indet ⊥-elim
+
+compose : Context -> Context -> Context
+compose (chan a c) c2 = chan a (compose c c2)
+compose (par cl cr) c2 = par (compose cl c2) (compose cr c2)
+compose (indet f) c2 = indet (\ s -> compose (f s) c2)
+compose (const n) c2 = const n
+compose (rename f c) c2 = rename f (compose c c2)
+compose (hide f c) c2 = hide f (compose c c2)
+compose replace c2 = c2
