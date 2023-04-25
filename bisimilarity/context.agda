@@ -1,10 +1,11 @@
 open import Data.Bool
+open import Data.Empty
 
 import ccs.proc
 
 module bisimilarity.context {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
 
-open import ccs.common {C} {N} {penv}
+open import ccs.common {C} {N} {penv} hiding (deadlock)
 
 -- A process context
 -- TODO: force one and only one replacement
@@ -27,3 +28,6 @@ subst (const n) p = const n
 subst (rename f c) p = rename f (subst c p)
 subst (hide f c) p = hide f (subst c p)
 subst replace p = p
+
+deadlock : Context
+deadlock = indet ⊥-elim

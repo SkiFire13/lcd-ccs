@@ -80,15 +80,15 @@ IsEquivalence.sym (isEquivalence) = sym
 IsEquivalence.trans (isEquivalence) = trans
 
 -- Prove that ~ is a congruence
-cong : forall {c} -> Homomorphic₂ Proc Proc _~_ _~_ (subst c) -- forall {c p q} -> p ~ q -> subst c p ~ subst c q
+-- forall {C[] p q} -> p ~ q -> subst C[] p ~ subst C[] q
+cong : forall {C[]} -> Homomorphic₂ Proc Proc _~_ _~_ (subst C[])
 q-to-p (cong p~q) = p-to-q (cong (sym p~q))
 p-to-q (cong p~q) = helper refl refl p~q
   where
   -- Prove only one half of the bisimulation property, the other can be proved through symmetry
-  helper : forall {c p q ps qs} -> ps ≡ subst c p -> qs ≡ subst c q -> p ~ q
-           -> BisimulationProperty _~_ ps qs
+  helper : forall {C[] p q ps qs} -> ps ≡ subst C[] p -> qs ≡ subst C[] q -> p ~ q -> BisimulationProperty _~_ ps qs
 
-  helper {chan a c} {q = q} refl refl p~q chan = subst c q , chan , cong p~q
+  helper {chan a C[]} {q = q} refl refl p~q chan = subst C[] q , chan , cong p~q
 
   helper {par c1 c2} refl refl p~q = p-to-q (helper-par (cong {c1} p~q) (cong {c2} p~q))
     where
@@ -111,12 +111,12 @@ p-to-q (cong p~q) = helper refl refl p~q
 
   helper {const _} refl refl _ = reflexive .p-to-q
 
-  helper {rename f c} refl refl p~q (rename {a = a} t) =
-    let q' , t' , p'~q' = (cong {c} p~q) .p-to-q t
+  helper {rename f C[]} refl refl p~q (rename {a = a} t) =
+    let q' , t' , p'~q' = (cong {C[]} p~q) .p-to-q t
     in rename f q' , rename {a = a} t' , cong p'~q'
 
-  helper {hide f c} refl refl p~q (hide {z = z} t) =
-    let q' , t' , p'~q' = (cong {c} p~q) .p-to-q t
+  helper {hide f C[]} refl refl p~q (hide {z = z} t) =
+    let q' , t' , p'~q' = (cong {C[]} p~q) .p-to-q t
     in hide f q' , hide {z = z} t' , cong p'~q'
 
   helper {replace} refl refl p~q = p~q .p-to-q

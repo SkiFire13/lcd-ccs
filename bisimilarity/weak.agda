@@ -4,12 +4,14 @@ open import Relation.Binary.Definitions using (Reflexive; Symmetric; Transitive)
 open import Relation.Binary.Morphism.Definitions using (Homomorphic₂)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 open import Relation.Binary.Structures using (IsEquivalence)
+open import Relation.Nullary
 
 import ccs.proc
 
 module bisimilarity.weak {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
 
-open import ccs.common {C} {N} {penv}
+open import ccs.common {C} {N} {penv} as ccs
+open import bisimilarity.context {C} {N} {penv} as ctx
 
 -- (Half) the property of a weak bisimulation
 BisimulationProperty : (Proc -> Proc -> Set₁) -> Proc -> Proc -> Set₁
@@ -124,3 +126,17 @@ isEquivalence : IsEquivalence _≈_
 IsEquivalence.refl (isEquivalence) = reflexive
 IsEquivalence.sym (isEquivalence) = sym
 IsEquivalence.trans (isEquivalence) = trans
+
+-- Prove that ≈ is not a congruence
+-- forall {c} -> ¬ (forall {C[] p q} -> p ≈ q -> subst C[] p ≈ subst C[] q)
+≈-not-cong : {c : C} -> ¬ forall {C[]} -> Homomorphic₂ Proc Proc _≈_ _≈_ (subst C[])
+≈-not-cong {c} cong with cong {C[]} τd≈d .p-to-q (Trans.indet {s = true} chan)
+  where
+  τd≈d : chan tau ccs.deadlock ≈ ccs.deadlock
+  p-to-q τd≈d (chan {p = q'}) = q' , tau self , reflexive
+  q-to-p τd≈d (indet {s = ()} t)
+  C[] = indet \ b -> if b then replace else chan (send c) ctx.deadlock
+... | _ , tau (cons (indet {s = true} (indet {s = ()} _)) _) , _
+... | _ , tau self , d≈c[d] with d≈c[d] .q-to-p (Trans.indet {s = false} chan)
+...   | _ , send self (indet {s = ()} _) _ , _
+...   | _ , send (cons (indet {s = ()} _) _) _ _ , _
