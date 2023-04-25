@@ -55,6 +55,9 @@ q-to-p (∼-to-~ (bisimilar p q R x)) {p' = q'} r =
 
 -- From now on everything will use the coinductive definition
 
+
+-- Properties of strong bisimilarity
+
 reflexive : Reflexive _~_ -- forall {p q} -> p ~ p
 p-to-q (reflexive {p}) {p' = p'} r = p' , r , reflexive
 q-to-p (reflexive {p}) {p' = p'} r = p' , r , reflexive
