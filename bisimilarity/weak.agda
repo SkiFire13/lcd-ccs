@@ -132,8 +132,8 @@ IsEquivalence.trans (isEquivalence) = trans
 ≈-not-cong {c} cong with cong {C[]} τd≈d .p-to-q (Trans.indet {s = true} chan)
   where
   τd≈d : chan tau ccs.deadlock ≈ ccs.deadlock
-  p-to-q τd≈d (chan {p = q'}) = q' , tau self , reflexive
-  q-to-p τd≈d (indet {s = ()} t)
+  p-to-q τd≈d chan = ccs.deadlock , tau self , reflexive
+  q-to-p τd≈d (indet {s = ()} _)
   C[] = indet \ b -> if b then replace else chan (send c) ctx.deadlock
 ... | _ , tau (cons (indet {s = true} (indet {s = ()} _)) _) , _
 ... | _ , tau self , d≈c[d] with d≈c[d] .q-to-p (Trans.indet {s = false} chan)
