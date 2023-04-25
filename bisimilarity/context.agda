@@ -4,7 +4,7 @@ import ccs.proc
 
 module bisimilarity.context {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
 
-open import ccs {C} {N} {penv}
+open import ccs.common {C} {N} {penv}
 
 -- A process context
 -- TODO: force one and only one replacement

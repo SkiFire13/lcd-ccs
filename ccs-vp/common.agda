@@ -15,7 +15,7 @@ import ccs-vp.proc
 --        but that was somewhat problematic.
 -- penv = Function from process names to the actual process,
 --        given the values for the variables to be binded.
-module ccs-vp {C N X V : Set} {n-fv : N -> X -> Bool} {penv : ccs-vp.proc.PEnv {C} {N} {X} {V} {n-fv}} where
+module ccs-vp.common {C N X V : Set} {n-fv : N -> X -> Bool} {penv : ccs-vp.proc.PEnv {C} {N} {X} {V} {n-fv}} where
 
 open import ccs-vp.proc {C} {N} {X} {V} {n-fv} public
 open import ccs-vp.trans {C} {N} {X} {V} {n-fv} {penv} public

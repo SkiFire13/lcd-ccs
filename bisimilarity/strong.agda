@@ -9,7 +9,7 @@ import ccs.proc
 
 module bisimilarity.strong {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
 
-open import ccs {C} {N} {penv}
+open import ccs.common {C} {N} {penv}
 open import bisimilarity.context {C} {N} {penv}
 
 -- (Half) the property of a strong bisimulation
