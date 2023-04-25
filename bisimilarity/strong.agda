@@ -15,6 +15,7 @@ open import bisimilarity.context {C} {N} {penv}
 BisimulationProperty : (Proc -> Proc -> Set₁) -> Proc -> Proc -> Set₁
 BisimulationProperty R p q = forall {a p'} -> Trans p a p' -> ∃[ q' ] (Trans q a q' × R p' q')
 
+
 -- Definition of a strong bisimulation
 record Bisimulation : Set₂ where
   field
@@ -27,6 +28,7 @@ open Bisimulation
 data _∼_ : Proc -> Proc -> Set₂ where
   bisimilar : (p : Proc) -> (q : Proc) -> (b : Bisimulation) -> b .R p q -> p ∼ q
 
+
 -- Strong bisimilarity defined coinductively
 record _~_ (p : Proc) (q : Proc) : Set₁ where
   coinductive
@@ -34,6 +36,7 @@ record _~_ (p : Proc) (q : Proc) : Set₁ where
     p-to-q : BisimulationProperty _~_ p q
     q-to-p : BisimulationProperty _~_ q p
 open _~_
+
 
 -- Strong bisimilarity (defined with a relation) implies strong bisimilarity (coinductive)
 ∼-to-~ : forall {p q} -> p ∼ q -> p ~ q
@@ -51,8 +54,6 @@ q-to-p (∼-to-~ (bisimilar p q R x)) {p' = q'} t =
   R (bis) = _~_
   p-to-q (bis) = p-to-q
   q-to-p (bis) = q-to-p
-
--- From now on everything will use the coinductive definition
 
 
 -- Properties of strong bisimilarity
@@ -77,6 +78,7 @@ isEquivalence : IsEquivalence _~_
 IsEquivalence.refl (isEquivalence) = reflexive
 IsEquivalence.sym (isEquivalence) = sym
 IsEquivalence.trans (isEquivalence) = trans
+
 
 -- Prove that ~ is a congruence
 cong : forall {C[] p q} -> p ~ q -> subst C[] p ~ subst C[] q

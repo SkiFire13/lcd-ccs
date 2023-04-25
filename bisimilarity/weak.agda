@@ -16,6 +16,7 @@ open import bisimilarity.context {C} {N} {penv} as ctx
 BisimulationProperty : (Proc -> Proc -> Set₁) -> Proc -> Proc -> Set₁
 BisimulationProperty R p q = forall {a p'} -> Trans p a p' -> ∃[ q' ] (WeakTrans q a q' × R p' q')
 
+
 -- Definition of a weak bisimulation
 record Bisimulation : Set₂ where
   field
@@ -28,6 +29,7 @@ open Bisimulation
 data _≈ᵣ_ : Proc -> Proc -> Set₂ where
   bisimilar : (p : Proc) -> (q : Proc) -> (b : Bisimulation) -> b .R p q -> p ≈ᵣ q
 
+
 -- Weak bisimilarity defined coinductively
 record _≈_ (p : Proc) (q : Proc) : Set₁ where
   coinductive
@@ -35,6 +37,7 @@ record _≈_ (p : Proc) (q : Proc) : Set₁ where
     p-to-q : BisimulationProperty _≈_ p q
     q-to-p : BisimulationProperty _≈_ q p
 open _≈_
+
 
 -- Weak bisimilarity (defined with a relation) implies weak bisimilarity (coinductive)
 ≈ᵣ-to-≈ : forall {p q} -> p ≈ᵣ q -> p ≈ q
@@ -53,8 +56,6 @@ q-to-p (≈ᵣ-to-≈ (bisimilar p q R x)) {p' = q'} t =
   p-to-q (bis) = p-to-q
   q-to-p (bis) = q-to-p
 
--- From now on everything will use the coinductive definition
-
 
 -- (Half) the property of a weak string bisimulation
 StringBisimulationProperty : (Proc -> Proc -> Set₁) -> Proc -> Proc -> Set₁
@@ -67,6 +68,7 @@ record _≈ₛ_ (p : Proc) (q : Proc) : Set₁ where
     p-to-q : StringBisimulationProperty _≈ₛ_ p q
     q-to-p : StringBisimulationProperty _≈ₛ_ q p
 open _≈ₛ_
+
 
 -- Weak string bisimilarity implies weak bisimilarity
 ≈ₛ-to-≈ : forall {p q} -> p ≈ₛ q -> p ≈ q
@@ -99,6 +101,7 @@ p-to-q (≈-to-≈ₛ p≈q) t = let q' , t' , p'≈q' = p-to-q-weak p≈q t in 
   p-to-q-weak p≈q (recv s1 t s2) = p-to-q-split p≈q s1 t s2
   p-to-q-weak p≈q (tau s) = p-to-q-tau p≈q s
 
+
 -- Properties of weak bisimilarity
 
 reflexive : Reflexive _≈_ -- forall {p q} -> p ≈ p
@@ -122,6 +125,7 @@ isEquivalence : IsEquivalence _≈_
 IsEquivalence.refl (isEquivalence) = reflexive
 IsEquivalence.sym (isEquivalence) = sym
 IsEquivalence.trans (isEquivalence) = trans
+
 
 -- Prove that ≈ is not a congruence
 ≈-not-cong : {c : C} -> ¬ forall {C[] p q} -> p ≈ q -> subst C[] p ≈ subst C[] q
