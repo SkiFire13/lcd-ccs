@@ -113,9 +113,9 @@ p-to-q (sym {p} {q} p≈q) = p≈q .q-to-p
 q-to-p (sym {p} {q} p≈q) = p≈q .p-to-q
 
 trans : Transitive _≈_ -- forall {p q s} -> p ≈ q -> q ≈ s -> p ≈ s
-p-to-q (trans {p} {q} {s} p≈q q≈s) rp =
-  let q' , rq , p'≈q' = p≈q .p-to-q rp
-      s' , rs , q'≈ₛs' = ≈-to-≈ₛ q≈s .p-to-q rq
+p-to-q (trans {p} {q} {s} p≈q q≈s) tp =
+  let q' , tq , p'≈q' = p≈q .p-to-q tp
+      s' , ts , q'≈ₛs' = ≈-to-≈ₛ q≈s .p-to-q tq
       q'≈s' = ≈ₛ-to-≈ q'≈ₛs'
   in s' , rs , trans p'≈q' q'≈s'
 q-to-p (trans {p} {q} {s} p≈q q≈s) = p-to-q (trans (sym q≈s) (sym p≈q))

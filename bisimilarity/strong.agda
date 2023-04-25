@@ -67,10 +67,10 @@ p-to-q (sym {p} {q} p~q) = p~q .q-to-p
 q-to-p (sym {p} {q} p~q) = p~q .p-to-q
 
 trans : Transitive _~_ -- forall {p q s} -> p ~ q -> q ~ s -> p ~ s
-p-to-q (trans {p} {q} {s} p~q q~s) rp =
-  let q' , rq , p'~q' = p~q .p-to-q rp
-      s' , rs , q'~s' = q~s .p-to-q rq
-  in s' , rs , trans p'~q' q'~s'
+p-to-q (trans {p} {q} {s} p~q q~s) tp =
+  let q' , tq , p'~q' = p~q .p-to-q tp
+      s' , ts , q'~s' = q~s .p-to-q tq
+  in s' , ts , trans p'~q' q'~s'
 q-to-p (trans {p} {q} {s} p~q q~s) = p-to-q (trans (sym q~s) (sym p~q))
 
 -- Agda's equivalence class, just to assert that ~ is effectively an equivalence
