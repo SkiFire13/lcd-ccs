@@ -1,5 +1,6 @@
 {-# OPTIONS --guardedness #-}
 
+open import Data.Bool
 open import Data.Product
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
@@ -12,7 +13,7 @@ open import bisimilarity.context {C} {N} {penv}
 open import bisimilarity.strong.base {C} {N} {penv}
 open import bisimilarity.strong.properties {C} {N} {penv}
 
--- Helper for cong
+-- -- Helper for cong
 par-respects-~ : forall {pl pr ql qr} -> pl ~ ql -> pr ~ qr -> par pl pr ~ par ql qr
 q-to-p (par-respects-~ pl~ql pr~qr) = p-to-q (par-respects-~ (sym pl~ql) (sym pr~qr))
 p-to-q (par-respects-~ {qr = qr} pl~ql pr~qr) (par-L {p' = p'} t) =
@@ -34,13 +35,14 @@ cong p~q = helper refl refl p~q
 
   p-to-q (helper {chan a C[]} {q = q} refl refl p~q) chan = subst C[] q , chan , cong p~q
 
-  helper {par _ _} refl refl p~q = par-respects-~ (cong p~q) (cong p~q)
+  helper {par-L c pr} refl refl p~q = par-respects-~ (cong p~q) reflexive
+  helper {par-R c pr} refl refl p~q = par-respects-~ reflexive (cong p~q)
 
-  p-to-q (helper {indet f} refl refl p~q) (indet {s = s} t) =
-    let q' , t' , p'~q' = (cong {f s} p~q) .p-to-q t
-    in q' , indet {s = s} t' , p'~q'
-
-  helper {const _} refl refl _ = reflexive
+  p-to-q (helper {indet c q} refl refl p~q) (indet {q = p'} {s = false} t) =
+    p' , indet {s = false} t , reflexive
+  p-to-q (helper {indet c q} refl refl p~q) (indet {s = true} t) =
+    let q' , t' , p'~q' = cong p~q .p-to-q t
+    in q' , indet t' , p'~q'
 
   p-to-q (helper {rename f C[]} refl refl p~q) (rename {a = a} t) =
     let q' , t' , p'~q' = (cong {C[]} p~q) .p-to-q t

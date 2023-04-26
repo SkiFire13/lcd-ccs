@@ -1,6 +1,7 @@
 {-# OPTIONS --guardedness #-}
 
 open import Data.Bool
+open import Data.Empty
 open import Data.Product
 open import Relation.Nullary
 
@@ -20,11 +21,19 @@ open import bisimilarity.weak.properties {C} {N} {penv}
   τd≈d : chan tau ccs.deadlock ≈ ccs.deadlock
   p-to-q τd≈d chan = ccs.deadlock , tau self , reflexive
   q-to-p τd≈d (indet {s = ()} _)
-  C[] = indet \ b -> if b then replace else chan (send c) ctx.deadlock
+  C[] = indet replace (chan (send c) ccs.deadlock)
 ... | _ , tau (cons (indet {s = true} (indet {s = ()} _)) _) , _
 ... | _ , tau self , d≈c[d] with d≈c[d] .q-to-p (indet {s = false} chan)
 ...   | _ , send self (indet {s = ()} _) _ , _
 ...   | _ , send (cons (indet {s = ()} _) _) _ _ , _
+
+≈-trivial-if-not-c : ¬ C -> forall {p q} -> p ≈ q
+p-to-q (≈-trivial-if-not-c ¬c) {send c} _ = ⊥-elim (¬c c)
+p-to-q (≈-trivial-if-not-c ¬c) {recv c} _ = ⊥-elim (¬c c)
+p-to-q (≈-trivial-if-not-c ¬c {q = q}) {tau} t = q , tau self , ≈-trivial-if-not-c ¬c
+q-to-p (≈-trivial-if-not-c ¬c) {send c} _ = ⊥-elim (¬c c)
+q-to-p (≈-trivial-if-not-c ¬c) {recv c} _ = ⊥-elim (¬c c)
+q-to-p (≈-trivial-if-not-c ¬c {p = p}) {tau} t = p , tau self , ≈-trivial-if-not-c ¬c
 
 -- Prove that ≈ respects all the other kind of contexts
 

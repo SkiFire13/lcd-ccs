@@ -8,28 +8,21 @@ module bisimilarity.context {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
 open import ccs.common {C} {N} {penv} hiding (deadlock)
 
 -- A process context
--- TODO: force one and only one replacement
--- TODO: decide what to do with `indet`
 data Context : Set₁ where
   chan    : Act -> Context -> Context
-  par     : Context -> Context -> Context
-  indet   : {S : Set} -> (S -> Context) -> Context
-  const   : N -> Context
+  par-L   : Context -> Proc -> Context
+  par-R   : Proc -> Context -> Context
+  indet   : Context -> Proc -> Context
   rename  : (C -> C) -> Context -> Context
   hide    : (C -> Bool) -> Context -> Context
   replace : Context
 
--- A context that when substituted always evaluates to a deadlock process
--- TODO: remove this and replace its usages with a Proc deadlock
-deadlock : Context
-deadlock = indet ⊥-elim
-
 -- Substitute a process inside a context
 subst : Context -> Proc -> Proc
 subst (chan a c) p = chan a (subst c p)
-subst (par cl cr) p = par (subst cl p) (subst cr p)
-subst (indet f) p = indet (\ s -> subst (f s) p)
-subst (const n) p = const n
+subst (par-L c q) p = par (subst c p) q
+subst (par-R q c) p = par q (subst c p)
+subst (indet c q) p = indet {Bool} \ {true -> subst c p ; false -> q}
 subst (rename f c) p = rename f (subst c p)
 subst (hide f c) p = hide f (subst c p)
 subst replace p = p
@@ -37,9 +30,9 @@ subst replace p = p
 -- Compose two processes in relation to subst
 compose : Context -> Context -> Context
 compose (chan a c) c2 = chan a (compose c c2)
-compose (par cl cr) c2 = par (compose cl c2) (compose cr c2)
-compose (indet f) c2 = indet (\ s -> compose (f s) c2)
-compose (const n) c2 = const n
+compose (par-L c q) c2 = par-L (compose c c2) q
+compose (par-R q c) c2 = par-R q (compose c c2)
+compose (indet c q) c2 = indet (compose c c2) q
 compose (rename f c) c2 = rename f (compose c c2)
 compose (hide f c) c2 = hide f (compose c c2)
 compose replace c2 = c2
