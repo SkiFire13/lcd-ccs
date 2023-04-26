@@ -27,13 +27,17 @@ open import bisimilarity.weak.properties {C} {N} {penv}
 ...   | _ , send self (indet {s = ()} _) _ , _
 ...   | _ , send (cons (indet {s = ()} _) _) _ _ , _
 
-≈-trivial-if-not-c : ¬ C -> forall {p q} -> p ≈ q
-p-to-q (≈-trivial-if-not-c ¬c) {send c} _ = ⊥-elim (¬c c)
-p-to-q (≈-trivial-if-not-c ¬c) {recv c} _ = ⊥-elim (¬c c)
-p-to-q (≈-trivial-if-not-c ¬c {q = q}) {tau} t = q , tau self , ≈-trivial-if-not-c ¬c
-q-to-p (≈-trivial-if-not-c ¬c) {send c} _ = ⊥-elim (¬c c)
-q-to-p (≈-trivial-if-not-c ¬c) {recv c} _ = ⊥-elim (¬c c)
-q-to-p (≈-trivial-if-not-c ¬c {p = p}) {tau} t = p , tau self , ≈-trivial-if-not-c ¬c
+-- Prove that the c requisite above is required, otherwise ≈ becomes always true
+¬c->≈-always-true : ¬ C -> forall {p q} -> p ≈ q
+p-to-q (¬c->≈-always-true ¬c) {send c} _ = ⊥-elim (¬c c)
+p-to-q (¬c->≈-always-true ¬c) {recv c} _ = ⊥-elim (¬c c)
+p-to-q (¬c->≈-always-true ¬c {q = q}) {tau} t = q , tau self , ¬c->≈-always-true ¬c
+q-to-p (¬c->≈-always-true ¬c) {send c} _ = ⊥-elim (¬c c)
+q-to-p (¬c->≈-always-true ¬c) {recv c} _ = ⊥-elim (¬c c)
+q-to-p (¬c->≈-always-true ¬c {p = p}) {tau} t = p , tau self , ¬c->≈-always-true ¬c
+-- And thus ≈ is trivially a congruence
+¬c->≈-cong : ¬ C -> forall {C[] p q} -> p ≈ q -> subst C[] p ≈ subst C[] q
+¬c->≈-cong ¬c _ = ¬c->≈-always-true ¬c
 
 -- Prove that ≈ respects all the other kind of contexts
 
