@@ -10,7 +10,8 @@ module bisimilarity.observational.reduc {C N : Set} {penv : ccs.proc.PEnv {C} {N
 open import ccs.common {C} {N} {penv}
 open import bisimilarity.context {C} {N} {penv}
 open import bisimilarity.weak.base {C} {N} {penv}
-open import bisimilarity.weak.properties {C} {N} {penv} using () renaming (reflexive to ≈-refl)
+open import bisimilarity.weak.properties {C} {N} {penv} using () renaming (reflexive to ≈-refl; trans to ≈-trans)
+open import bisimilarity.weak.string {C} {N} {penv}
 
 -- An observable (weak) transition
 data ObsTrans : Proc -> Act -> Proc -> Set₁ where
@@ -21,6 +22,14 @@ trans-to-obs t = obs-t self t self
 
 obs-to-weak : forall {p a q} -> ObsTrans p a q -> WeakTrans p a q
 obs-to-weak (obs-t s1 t s2) = join (tau s1) (trans-to-weak t) (tau s2)
+
+merge-weak-tau : forall {p1 p2 p3 a} -> ObsTrans p1 a p2 -> WeakTrans p2 tau p3 -> ObsTrans p1 a p3
+merge-weak-tau (obs-t s1 t s2) (tau s3) = obs-t s1 t (concat s2 s3)
+
+merge-weak-tau' : forall {p1 p2 p3 a} -> ObsTrans p1 tau p2 -> WeakTrans p2 a p3 -> ObsTrans p1 a p3
+merge-weak-tau' (obs-t s1 t s2) (send s3 t' s4) = obs-t (concat s1 (cons t (concat s2 s3))) t' s4
+merge-weak-tau' (obs-t s1 t s2) (recv s3 t' s4) = obs-t (concat s1 (cons t (concat s2 s3))) t' s4
+merge-weak-tau' (obs-t s1 t s2) (tau s3) = obs-t s1 t (concat s2 s3)
 
 -- Observational weak bisimilarity property
 ObsBisProperty : (Proc -> Proc -> Set₁) -> Proc -> Proc -> Set₁
@@ -52,14 +61,13 @@ p-to-q (sym p≈ₒq) = p≈ₒq .q-to-p
 q-to-p (sym p≈ₒq) = p≈ₒq .p-to-q
 
 trans : forall {p q s} -> p ≈ₒ q -> q ≈ₒ s -> p ≈ₒ s
-p-to-q (trans p≈ₒq q≈ₒs) t =
-  let q' , tq , p'≈ₒq' = p≈ₒq .p-to-q t
-  in {!   !}
-  where
-  p-to-q-tau : forall {p q p'} -> p ≈ q -> TauSeq p p' -> ∃[ q' ] (WeakTrans q tau q' × p' ≈ q')
-  p-to-q-tau {q = q} p≈q self = q , tau self , p≈q
-  p-to-q-tau {q = q} p≈q (cons t s') =
-    let q1 , r1 , p'≈q1 = p≈q .p-to-q t
-        q2 , r2 , p'≈q2 = p-to-q-tau p'≈q1 s'
-    in q2 , join-tau r1 r2 , p'≈q2
+p-to-q (trans p≈ₒq q≈ₒs) t with p≈ₒq .p-to-q t
+... | q' , obs-t self tq s , p'≈q' =
+  let s' , ts , q''≈s' = q≈ₒs .p-to-q tq
+      s'' , ts' , q'≈s'' = p-to-q-tau q''≈s' s
+  in s'' , merge-weak-tau ts ts' , ≈-trans p'≈q' q'≈s''
+... | q' , obs-t (cons tq s1) tq' s2 , p'≈q' =
+  let s' , ts , q''≈s' = q≈ₒs .p-to-q tq
+      s'' , ts' , q'≈s'' = p-to-q-weak q''≈s' (obs-to-weak (obs-t s1 tq' s2))
+  in s'' , merge-weak-tau' ts ts' , ≈-trans p'≈q' q'≈s''
 q-to-p (trans p≈ₒq q≈ₒs) = p-to-q (trans (sym q≈ₒs) (sym p≈ₒq))
