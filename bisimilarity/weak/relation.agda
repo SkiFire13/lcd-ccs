@@ -18,20 +18,23 @@ record Bisimulation : Set₂ where
 open Bisimulation
 
 -- Definition of weak bisimilarity 
-data _≈ᵣ_ : Proc -> Proc -> Set₂ where
-  bisimilar : (p : Proc) -> (q : Proc) -> (b : Bisimulation) -> b .R p q -> p ≈ᵣ q
+record _≈ᵣ_ (p : Proc) (q : Proc) : Set₂ where
+  constructor bisimilar
+  field
+    b : Bisimulation
+    r : b .R p q
 
 -- Weak bisimilarity (defined with a relation) implies weak bisimilarity (coinductive)
 ≈ᵣ-to-≈ : forall {p q} -> p ≈ᵣ q -> p ≈ q
-p-to-q (≈ᵣ-to-≈ (bisimilar p q R x)) {p' = p'} t =
-  let q' , t' , x' = R .p-to-q {p} {q} x t
-  in q' , t' , ≈ᵣ-to-≈ (bisimilar p' q' R x')
-q-to-p (≈ᵣ-to-≈ (bisimilar p q R x)) {p' = q'} t =
-  let p' , t' , x' = R .q-to-p {p} {q} x t
-  in p' , t' , ≈ᵣ-to-≈ (bisimilar q' p' R x')
+p-to-q (≈ᵣ-to-≈ (bisimilar R r)) t =
+  let q' , t' , r' = R .p-to-q r t
+  in q' , t' , ≈ᵣ-to-≈ (bisimilar R r')
+q-to-p (≈ᵣ-to-≈ (bisimilar R r)) t =
+  let p' , t' , r' = R .q-to-p r t
+  in p' , t' , ≈ᵣ-to-≈ (bisimilar R r')
 -- Weak bisimilarity (coinductive) implies weak bisimilarity (defined with a relation)
 ≈-to-≈ᵣ : forall {p q} -> p ≈ q -> p ≈ᵣ q
-≈-to-≈ᵣ {p} {q} p≈q = bisimilar p q bis p≈q
+≈-to-≈ᵣ {p} {q} p≈q = bisimilar bis p≈q
   where
   bis : Bisimulation
   R (bis) = _≈_
