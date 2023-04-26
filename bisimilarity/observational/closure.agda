@@ -7,18 +7,32 @@ import ccs.proc
 
 module bisimilarity.observational.closure {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
 
-open import ccs.common {C} {N} {penv}
+open import ccs.common {C} {N} {penv} as ccs
 open import bisimilarity.context {C} {N} {penv}
 open import bisimilarity.strong.base {C} {N} {penv}
 open import bisimilarity.strong.congruence {C} {N} {penv} renaming (cong to ~-cong)
 open import bisimilarity.strong.properties {C} {N} {penv} using () renaming (reflexive to ~-refl)
 open import bisimilarity.weak.base {C} {N} {penv}
-open import bisimilarity.weak.properties {C} {N} {penv} using () renaming (trans to ≈-trans; sym to ≈-sym)
+open import bisimilarity.weak.properties {C} {N} {penv} using () renaming (reflexive to ≈-refl; sym to ≈-sym; trans to ≈-trans)
 open import bisimilarity.weak.strong {C} {N} {penv} using (~-to-≈)
 
 -- Observational congruence defined as a closure over weak bisimilarity in contexts
 data _̂≈_ (p : Proc) (q : Proc) : Set₁ where
   closure : ((C[] : Context) -> (subst C[] p) ≈ (subst C[] q)) -> p ̂≈ q
+
+-- Prove that ̂≈ is an equivalence
+reflexive : forall {p} -> p ̂≈ p
+reflexive = closure \ _ -> ≈-refl
+
+sym : forall {p q} -> p ̂≈ q -> q ̂≈ p
+sym (closure C[p]≈C[q]) = closure \ C[] -> ≈-sym (C[p]≈C[q] C[])
+
+trans : forall {p q s} -> p ̂≈ q -> q ̂≈ s -> p ̂≈ s
+trans (closure C[p]≈C[q]) (closure C[q]≈C[s]) = closure \ C[] -> ≈-trans (C[p]≈C[q] C[]) (C[q]≈C[s] C[])
+
+-- Prove that ̂≈ implies ≈, even though it is pretty obvious
+̂≈-to-≈ : forall {p q} -> p ̂≈ q -> p ≈ q
+̂≈-to-≈ (closure C[p]≈C[q]) = C[p]≈C[q] replace
 
 -- Helper to prove that compose is the same as composing subst under strong bisimilarity
 ss~sc : forall {C1[] C2[] p} -> subst C1[] (subst C2[] p) ~ subst (compose C1[] C2[]) p
