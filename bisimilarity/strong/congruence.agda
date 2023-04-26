@@ -13,7 +13,7 @@ open import bisimilarity.context {C} {N} {penv}
 open import bisimilarity.strong.base {C} {N} {penv}
 open import bisimilarity.strong.properties {C} {N} {penv}
 
--- -- Helper for cong
+-- Helper for cong
 par-respects-~ : forall {pl pr ql qr} -> pl ~ ql -> pr ~ qr -> par pl pr ~ par ql qr
 q-to-p (par-respects-~ pl~ql pr~qr) = p-to-q (par-respects-~ (sym pl~ql) (sym pr~qr))
 p-to-q (par-respects-~ {qr = qr} pl~ql pr~qr) (par-L {p' = p'} t) =
