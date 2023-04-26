@@ -13,8 +13,7 @@ open import bisimilarity.strong.base {C} {N} {penv}
 open import bisimilarity.strong.congruence {C} {N} {penv} renaming (cong to ~-cong)
 open import bisimilarity.strong.properties {C} {N} {penv} using () renaming (reflexive to ~-refl)
 open import bisimilarity.weak.base {C} {N} {penv}
-open import bisimilarity.weak.properties {C} {N} {penv} using () renaming (reflexive to ≈-refl; sym to ≈-sym; trans to ≈-trans)
-open import bisimilarity.weak.strong {C} {N} {penv} using (~-to-≈)
+open import bisimilarity.weak.properties {C} {N} {penv} using (~-to-≈) renaming (reflexive to ≈-refl; sym to ≈-sym; trans to ≈-trans)
 
 -- Observational congruence defined as a closure over weak bisimilarity in contexts
 data _̂≈_ (p : Proc) (q : Proc) : Set₁ where
