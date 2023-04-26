@@ -1,3 +1,5 @@
+{-# OPTIONS --guardedness #-}
+
 open import Data.Product
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 

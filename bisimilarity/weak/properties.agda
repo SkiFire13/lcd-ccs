@@ -1,3 +1,5 @@
+{-# OPTIONS --guardedness #-}
+
 open import Data.Product
 open import Relation.Binary.Definitions using (Reflexive; Symmetric; Transitive)
 open import Relation.Binary.Structures using (IsEquivalence)

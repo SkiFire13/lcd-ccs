@@ -1,3 +1,5 @@
+{-# OPTIONS --guardedness #-}
+
 open import Data.Bool
 open import Data.Product
 open import Relation.Nullary
