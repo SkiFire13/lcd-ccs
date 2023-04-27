@@ -45,7 +45,7 @@ p-to-q (̂≈-to-≈ₒ c (closure C[p]≈C[q])) {a = tau} t with C[p]≈C[q] C[
   helper : forall {p q} -> TauSeq (hide (\ _ -> false) p) q -> ∃[ q' ] TauSeq p q'
   helper {q = hide _ q'} self = q' , self
   helper (cons (hide t) s) = let q' , s' = helper s in q' , cons t s'
-... | _ , tau self , p'≈q' with p'≈q' .q-to-p (indet {s = false} chan)
+... | _ , tau self , p'≈q'' with p'≈q'' .q-to-p (indet {s = false} chan)
 ... | _ , send s1 tq _ , _ = ⊥-elim (helper s1 tq)
   where
   helper : forall {p1 p2 p3} -> TauSeq (hide (\ _ -> false) p1) p2 -> Trans p2 (send c) p3 -> ⊥
