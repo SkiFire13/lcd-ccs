@@ -40,7 +40,7 @@ record _≈ₒ_ (p : Proc) (q : Proc) : Set₁ where
   field
     p-to-q : ObsBisProperty _≈_ p q
     q-to-p : ObsBisProperty _≈_ q p
-open _≈ₒ_
+open _≈ₒ_ public
 
 -- Prove that ≈ₒ implies ≈, even though it is pretty obvious
 ≈ₒ-to-≈ : forall {p q} -> p ≈ₒ q -> p ≈ q
