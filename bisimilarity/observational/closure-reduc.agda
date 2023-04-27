@@ -30,7 +30,14 @@ p-to-q (̂≈-to-≈ₒ c (closure C[p]≈C[q])) {a = recv _} t with C[p]≈C[q]
 ... | _ , recv (cons (indet {s = false} (indet {s = ()} _)) _) _ _ , _
 p-to-q (̂≈-to-≈ₒ c (closure C[p]≈C[q])) {a = tau} t with C[p]≈C[q] C[] .p-to-q (indet (hide t))
   where C[] = indet (hide (\ _ -> false) replace) (chan (send c) ccs.deadlock)
-... | q' , tau (cons tq s) , p'≈q' = {!   !}
+... | q' , tau (cons (indet {s = false} ()) s) , p'≈q'
+... | q' , tau (cons (indet {s = true} (hide tq)) s) , p'≈q' =
+  let q'' , s' = helper s
+  in q'' , obs-t self tq s' , {!  !}
+  where
+  helper : forall {p q} -> TauSeq (hide (\ _ -> false) p) q -> ∃[ q' ] TauSeq p q'
+  helper {q = hide _ q'} self = q' , self
+  helper (cons (hide t) s) = let q' , s' = helper s in q' , cons t s'
 ... | q' , tau self , p'≈q' with p'≈q' .q-to-p (indet {s = false} chan)
 ... | q'' , send s1 tq _ , _ = ⊥-elim (helper s1 tq)
   where
