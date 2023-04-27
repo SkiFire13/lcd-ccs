@@ -11,24 +11,27 @@ module bisimilarity.observational.closure-reduc {C N : Set} {penv : ccs.proc.PEn
 
 open import ccs.common {C} {N} {penv} as ccs
 open import bisimilarity.context {C} {N} {penv}
-open import bisimilarity.observational.closure {C} {N} {penv} renaming (sym to ̂≈-sym)
-open import bisimilarity.observational.reduc {C} {N} {penv} renaming (sym to ≈ₒ-sym)
+open import bisimilarity.observational.closure {C} {N} {penv} renaming (cong to ̂≈-cong; sym to ̂≈-sym)
+open import bisimilarity.observational.reduc {C} {N} {penv} renaming (cong to ≈ₒ-cong; sym to ≈ₒ-sym)
 open import bisimilarity.weak.base {C} {N} {penv}
 
+≈ₒ-to-̂≈ : forall {p q} -> p ≈ₒ q -> p ̂≈ q
+≈ₒ-to-̂≈ p≈ₒq = obs-c \ _ -> ≈ₒ-to-≈ (≈ₒ-cong p≈ₒq)
+
 ̂≈-to-≈ₒ : (c : C) -> forall {p q} -> p ̂≈ q -> p ≈ₒ q
-p-to-q (̂≈-to-≈ₒ c (closure C[p]≈C[q])) {a = send _} t with C[p]≈C[q] C[] .p-to-q (indet t)
+p-to-q (̂≈-to-≈ₒ c (obs-c C[p]≈C[q])) {a = send _} t with C[p]≈C[q] C[] .p-to-q (indet t)
   where C[] = indet replace ccs.deadlock
 ... | q' , send self (indet {s = true} tq) s2 , p'≈q' = q' , obs-t self tq s2 , p'≈q'
 ... | _ , send self (indet {s = false} (indet {s = ()} _)) _ , _
 ... | q' , send (cons (indet {s = true} tq) s1) tq' s2 , p'≈q' = q' , obs-t (cons tq s1) tq' s2 , p'≈q'
 ... | _ , send (cons (indet {s = false} (indet {s = ()} _)) _) _ _ , _
-p-to-q (̂≈-to-≈ₒ c (closure C[p]≈C[q])) {a = recv _} t with C[p]≈C[q] C[] .p-to-q (indet t)
+p-to-q (̂≈-to-≈ₒ c (obs-c C[p]≈C[q])) {a = recv _} t with C[p]≈C[q] C[] .p-to-q (indet t)
   where C[] = indet replace ccs.deadlock
 ... | q' , recv self (indet {s = true} tq) s2 , p'≈q' = q' , obs-t self tq s2 , p'≈q'
 ... | _ , recv self (indet {s = false} (indet {s = ()} _)) _ , _
 ... | q' , recv (cons (indet {s = true} tq) s1) tq' s2 , p'≈q' = q' , obs-t (cons tq s1) tq' s2 , p'≈q'
 ... | _ , recv (cons (indet {s = false} (indet {s = ()} _)) _) _ _ , _
-p-to-q (̂≈-to-≈ₒ c (closure C[p]≈C[q])) {a = tau} t with C[p]≈C[q] C[] .p-to-q (indet t)
+p-to-q (̂≈-to-≈ₒ c (obs-c C[p]≈C[q])) {a = tau} t with C[p]≈C[q] C[] .p-to-q (indet t)
   where C[] = indet replace ccs.deadlock
 ... | _ , tau (cons (indet {s = false} (indet {s = ()} _)) _) , _
 ... | q' , tau (cons (indet {s = true} tq) s) , p'≈q' = q' , obs-t self tq s , p'≈q'
@@ -52,7 +55,7 @@ p-to-q (̂≈-to-≈ₒ c (closure C[p]≈C[q])) {a = tau} t with C[p]≈C[q] C[
   helper (cons (hide t') s1) tq' = helper s1 tq'
   helper self (hide {z = ()} _)
 
--- p-to-q (̂≈-to-≈ₒ c (closure C[p]≈C[q])) {a = tau} t with C[p]≈C[q] C[] .p-to-q (indet t)
+-- p-to-q (̂≈-to-≈ₒ c (obs-c C[p]≈C[q])) {a = tau} t with C[p]≈C[q] C[] .p-to-q (indet t)
 --   where C[] = indet replace ccs.deadlock
 -- ... | _ , tau (cons (indet {s = false} (indet {s = ()} _)) _) , _
 -- ... | q' , tau (cons (indet {s = true} tq) s) , p'≈q' = q' , obs-t self tq s , p'≈q'

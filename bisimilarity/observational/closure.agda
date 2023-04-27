@@ -16,22 +16,25 @@ open import bisimilarity.weak.base {C} {N} {penv}
 open import bisimilarity.weak.properties {C} {N} {penv} using (~-to-≈) renaming (reflexive to ≈-refl; sym to ≈-sym; trans to ≈-trans)
 
 -- Observational congruence defined as a closure over weak bisimilarity in contexts
-data _̂≈_ (p : Proc) (q : Proc) : Set₁ where
-  closure : ((C[] : Context) -> (subst C[] p) ≈ (subst C[] q)) -> p ̂≈ q
+record _̂≈_ (p : Proc) (q : Proc) : Set₁ where
+  constructor obs-c
+  field
+    closure : (C[] : Context) -> (subst C[] p) ≈ (subst C[] q)
+open _̂≈_ public
 
 -- Prove that ̂≈ is an equivalence
 reflexive : forall {p} -> p ̂≈ p
-reflexive = closure \ _ -> ≈-refl
+reflexive = obs-c \ _ -> ≈-refl
 
 sym : forall {p q} -> p ̂≈ q -> q ̂≈ p
-sym (closure C[p]≈C[q]) = closure \ C[] -> ≈-sym (C[p]≈C[q] C[])
+sym (obs-c C[p]≈C[q]) = obs-c \ C[] -> ≈-sym (C[p]≈C[q] C[])
 
 trans : forall {p q s} -> p ̂≈ q -> q ̂≈ s -> p ̂≈ s
-trans (closure C[p]≈C[q]) (closure C[q]≈C[s]) = closure \ C[] -> ≈-trans (C[p]≈C[q] C[]) (C[q]≈C[s] C[])
+trans (obs-c C[p]≈C[q]) (obs-c C[q]≈C[s]) = obs-c \ C[] -> ≈-trans (C[p]≈C[q] C[]) (C[q]≈C[s] C[])
 
 -- Prove that ̂≈ implies ≈, even though it is pretty obvious
 ̂≈-to-≈ : forall {p q} -> p ̂≈ q -> p ≈ q
-̂≈-to-≈ (closure C[p]≈C[q]) = C[p]≈C[q] replace
+̂≈-to-≈ (obs-c C[p]≈C[q]) = C[p]≈C[q] replace
 
 -- Helper to prove that compose is the same as composing subst under strong bisimilarity
 ss~sc : forall {C1[] C2[] p} -> subst C1[] (subst C2[] p) ~ subst (compose C1[] C2[]) p
@@ -49,8 +52,8 @@ ss~sc {hide f c} = ~-cong {hide f replace} (ss~sc {c})
 ss~sc {replace} = ~-refl
 
 -- Prove that ̂≈ is a congruence
-̂≈-cong : forall {C[] p q} -> p ̂≈ q -> (subst C[] p) ̂≈ (subst C[] q)
-̂≈-cong {C[]} {p} {q} (closure C[p]≈C[q]) = closure \ C'[] ->
+cong : forall {C[] p q} -> p ̂≈ q -> (subst C[] p) ̂≈ (subst C[] q)
+cong {C[]} {p} {q} (obs-c C[p]≈C[q]) = obs-c \ C'[] ->
   let t1 = ~-to-≈ (ss~sc {C'[]} {C[]} {p})
       t2 = C[p]≈C[q] (compose C'[] C[])
       t3 = ~-to-≈ (ss~sc {C'[]} {C[]} {q})
