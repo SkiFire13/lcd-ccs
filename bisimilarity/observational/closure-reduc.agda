@@ -14,6 +14,7 @@ open import bisimilarity.context {C} {N} {penv}
 open import bisimilarity.observational.closure {C} {N} {penv} renaming (cong to ̂≈-cong; sym to ̂≈-sym)
 open import bisimilarity.observational.reduc {C} {N} {penv} renaming (cong to ≈ₒ-cong; sym to ≈ₒ-sym)
 open import bisimilarity.weak.base {C} {N} {penv}
+open import bisimilarity.weak.properties {C} {N} {penv} renaming (sym to ≈-sym; trans to ≈-trans)
 
 ≈ₒ-to-̂≈ : forall {p q} -> p ≈ₒ q -> p ̂≈ q
 ≈ₒ-to-̂≈ p≈ₒq = obs-c \ _ -> ≈ₒ-to-≈ (≈ₒ-cong p≈ₒq)
@@ -34,45 +35,21 @@ p-to-q (̂≈-to-≈ₒ c (obs-c C[p]≈C[q])) {a = recv _} t with C[p]≈C[q] C
 p-to-q (̂≈-to-≈ₒ c (obs-c C[p]≈C[q])) {a = tau} t with C[p]≈C[q] C[] .p-to-q (indet t)
   where C[] = indet replace ccs.deadlock
 ... | _ , tau (cons (indet {s = false} (indet {s = ()} _)) _) , _
-... | q' , tau (cons (indet {s = true} tq) s) , p'≈q' = q' , obs-t self tq s , p'≈q'
-... | q' , tau self , p'≈q' with C[p]≈C[q] C2[] .p-to-q (indet (hide (indet t)))
-  where
-  C1[] = indet replace ccs.deadlock
-  C2[] = indet (hide (\ _ -> false) C1[]) (chan (send c) ccs.deadlock)
+... | qd' , tau (cons (indet {s = true} tq) s) , p'≈qd' = qd' , obs-t self tq s , p'≈qd'
+... | qd' , tau self , p'≈qd' with C[p]≈C[q] C[] .p-to-q (indet t)
+  where C[] = indet replace (chan (send c) ccs.deadlock)
 ... | _ , tau (cons (indet {s = false} ()) _) , _
-... | _ , tau (cons (indet {s = true} (hide (indet {s = false} (indet {s = ()} _)))) _) , _
-... | q'' , tau (cons (indet {s = true} (hide (indet {s = true} tq))) s) , hp'≈q'' =
-  let q''' , s' = helper s
-  in q''' , obs-t self tq s' , {!  !}
+... | qc' , tau (cons (indet {s = true} tq) s) , p'≈qc' = qc' , obs-t self tq s , p'≈qc'
+... | qc' , tau self , p'≈qc' with C[p]≈C[q] C[] .p-to-q (indet t)
+  where C[] = indet replace (chan tau ccs.deadlock)
+... | qt' , tau (cons (indet {s = false} chan) (cons (indet {s = ()} _) _)) , p'≈qt'
+... | qt' , tau (cons (indet {s = false} chan) self) , p'≈qt' =
+  let _ , tqt , _ = ≈-trans (≈-sym p'≈qc') p'≈qt' .p-to-q (indet {s = false} chan)
+  in w-deadlock-elim tqt
   where
-  helper : forall {p q} -> TauSeq (hide (\ _ -> false) p) q -> ∃[ q' ] TauSeq p q'
-  helper {q = hide _ q'} self = q' , self
-  helper (cons (hide t) s) = let q' , s' = helper s in q' , cons t s'
-... | _ , tau self , p'≈q'' with p'≈q'' .q-to-p (indet {s = false} chan)
-... | _ , send s1 tq _ , _ = ⊥-elim (helper s1 tq)
-  where
-  helper : forall {p1 p2 p3} -> TauSeq (hide (\ _ -> false) p1) p2 -> Trans p2 (send c) p3 -> ⊥
-  helper (cons (hide t') s1) tq' = helper s1 tq'
-  helper self (hide {z = ()} _)
-
--- p-to-q (̂≈-to-≈ₒ c (obs-c C[p]≈C[q])) {a = tau} t with C[p]≈C[q] C[] .p-to-q (indet t)
---   where C[] = indet replace ccs.deadlock
--- ... | _ , tau (cons (indet {s = false} (indet {s = ()} _)) _) , _
--- ... | q' , tau (cons (indet {s = true} tq) s) , p'≈q' = q' , obs-t self tq s , p'≈q'
--- ... | q' , tau self , p'≈q' with C[p]≈C[q] C[] .p-to-q (indet (hide t))
---   where C[] = indet (hide (\ _ -> false) replace) (chan (send c) ccs.deadlock)
--- ... | _ , tau (cons (indet {s = false} ()) _) , _
--- ... | q'' , tau (cons (indet {s = true} (hide tq)) s) , hp'≈q'' =
---   let q''' , s' = helper s
---   in q''' , obs-t self tq s' , {!  !}
---   where
---   helper : forall {p q} -> TauSeq (hide (\ _ -> false) p) q -> ∃[ q' ] TauSeq p q'
---   helper {q = hide _ q'} self = q' , self
---   helper (cons (hide t) s) = let q' , s' = helper s in q' , cons t s'
--- ... | _ , tau self , p'≈q' with p'≈q' .q-to-p (indet {s = false} chan)
--- ... | _ , send s1 tq _ , _ = ⊥-elim (helper s1 tq)
---   where
---   helper : forall {p1 p2 p3} -> TauSeq (hide (\ _ -> false) p1) p2 -> Trans p2 (send c) p3 -> ⊥
---   helper (cons (hide t') s1) tq' = helper s1 tq'
---   helper self (hide {z = ()} _)
+  w-deadlock-elim : forall {S p} -> WeakTrans ccs.deadlock (send c) p -> S
+  w-deadlock-elim (send self (indet {s = ()} _) _)
+  w-deadlock-elim (send (cons (indet {s = ()} _) _) _ _)
+... | qt' , tau (cons (indet {s = true} tq) s) , p'≈qt' = qt' , obs-t self tq s , p'≈qt'
+... | qt' , tau self , p'≈qt' = {!   !}
 q-to-p (̂≈-to-≈ₒ c oc) = ̂≈-to-≈ₒ c (̂≈-sym oc) .p-to-q
