@@ -1,5 +1,6 @@
 {-# OPTIONS --guardedness #-}
 
+open import Data.Bool
 open import Data.Product
 open import Relation.Binary.Definitions using (Reflexive; Symmetric; Transitive)
 open import Relation.Binary.Structures using (IsEquivalence)
@@ -8,7 +9,7 @@ import ccs.proc
 
 module bisimilarity.strong.properties {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
 
-open import ccs.common {C} {N} {penv}
+open import ccs.common {C} {N} {penv} as ccs
 open import bisimilarity.strong.base {C} {N} {penv}
 
 -- Properties of strong bisimilarity
@@ -33,3 +34,9 @@ isEquivalence : IsEquivalence _~_
 IsEquivalence.refl (isEquivalence) = reflexive
 IsEquivalence.sym (isEquivalence) = sym
 IsEquivalence.trans (isEquivalence) = trans
+
+-- Useful property
+p~ipd : forall {p} -> p ~ indet {Bool} \ { true -> p ; false -> ccs.deadlock }
+p-to-q (p~ipd {p}) {p' = p'} t = p' , indet t , reflexive
+q-to-p (p~ipd {p}) (indet {s = false} (indet {s = ()} _))
+q-to-p (p~ipd {p}) {p' = p'} (indet {s = true} t) = p' , t , reflexive
