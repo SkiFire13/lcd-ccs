@@ -56,4 +56,18 @@ cong p~q = helper refl refl p~q
 
   -- The other half be proved through symmetry
   q-to-p (helper refl refl p~q) = p-to-q (helper refl refl (sym p~q))
- 
+
+-- Helper to prove that compose is the same as composing subst under strong bisimilarity
+ss~sc : forall {C1[] C2[] p} -> subst C1[] (subst C2[] p) ~ subst (compose C1[] C2[]) p
+ss~sc {chan a c} = cong {chan a replace} (ss~sc {c})
+ss~sc {par-L c p} = cong {par-L replace p} (ss~sc {c})
+ss~sc {par-R p c} = cong {par-R p replace} (ss~sc {c})
+p-to-q (ss~sc {indet c _}) (indet {q = p'} {s = s} t) with s
+... | true = let q' , t' , p'~q' = ss~sc {c} .p-to-q t in q' , indet t' , p'~q'
+... | false = p' , indet {s = false} t , reflexive
+q-to-p (ss~sc {indet c _}) (indet {q = p'} {s = s} t) with s
+... | true = let q' , t' , p'~q' = ss~sc {c} .q-to-p t in q' , indet t' , p'~q'
+... | false = p' , indet {s = false} t , reflexive
+ss~sc {rename f c} = cong {rename f replace} (ss~sc {c})
+ss~sc {hide f c} = cong {hide f replace} (ss~sc {c})
+ss~sc {replace} = reflexive

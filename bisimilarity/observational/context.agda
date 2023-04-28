@@ -36,21 +36,6 @@ trans (obs-c C[p]≈C[q]) (obs-c C[q]≈C[s]) = obs-c \ C[] -> ≈-trans (C[p]�
 ̂≈-to-≈ : forall {p q} -> p ̂≈ q -> p ≈ q
 ̂≈-to-≈ (obs-c C[p]≈C[q]) = C[p]≈C[q] replace
 
--- Helper to prove that compose is the same as composing subst under strong bisimilarity
-ss~sc : forall {C1[] C2[] p} -> subst C1[] (subst C2[] p) ~ subst (compose C1[] C2[]) p
-ss~sc {chan a c} = ~-cong {chan a replace} (ss~sc {c})
-ss~sc {par-L c p} = ~-cong {par-L replace p} (ss~sc {c})
-ss~sc {par-R p c} = ~-cong {par-R p replace} (ss~sc {c})
-p-to-q (ss~sc {indet c _}) (indet {q = p'} {s = s} t) with s
-... | true = let q' , t' , p'~q' = ss~sc {c} .p-to-q t in q' , indet t' , p'~q'
-... | false = p' , indet {s = false} t , ~-refl
-q-to-p (ss~sc {indet c _}) (indet {q = p'} {s = s} t) with s
-... | true = let q' , t' , p'~q' = ss~sc {c} .q-to-p t in q' , indet t' , p'~q'
-... | false = p' , indet {s = false} t , ~-refl
-ss~sc {rename f c} = ~-cong {rename f replace} (ss~sc {c})
-ss~sc {hide f c} = ~-cong {hide f replace} (ss~sc {c})
-ss~sc {replace} = ~-refl
-
 -- Prove that ̂≈ is a congruence
 cong : forall {C[] p q} -> p ̂≈ q -> (subst C[] p) ̂≈ (subst C[] q)
 cong {C[]} {p} {q} (obs-c C[p]≈C[q]) = obs-c \ C'[] ->
