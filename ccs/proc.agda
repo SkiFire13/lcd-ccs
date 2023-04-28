@@ -21,6 +21,10 @@ data Proc : Set₁ where
 -- The "desugaring" of the deadlock CCS Process
 deadlock = indet ⊥-elim
 
+-- A non-deterministic choice with 2 options
+indet₂ : Proc -> Proc -> Proc
+indet₂ p q = indet {Bool} \ { true -> p ; false -> q }
+
 -- Utility functions used in `Trans`
 flip-act : Act -> Act
 flip-act (send c) = recv c

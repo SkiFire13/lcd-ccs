@@ -36,7 +36,7 @@ IsEquivalence.sym (isEquivalence) = sym
 IsEquivalence.trans (isEquivalence) = trans
 
 -- Useful property
-p~ipd : forall {p} -> p ~ indet {Bool} \ { true -> p ; false -> ccs.deadlock }
-p-to-q (p~ipd {p}) {p' = p'} t = p' , indet t , reflexive
-q-to-p (p~ipd {p}) (indet {s = false} (indet {s = ()} _))
-q-to-p (p~ipd {p}) {p' = p'} (indet {s = true} t) = p' , t , reflexive
+p~p+d : forall {p} -> p ~ indet₂ p ccs.deadlock
+p-to-q (p~p+d {p}) {p' = p'} t = p' , indet t , reflexive
+q-to-p (p~p+d {p}) (indet {s = false} (indet {s = ()} _))
+q-to-p (p~p+d {p}) {p' = p'} (indet {s = true} t) = p' , t , reflexive

@@ -22,7 +22,7 @@ subst : Context -> Proc -> Proc
 subst (chan a c) p = chan a (subst c p)
 subst (par-L c q) p = par (subst c p) q
 subst (par-R q c) p = par q (subst c p)
-subst (indet c q) p = indet {Bool} \ {true -> subst c p ; false -> q}
+subst (indet c q) p = indet₂ (subst c p) q
 subst (rename f c) p = rename f (subst c p)
 subst (hide f c) p = hide f (subst c p)
 subst replace p = p
