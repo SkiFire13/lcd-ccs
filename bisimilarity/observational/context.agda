@@ -5,7 +5,7 @@ open import Data.Product
 
 import ccs.proc
 
-module bisimilarity.observational.closure {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
+module bisimilarity.observational.context {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
 
 open import ccs.common {C} {N} {penv} as ccs
 open import bisimilarity.context {C} {N} {penv}

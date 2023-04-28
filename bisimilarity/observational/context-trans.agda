@@ -7,12 +7,12 @@ open import Relation.Binary.PropositionalEquality
 
 import ccs.proc
 
-module bisimilarity.observational.closure-reduc {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
+module bisimilarity.observational.context-trans {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
 
 open import ccs.common {C} {N} {penv} as ccs
 open import bisimilarity.context {C} {N} {penv}
-open import bisimilarity.observational.closure {C} {N} {penv} renaming (cong to ̂≈-cong; sym to ̂≈-sym)
-open import bisimilarity.observational.reduc {C} {N} {penv} renaming (cong to ≈ₒ-cong; sym to ≈ₒ-sym)
+open import bisimilarity.observational.context {C} {N} {penv} renaming (cong to ̂≈-cong; sym to ̂≈-sym)
+open import bisimilarity.observational.trans {C} {N} {penv} renaming (cong to ≈ₒ-cong; sym to ≈ₒ-sym)
 open import bisimilarity.weak.base {C} {N} {penv}
 open import bisimilarity.weak.properties {C} {N} {penv} renaming (sym to ≈-sym; trans to ≈-trans)
 
