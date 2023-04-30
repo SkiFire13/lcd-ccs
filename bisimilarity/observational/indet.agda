@@ -42,20 +42,21 @@ p-to-q (closure (cong p≈ᵢq) r) (indet {q = r'} {s = false} t) =
   r' , trans-to-weak (indet t) , ≈-refl
 p-to-q (closure (cong {chan c C[]} {q = q} p≈ᵢq) r) (indet {s = true} chan) =
   subst C[] q , trans-to-weak (indet chan) , ≈ᵢ-to-≈ (cong p≈ᵢq)
-p-to-q (closure (cong {par-L C[] pc} p≈ᵢq) r) (indet {s = true} t) with t
+p-to-q (closure (cong {par-L C[] pc} {q = q} p≈ᵢq) r) (indet {s = true} t) with t
 ... | par-L tl = {!   !}
-... | par-R tr = {!   !}
+... | par-R {p' = pc'} tr = par (subst C[] q) pc' , trans-to-weak (indet (par-R tr)) , {!   !}
 ... | par-B tl tr = {!   !}
 p-to-q (closure (cong {par-R pc C[]} p≈ᵢq) r) (indet {s = true} t) = {!   !}
-p-to-q (closure (cong {indet C[] pc} p≈ᵢq) r) (indet {s = true} (indet {s = false} t)) = {!   !}
-p-to-q (closure (cong {indet C[] pc} {q = q} p≈ᵢq) r) (indet {s = true} (indet {s = true} t))
-  with cong {C[]} p≈ᵢq .closure (indet₂ pc r) .p-to-q (indet {s = true} t)
-... | q' , send (cons tq s) x₁ x₂ , p'≈q' = {!   !}
-... | q' , send self x₁ x₂ , p'≈q' = {!   !}
-... | q' , recv (cons tq s) x₁ x₂ , p'≈q' = {!   !}
-... | q' , recv self x₁ x₂ , p'≈q' = {!   !}
-... | q' , tau (cons tq s) , p'≈q' = {!   !}
-... | q' , tau self , p'≈q' = q' , tau self , p'≈q'
+p-to-q (closure (cong {indet C[] pc} {q = q} p≈ᵢq) r) t =
+  ≈-trans (≈-trans helper (cong p≈ᵢq .closure (indet₂ pc r))) (≈-sym helper) .p-to-q t
+  where
+  helper : forall {p1 p2 p3} -> indet₂ (indet₂ p1 p2) p3 ≈ indet₂ p1 (indet₂ p2 p3)
+  p-to-q helper {p' = q'} (indet {s = true} (indet {s = true} t)) = q' , trans-to-weak (indet t) , ≈-refl
+  p-to-q helper {p' = q'} (indet {s = true} (indet {s = false} t)) = q' , trans-to-weak (indet (indet t)), ≈-refl
+  p-to-q helper {p' = q'} (indet {s = false} t) = q' , trans-to-weak (indet (indet t)) , ≈-refl
+  q-to-p helper {p' = p'} (indet {s = true} t) = p' , trans-to-weak (indet (indet t)) , ≈-refl
+  q-to-p helper {p' = p'} (indet {s = false} (indet {s = true} t)) = p' , trans-to-weak (indet (indet t)) , ≈-refl
+  q-to-p helper {p' = p'} (indet {s = false} (indet {s = false} t)) = p' , trans-to-weak (indet t), ≈-refl
 p-to-q (closure (cong {rename f C[]} p≈ᵢq) r) (indet {s = true} t) = {!   !}
 p-to-q (closure (cong {hide f C[]} p≈ᵢq) r) (indet {s = true} (hide {z = z} t)) with
   cong {C[]} p≈ᵢq .closure ccs.deadlock .p-to-q (indet {s = true} t)
@@ -78,3 +79,4 @@ p-to-q (closure (cong {hide f C[]} p≈ᵢq) r) (indet {s = true} (hide {z = z} 
 -- ... | q' , tau self , p'≈q' = {!   !}
 p-to-q (closure (cong {replace} p≈ᵢq) r) (indet {s = true} t) = p≈ᵢq .closure r .p-to-q (indet t)
 q-to-p (closure (cong p≈ᵢq) r) = cong (sym p≈ᵢq) .closure r .p-to-q
+ 
