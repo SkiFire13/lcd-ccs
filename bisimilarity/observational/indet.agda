@@ -44,7 +44,8 @@ p-to-q (closure (cong {chan c C[]} {q = q} p≈ᵢq) r) (indet {s = true} chan) 
   subst C[] q , trans-to-weak (indet chan) , ≈ᵢ-to-≈ (cong p≈ᵢq)
 p-to-q (closure (cong {par-L C[] pc} {q = q} p≈ᵢq) r) (indet {s = true} t) with t
 ... | par-L tl = {!   !}
-... | par-R {p' = pc'} tr = par (subst C[] q) pc' , trans-to-weak (indet (par-R tr)) , {!   !}
+... | par-R {p' = pc'} tr =
+  par (subst C[] q) pc' , trans-to-weak (indet (par-R tr)) , par-respects-≈ (≈ᵢ-to-≈ (cong {C[]} p≈ᵢq)) ≈-refl
 ... | par-B tl tr = {!   !}
 p-to-q (closure (cong {par-R pc C[]} p≈ᵢq) r) (indet {s = true} t) = {!   !}
 p-to-q (closure (cong {indet C[] pc} {q = q} p≈ᵢq) r) t =
@@ -79,4 +80,3 @@ p-to-q (closure (cong {hide f C[]} p≈ᵢq) r) (indet {s = true} (hide {z = z} 
 -- ... | q' , tau self , p'≈q' = {!   !}
 p-to-q (closure (cong {replace} p≈ᵢq) r) (indet {s = true} t) = p≈ᵢq .closure r .p-to-q (indet t)
 q-to-p (closure (cong p≈ᵢq) r) = cong (sym p≈ᵢq) .closure r .p-to-q
- 
