@@ -44,3 +44,6 @@ cong {C[]} {p} {q} (obs-c C[p]≈C[q]) = obs-c \ C'[] ->
       t2 = C[p]≈C[q] (compose C'[] C[])
       t3 = ~-to-≈ (ss~sc {C'[]} {C[]} {q})
   in ≈-trans (≈-trans t1 t2) (≈-sym t3)
+
+≈-cong-to-̂≈ : forall {_≈ₓ_ p q} -> (forall {p' q'} -> p' ≈ₓ q' -> p' ≈ q') -> Cong _≈ₓ_ -> p ≈ₓ q -> p ̂≈ q
+≈-cong-to-̂≈ {_≈ₓ_} ≈ₓ-to-≈ Cong≈ₓ p≈ₓq = obs-c \ _ -> ≈ₓ-to-≈ (Cong≈ₓ p≈ₓq)
