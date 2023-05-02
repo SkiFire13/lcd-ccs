@@ -11,13 +11,13 @@ module bisimilarity.observational.context-trans {C N : Set} {penv : ccs.proc.PEn
 
 open import ccs.common {C} {N} {penv} as ccs
 open import bisimilarity.context {C} {N} {penv}
-open import bisimilarity.observational.context {C} {N} {penv} renaming (cong to ̂≈-cong; sym to ̂≈-sym)
-open import bisimilarity.observational.trans {C} {N} {penv} renaming (cong to ≈ₒ-cong; sym to ≈ₒ-sym)
+open import bisimilarity.observational.context {C} {N} {penv} renaming (sym to ̂≈-sym)
+open import bisimilarity.observational.trans {C} {N} {penv} renaming (cong to ≈ₒ-cong)
 open import bisimilarity.weak.base {C} {N} {penv}
 open import bisimilarity.weak.properties {C} {N} {penv} renaming (sym to ≈-sym; trans to ≈-trans)
 
 ≈ₒ-to-̂≈ : forall {p q} -> p ≈ₒ q -> p ̂≈ q
-≈ₒ-to-̂≈ p≈ₒq = obs-c \ _ -> ≈ₒ-to-≈ (≈ₒ-cong p≈ₒq)
+≈ₒ-to-̂≈ p≈ₒq = ≈-cong-to-̂≈ ≈ₒ-to-≈ ≈ₒ-cong p≈ₒq
 
 ̂≈-to-≈ₒ : (c : C) -> forall {p q} -> p ̂≈ q -> p ≈ₒ q
 p-to-q (̂≈-to-≈ₒ c (obs-c C[p]≈C[q])) {a = send _} t with C[p]≈C[q] C[] .p-to-q (indet t)
