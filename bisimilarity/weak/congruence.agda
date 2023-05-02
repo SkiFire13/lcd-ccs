@@ -10,6 +10,7 @@ import ccs.proc
 module bisimilarity.weak.congruence {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
 
 open import ccs.common {C} {N} {penv} as ccs
+open import bisimilarity.cong {C} {N} {penv}
 open import bisimilarity.context {C} {N} {penv} as ctx
 open import bisimilarity.weak.base {C} {N} {penv}
 open import bisimilarity.weak.properties {C} {N} {penv}
@@ -36,7 +37,7 @@ q-to-p (¬c->≈-always-true ¬c) {send c} _ = ⊥-elim (¬c c)
 q-to-p (¬c->≈-always-true ¬c) {recv c} _ = ⊥-elim (¬c c)
 q-to-p (¬c->≈-always-true ¬c {p = p}) {tau} t = p , tau self , ¬c->≈-always-true ¬c
 -- And thus ≈ is trivially a congruence
-¬c->≈-cong : ¬ C -> forall {C[] p q} -> p ≈ q -> subst C[] p ≈ subst C[] q
+¬c->≈-cong : ¬ C -> Cong _≈_
 ¬c->≈-cong ¬c _ = ¬c->≈-always-true ¬c
 
 -- Prove that ≈ respects all the other kind of contexts

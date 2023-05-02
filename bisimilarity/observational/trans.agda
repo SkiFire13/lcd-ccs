@@ -8,6 +8,7 @@ import ccs.proc
 module bisimilarity.observational.trans {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
 
 open import ccs.common {C} {N} {penv}
+open import bisimilarity.cong {C} {N} {penv}
 open import bisimilarity.context {C} {N} {penv}
 open import bisimilarity.weak.base {C} {N} {penv}
 open import bisimilarity.weak.congruence {C} {N} {penv}
@@ -79,7 +80,7 @@ p-to-q (trans p≈ₒq q≈ₒs) t with p≈ₒq .p-to-q t
 q-to-p (trans p≈ₒq q≈ₒs) = p-to-q (trans (sym q≈ₒs) (sym p≈ₒq))
 
 -- Prove that ≈ₒ is a congruence
-cong : forall {C[] p q} -> p ≈ₒ q -> subst C[] p ≈ₒ subst C[] q
+cong : Cong _≈ₒ_
 p-to-q (cong {chan a C[]} {q = q} p≈ₒq) chan = subst C[] q , trans-to-obs chan , ≈ₒ-to-≈ (cong p≈ₒq)
 p-to-q (cong {par-L C[] pc} {q = q} p≈ₒq) (par-L t) =
   let q' , obs-t s1 tq s2 , p'≈q' = cong {C[]} p≈ₒq .p-to-q t

@@ -8,6 +8,7 @@ import ccs.proc
 module bisimilarity.observational.context {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
 
 open import ccs.common {C} {N} {penv} as ccs
+open import bisimilarity.cong {C} {N} {penv}
 open import bisimilarity.context {C} {N} {penv}
 open import bisimilarity.strong.base {C} {N} {penv}
 open import bisimilarity.strong.congruence {C} {N} {penv} renaming (cong to ~-cong)
@@ -37,7 +38,7 @@ trans (obs-c C[p]≈C[q]) (obs-c C[q]≈C[s]) = obs-c \ C[] -> ≈-trans (C[p]�
 ̂≈-to-≈ (obs-c C[p]≈C[q]) = C[p]≈C[q] replace
 
 -- Prove that ̂≈ is a congruence
-cong : forall {C[] p q} -> p ̂≈ q -> (subst C[] p) ̂≈ (subst C[] q)
+cong : Cong _̂≈_
 cong {C[]} {p} {q} (obs-c C[p]≈C[q]) = obs-c \ C'[] ->
   let t1 = ~-to-≈ (ss~sc {C'[]} {C[]} {p})
       t2 = C[p]≈C[q] (compose C'[] C[])

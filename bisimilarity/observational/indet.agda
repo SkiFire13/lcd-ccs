@@ -8,6 +8,7 @@ import ccs.proc
 module bisimilarity.observational.indet {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
 
 open import ccs.common {C} {N} {penv} as ccs
+open import bisimilarity.cong {C} {N} {penv}
 open import bisimilarity.context {C} {N} {penv}
 open import bisimilarity.strong.base {C} {N} {penv}
 open import bisimilarity.strong.congruence {C} {N} {penv} renaming (cong to ~-cong)
@@ -37,7 +38,7 @@ trans (obs-i p+r≈q+r) (obs-i q+r≈s+r) = obs-i \ r -> ≈-trans (p+r≈q+r r)
 ≈ᵢ-to-≈ : forall {p q} -> p ≈ᵢ q -> p ≈ q
 ≈ᵢ-to-≈ (obs-i p+r≈q+r) = ≈-trans (≈-trans p≈p+d (p+r≈q+r ccs.deadlock)) (≈-sym p≈p+d)
 
-cong : forall {C[] p q} -> p ≈ᵢ q -> subst C[] p ≈ᵢ subst C[] q
+cong : Cong _≈ᵢ_
 p-to-q (closure (cong p≈ᵢq) r) (indet {q = r'} {s = false} t) =
   r' , trans-to-weak (indet t) , ≈-refl
 p-to-q (closure (cong {chan c C[]} {q = q} p≈ᵢq) r) (indet {s = true} chan) =

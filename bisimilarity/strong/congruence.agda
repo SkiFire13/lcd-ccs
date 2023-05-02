@@ -9,6 +9,7 @@ import ccs.proc
 module bisimilarity.strong.congruence {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
 
 open import ccs.common {C} {N} {penv}
+open import bisimilarity.cong {C} {N} {penv}
 open import bisimilarity.context {C} {N} {penv}
 open import bisimilarity.strong.base {C} {N} {penv}
 open import bisimilarity.strong.properties {C} {N} {penv}
@@ -28,7 +29,7 @@ p-to-q (par-respects-~ pl~ql pr~qr) (par-B {a} {pl' = pl'} {pr' = pr'} tl tr) =
   in par ql' qr' , par-B tl' tr' , par-respects-~ pl'~ql' pr'~qr'
 
 -- Prove that ~ is a congruence
-cong : forall {C[] p q} -> p ~ q -> subst C[] p ~ subst C[] q
+cong : Cong _~_
 cong p~q = helper refl refl p~q
   where
   helper : forall {C[] p q ps qs} -> ps ≡ subst C[] p -> qs ≡ subst C[] q -> p ~ q -> ps ~ qs
