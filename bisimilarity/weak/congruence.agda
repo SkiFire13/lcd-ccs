@@ -24,7 +24,7 @@ open import bisimilarity.weak.properties {C} {N} {penv}
   q-to-p τd≈d (indet {s = ()} _)
   C[] = indet replace (chan (send c) ccs.deadlock)
 ... | _ , tau (cons (indet {s = true} (indet {s = ()} _)) _) , _
-... | _ , tau self , d≈c[d] with d≈c[d] .q-to-p (indet {s = false} chan)
+... | _ , tau self , d≈C[d] with d≈C[d] .q-to-p (indet {s = false} chan)
 ...   | _ , send self (indet {s = ()} _) _ , _
 ...   | _ , send (cons (indet {s = ()} _) _) _ _ , _
 
@@ -32,10 +32,10 @@ open import bisimilarity.weak.properties {C} {N} {penv}
 ¬c->≈-always-true : ¬ C -> forall {p q} -> p ≈ q
 p-to-q (¬c->≈-always-true ¬c) {send c} _ = ⊥-elim (¬c c)
 p-to-q (¬c->≈-always-true ¬c) {recv c} _ = ⊥-elim (¬c c)
-p-to-q (¬c->≈-always-true ¬c {q = q}) {tau} t = q , tau self , ¬c->≈-always-true ¬c
+p-to-q (¬c->≈-always-true ¬c) {tau} t = -, tau self , ¬c->≈-always-true ¬c
 q-to-p (¬c->≈-always-true ¬c) {send c} _ = ⊥-elim (¬c c)
 q-to-p (¬c->≈-always-true ¬c) {recv c} _ = ⊥-elim (¬c c)
-q-to-p (¬c->≈-always-true ¬c {p = p}) {tau} t = p , tau self , ¬c->≈-always-true ¬c
+q-to-p (¬c->≈-always-true ¬c) {tau} t = -, tau self , ¬c->≈-always-true ¬c
 -- And thus ≈ is trivially a congruence
 ¬c->≈-cong : ¬ C -> Cong _≈_
 ¬c->≈-cong ¬c _ = ¬c->≈-always-true ¬c
@@ -47,7 +47,6 @@ p-to-q (chan-respects-≈ {q = q} p≈q) chan = q , trans-to-weak chan , p≈q
 q-to-p (chan-respects-≈ {p = p} p≈q) chan = p , trans-to-weak chan , sym p≈q
 
 par-respects-≈ : forall {pl ql pr qr} -> pl ≈ ql -> pr ≈ qr -> par pl pr ≈ par ql qr
-q-to-p (par-respects-≈ pl~ql pr~qr) = p-to-q (par-respects-≈ (sym pl~ql) (sym pr~qr))
 p-to-q (par-respects-≈ {qr = qr} pl~ql pr~qr) (par-L {p' = p'} t) =
   let q' , t' , p'~q' = pl~ql .p-to-q t
   in par q' qr , w-map par-L t' , par-respects-≈ p'~q' pr~qr
@@ -58,6 +57,7 @@ p-to-q (par-respects-≈ pl~ql pr~qr) (par-B {a} {pl' = pl'} {pr' = pr'} tl tr) 
   let ql' , tl' , pl'~ql' = pl~ql .p-to-q tl
       qr' , tr' , pr'~qr' = pr~qr .p-to-q tr
   in par ql' qr' , w-par-B tl' tr' , par-respects-≈ pl'~ql' pr'~qr'
+q-to-p (par-respects-≈ pl~ql pr~qr) = p-to-q (par-respects-≈ (sym pl~ql) (sym pr~qr))
 
 hide-respects-≈ : forall {f p q} -> p ≈ q -> hide f p ≈ hide f q
 p-to-q (hide-respects-≈ {f} p≈q) (hide {z = z} t) =

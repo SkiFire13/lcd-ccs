@@ -49,16 +49,16 @@ p-to-q (closure (cong {par-L C[] pc} {q = q} p≈ᵢq) r) (indet {s = true} t) w
   par (subst C[] q) pc' , trans-to-weak (indet (par-R tr)) , par-respects-≈ (≈ᵢ-to-≈ (cong {C[]} p≈ᵢq)) ≈-refl
 ... | par-B tl tr = {!   !}
 p-to-q (closure (cong {par-R pc C[]} p≈ᵢq) r) (indet {s = true} t) = {!   !}
-p-to-q (closure (cong {indet C[] pc} {q = q} p≈ᵢq) r) t =
+p-to-q (closure (cong {indet C[] pc} p≈ᵢq) r) t =
   ≈-trans (≈-trans helper (cong p≈ᵢq .closure (indet₂ pc r))) (≈-sym helper) .p-to-q t
   where
   helper : forall {p1 p2 p3} -> indet₂ (indet₂ p1 p2) p3 ≈ indet₂ p1 (indet₂ p2 p3)
-  p-to-q helper {p' = q'} (indet {s = true} (indet {s = true} t)) = q' , trans-to-weak (indet t) , ≈-refl
-  p-to-q helper {p' = q'} (indet {s = true} (indet {s = false} t)) = q' , trans-to-weak (indet (indet t)), ≈-refl
-  p-to-q helper {p' = q'} (indet {s = false} t) = q' , trans-to-weak (indet (indet t)) , ≈-refl
-  q-to-p helper {p' = p'} (indet {s = true} t) = p' , trans-to-weak (indet (indet t)) , ≈-refl
-  q-to-p helper {p' = p'} (indet {s = false} (indet {s = true} t)) = p' , trans-to-weak (indet (indet t)) , ≈-refl
-  q-to-p helper {p' = p'} (indet {s = false} (indet {s = false} t)) = p' , trans-to-weak (indet t), ≈-refl
+  p-to-q helper (indet {s = true} (indet {s = true} t)) = -, trans-to-weak (indet t) , ≈-refl
+  p-to-q helper (indet {s = true} (indet {s = false} t)) = -, trans-to-weak (indet (indet t)), ≈-refl
+  p-to-q helper (indet {s = false} t) = -, trans-to-weak (indet (indet t)) , ≈-refl
+  q-to-p helper (indet {s = true} t) = -, trans-to-weak (indet (indet t)) , ≈-refl
+  q-to-p helper (indet {s = false} (indet {s = true} t)) = -, trans-to-weak (indet (indet t)) , ≈-refl
+  q-to-p helper (indet {s = false} (indet {s = false} t)) = -, trans-to-weak (indet t), ≈-refl
 p-to-q (closure (cong {rename f C[]} p≈ᵢq) r) (indet {s = true} t) = {!   !}
 p-to-q (closure (cong {hide f C[]} p≈ᵢq) r) (indet {s = true} (hide {z = z} t)) with
   cong {C[]} p≈ᵢq .closure ccs.deadlock .p-to-q (indet {s = true} t)

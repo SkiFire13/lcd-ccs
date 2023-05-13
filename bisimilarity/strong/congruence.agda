@@ -2,7 +2,7 @@
 
 open import Data.Bool
 open import Data.Product
-open import Relation.Binary.PropositionalEquality using (_≡_; refl)
+open import Relation.Binary.PropositionalEquality using (_≡_; refl; inspect; [_])
 
 import ccs.proc
 
@@ -30,33 +30,21 @@ p-to-q (par-respects-~ pl~ql pr~qr) (par-B {a} {pl' = pl'} {pr' = pr'} tl tr) =
 
 -- Prove that ~ is a congruence
 cong : Cong _~_
-cong p~q = helper refl refl p~q
-  where
-  helper : forall {C[] p q ps qs} -> ps ≡ subst C[] p -> qs ≡ subst C[] q -> p ~ q -> ps ~ qs
-
-  p-to-q (helper {chan a C[]} {q = q} refl refl p~q) chan = subst C[] q , chan , cong p~q
-
-  helper {par-L c pr} refl refl p~q = par-respects-~ (cong p~q) reflexive
-  helper {par-R c pr} refl refl p~q = par-respects-~ reflexive (cong p~q)
-
-  p-to-q (helper {indet c q} refl refl p~q) (indet {q = p'} {s = false} t) =
-    p' , indet {s = false} t , reflexive
-  p-to-q (helper {indet c q} refl refl p~q) (indet {s = true} t) =
-    let q' , t' , p'~q' = cong p~q .p-to-q t
-    in q' , indet t' , p'~q'
-
-  p-to-q (helper {rename f C[]} refl refl p~q) (rename {a = a} t) =
-    let q' , t' , p'~q' = (cong {C[]} p~q) .p-to-q t
-    in rename f q' , rename {a = a} t' , cong p'~q'
-
-  p-to-q (helper {hide f C[]} refl refl p~q) (hide {z = z} t) =
-    let q' , t' , p'~q' = (cong {C[]} p~q) .p-to-q t
-    in hide f q' , hide {z = z} t' , cong p'~q'
-
-  helper {replace} refl refl p~q = p~q
-
-  -- The other half be proved through symmetry
-  q-to-p (helper refl refl p~q) = p-to-q (helper refl refl (sym p~q))
+p-to-q (cong {chan a C[]} p~q) chan = subst C[] _ , chan , cong p~q
+cong {par-L C[] r} p~q = par-respects-~ (cong p~q) reflexive
+cong {par-R r C[]} p~q = par-respects-~ reflexive (cong p~q)
+p-to-q (cong {indet C[] r} p~q) (indet {s = false} t) = -, indet {s = false} t , reflexive
+p-to-q (cong {indet C[] r} p~q) (indet {s = true} t) =
+  let q' , t' , p'~q' = cong p~q .p-to-q t
+  in q' , indet t' , p'~q'
+p-to-q (cong {rename f C[]} p~q) (rename {a = a} t) =
+  let q' , t' , p'~q' = (cong {C[]} p~q) .p-to-q t
+  in rename f q' , rename {a = a} t' , cong p'~q'
+p-to-q (cong {hide f C[]} p~q) (hide {z = z} t) =
+  let q' , t' , p'~q' = (cong {C[]} p~q) .p-to-q t
+  in hide f q' , hide {z = z} t' , cong p'~q'
+p-to-q (cong {replace} p~q) = p~q .p-to-q
+q-to-p (cong p~q) = p-to-q (cong (sym p~q))
 
 -- Helper to prove that compose is the same as composing subst under strong bisimilarity
 ss~sc : forall {C1[] C2[] p} -> subst C1[] (subst C2[] p) ~ subst (compose C1[] C2[]) p
