@@ -81,7 +81,7 @@ w-hide {z = z} (recv s1 t s2) = recv (s-map hide s1) (hide {z = z} t) (s-map hid
 w-hide (tau s) = tau (s-map hide s)
 
 -- Like Trans.rename but for weak transitions
-w-rename : forall {f} -> WeakTrans p a q -> WeakTrans (rename f p) (map-action f a) (rename f q)
+w-rename : forall {f} -> WeakTrans p a q -> WeakTrans (rename f p) (map-act f a) (rename f q)
 w-rename (send s1 t s2) = send (s-map rename s1) (rename t) (s-map rename s2)
 w-rename (recv s1 t s2) = recv (s-map rename s1) (rename t) (s-map rename s2)
 w-rename (tau s) = tau (s-map rename s)

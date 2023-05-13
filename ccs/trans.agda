@@ -22,5 +22,5 @@ data Trans : Proc -> Act -> Proc -> Set₁ where
   par-B   : Trans pl a pl' -> Trans pr (flip-act a) pr' -> Trans (par pl pr) tau (par pl' pr')
   indet   : forall {S f} {s : S} -> Trans (f s) a q -> Trans (indet f) a q
   const   : Trans (penv n) a p -> Trans (const n) a p
-  rename  : forall {f} -> Trans p a q -> Trans (rename f p) (map-action f a) (rename f q)
+  rename  : forall {f} -> Trans p a q -> Trans (rename f p) (map-act f a) (rename f q)
   hide    : forall {f} {z : T (filter-act f a)} -> Trans p a q -> Trans (hide f p) a (hide f q)

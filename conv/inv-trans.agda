@@ -20,75 +20,64 @@ NaiveInvConv : Set₁
 NaiveInvConv = forall {p1 a p2} 
               -> ccs.Trans (conv-proc p1) (conv-act a) (conv-proc p2)
               -> vp.Trans p1 a p2
-
 inv-conv-need-exists : ¬ NaiveInvConv
-inv-conv-need-exists f with f {tau vp.deadlock} {tau} {if true vp.deadlock} chan
-... | ()
+inv-conv-need-exists f with () <- f {tau vp.deadlock} {tau} {if true vp.deadlock} chan
 
 -- Prove some guarantees about composing functions on channel/transition operation that Agda can't prove.
-inv-conv-map-rename-eq : forall {ca a f}
-                       -> map-action (conv-rename f) ca ≡ conv-act a
-                       -> ∃[ a' ] (ca ≡ conv-act a' × a ≡ map-act f a')
-inv-conv-map-rename-eq {send (conv-c c v)} {send _ _} refl = send c v , refl , refl
-inv-conv-map-rename-eq {recv (conv-c c v)} {recv _ _} refl = recv c v , refl , refl
-inv-conv-map-rename-eq {tau} {tau} refl = tau , refl , refl
 
--- The inverse conversion for the condition when hiding channels
-inv-conv-hide-z : forall {f a}
-                -> T (ccs.filter-act (conv-hide f) (conv-act a))
-                -> T (vp.filter-act f a)
-inv-conv-hide-z {f} {send c _} _ with f c
-... | true = tt
-inv-conv-hide-z {f} {recv c _} _ with f c
-... | true = tt
-inv-conv-hide-z {f} {tau} _ = tt
+inv-conv-act : forall {ca} -> ∃[ a ] (ca ≡ conv-act a)
+inv-conv-act {send (conv-c c v)} = send c v , refl
+inv-conv-act {recv (conv-c c v)} = recv c v , refl
+inv-conv-act {tau} = tau , refl
+
+inv-flip-eq : forall {a} -> ccs.flip-act (conv-act a) ≡ conv-act (vp.flip-act a)
+inv-flip-eq {send _ _} = refl
+inv-flip-eq {recv _ _} = refl
+inv-flip-eq {tau} = refl
+
+inv-rename-eq : forall {a a' f} -> conv-act a ≡ ccs.map-act (conv-rename f) (conv-act a') -> a ≡ vp.map-act f a'
+inv-rename-eq {send _ _} {send _ _} refl = refl
+inv-rename-eq {recv _ _} {recv _ _} refl = refl
+inv-rename-eq {tau} {tau} refl = refl
+
+inv-filter-eq : forall {f a} -> ccs.filter-act (conv-hide f) (conv-act a) ≡ vp.filter-act f a
+inv-filter-eq {f} {send c _} = refl
+inv-filter-eq {f} {recv c _} = refl
+inv-filter-eq {f} {tau} = refl
 
 -- Prove the less-strong version of the previous (false) theorem, that is
 -- if a CCS VP process converted to CCS has a relation with another CCS process
 -- then there exists a corresponding relation between the initial CCS VP process
 -- and some other CCS VP process that can be converted in the initial second CCS process.
-inv-conv-trans : forall {p1 a cp2} 
+inv-conv-trans' : forall {p1 a cp2} 
                -> ccs.Trans (conv-proc p1) (conv-act a) cp2
                -> ∃[ p2 ] (cp2 ≡ conv-proc p2 × vp.Trans p1 a p2)
-inv-conv-trans = helper refl refl
-  where
-  -- This helper is needed because Agda prefers plain variables when pattern matching rather
-  -- the possible return values of a function.
-  helper : forall {p1 a cp1 ca cp2} 
-           -> cp1 ≡ conv-proc p1
-           -> ca ≡ conv-act a
-           -> ccs.Trans cp1 ca cp2
-           -> ∃[ p2 ] (cp2 ≡ conv-proc p2 × vp.Trans p1 a p2)
-  helper {send _ _ p} {send _ _} refl refl chan = p , refl , send
-  helper {recv _ f} {recv _ v} refl refl (indet chan) = f v , refl , recv
-  helper {tau p} {tau} refl refl chan = p , refl , tau
-  
-  helper {par pl pr} refl eq (par-L tl) with helper {pl} refl eq tl
-  ... | pl' , refl , tl' = par pl' pr , refl , par-L tl'
-  
-  helper {par pl pr} refl eq (par-R tr) with helper {pr} refl eq tr
-  ... | pr' , refl , tr' = par pl pr' , refl , par-R tr'
-
-  helper {par pl pr} {tau} refl refl (par-B {a = send _} tl tr) with inv-conv-trans {pl} tl | inv-conv-trans {pr} tr
-  ... | pl' , refl , tl' | pr' , refl , tr' = par pl' pr' , refl , par-B tl' tr'
-  helper {par pl pr} {tau} refl refl (par-B {a = recv _} tl tr) with inv-conv-trans {pl} tl | inv-conv-trans {pr} tr
-  ... | pl' , refl , tl' | pr' , refl , tr' = par pl' pr' , refl , par-B tl' tr'
-  helper {par pl pr} {tau} refl refl (par-B {a = tau} tl tr) with inv-conv-trans {pl} tl | inv-conv-trans {pr} tr
-  ... | pl' , refl , tl' | pr' , refl , tr' = par pl' pr' , refl , par-B tl' tr'
-  
-  helper {indet f} {a} refl refl (indet {s = s} t) with inv-conv-trans {f s} {a} t
-  ... | p' , refl , t' = p' , refl , indet {s = s} t'
-  
-  helper {const n args} refl refl (const t) with inv-conv-trans {penv n args} t
-  ... | p' , refl , t' = p' , refl , const t'
-  
-  helper {rename f p} refl e (rename t) with inv-conv-map-rename-eq e
-  ... | _ , refl , refl with inv-conv-trans {p} t
-  ... | p' , refl , t' = rename f p' , refl , rename t'
-  
-  helper {hide f p} {a} refl refl (hide {z = z} t) with inv-conv-trans {p} t
-  ... | p' , refl , t' = hide f p' , refl , hide {z = inv-conv-hide-z {f} {a} z} t'
-
-  helper {if false _} refl refl (indet {s = ()} t)
-  helper {if true p} refl refl t with inv-conv-trans {p} t
-  ... | p' , refl , t' = p' , refl , if t'
+inv-conv-trans' {p1} {a} t with {conv-proc p1} | {conv-act a} | inspect conv-proc p1 | inspect conv-act a
+inv-conv-trans' {send _ _ p} {send _ _} chan | [ refl ] | [ refl ] = p , refl , send
+inv-conv-trans' {recv _ f} {recv _ v} (indet chan) | [ refl ] | [ refl ] = f v , refl , recv
+inv-conv-trans' {tau p} {tau} chan | [ refl ] | [ refl ] = p , refl , tau
+inv-conv-trans' {par pl pr} (par-L tl) | [ refl ] | [ e2 ] with refl <- e2
+  with pl' , refl , tl' <- inv-conv-trans' {pl} tl = par pl' pr , refl , par-L tl'
+inv-conv-trans' {par pl pr} (par-R tr) | [ refl ] | [ e2 ] with refl <- e2
+  with pr' , refl , tr' <- inv-conv-trans' {pr} tr = par pl pr' , refl , par-R tr'
+inv-conv-trans' {par pl pr} {tau} (par-B {a = ca} tl tr) | [ refl ] | [ refl ]
+  with a , refl <- inv-conv-act {ca}
+  rewrite inv-flip-eq {a}
+  with pl' , refl , tl' <- inv-conv-trans' {pl} tl
+  with pr' , refl , tr' <- inv-conv-trans' {pr} tr
+  = par pl' pr' , refl , par-B tl' tr'
+inv-conv-trans' {indet f} {a} (indet {s = s} t) | [ refl ] | [ refl ]
+  with p' , refl , t' <- inv-conv-trans' {f s} {a} t = p' , refl , indet {s = s} t'
+inv-conv-trans' {const n args} (const t) | [ refl ] | [ refl ]
+  with p' , refl , t' <- inv-conv-trans' {penv n args} t = p' , refl , const t'
+inv-conv-trans' {rename f p} (rename {a = ca} t) | [ refl ] | [ e ]
+  with a , refl <- inv-conv-act {ca}
+  rewrite inv-rename-eq e
+  with p' , refl , t' <- inv-conv-trans' {p} t
+  = rename f p' , refl , rename t'
+inv-conv-trans' {hide f p} {a} (hide {z = z} t) | [ refl ] | [ refl ]
+  rewrite inv-filter-eq {f} {a}
+  with p' , refl , t' <- inv-conv-trans' {p} t = hide f p' , refl , hide {z = z} t'
+inv-conv-trans' {if false _} (indet {s = ()} _) | [ refl ] | [ refl ]
+inv-conv-trans' {if true p} t | [ refl ] | [ refl ]
+  with p' , refl , t' <- inv-conv-trans' {p} t = p' , refl , if t'

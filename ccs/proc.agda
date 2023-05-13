@@ -31,10 +31,10 @@ flip-act (send c) = recv c
 flip-act (recv c) = send c
 flip-act tau = tau
 
-map-action : (C -> C) -> Act -> Act
-map-action f (send c) = send (f c)
-map-action f (recv c) = recv (f c)
-map-action f tau = tau
+map-act : (C -> C) -> Act -> Act
+map-act f (send c) = send (f c)
+map-act f (recv c) = recv (f c)
+map-act f tau = tau
 
 filter-act : (C -> Bool) -> Act -> Bool
 filter-act f (send c) = f c
