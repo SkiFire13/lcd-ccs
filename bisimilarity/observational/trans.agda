@@ -81,28 +81,28 @@ q-to-p (trans p≈ₒq q≈ₒs) = p-to-q (trans (sym q≈ₒs) (sym p≈ₒq))
 
 -- Prove that ≈ₒ is a congruence
 cong : Cong _≈ₒ_
-p-to-q (cong {chan a C[]} {q = q} p≈ₒq) chan = subst C[] q , trans-to-obs chan , ≈ₒ-to-≈ (cong p≈ₒq)
-p-to-q (cong {par-L C[] pc} {q = q} p≈ₒq) (par-L t) =
+p-to-q (cong {chan a C[]} p≈ₒq) chan = subst C[] _ , trans-to-obs chan , ≈ₒ-to-≈ (cong p≈ₒq)
+p-to-q (cong {par-L C[] pc} p≈ₒq) (par-L t) =
   let q' , obs-t s1 tq s2 , p'≈q' = cong {C[]} p≈ₒq .p-to-q t
   in par q' pc , obs-t (s-map par-L s1) (par-L tq) (s-map par-L s2) , par-respects-≈ p'≈q' ≈-refl
-p-to-q (cong {par-L C[] pc} {q = q} p≈ₒq) (par-R {p' = pc'} t) = 
-  par (subst C[] q) pc' , trans-to-obs (par-R t) , par-respects-≈ (≈ₒ-to-≈ (cong {C[]} p≈ₒq)) ≈-refl
+p-to-q (cong {par-L C[] pc} p≈ₒq) (par-R {p' = pc'} t) = 
+  par (subst C[] _) pc' , trans-to-obs (par-R t) , par-respects-≈ (≈ₒ-to-≈ (cong {C[]} p≈ₒq)) ≈-refl
 p-to-q (cong {par-L C[] pc} p≈ₒq) (par-B {pr' = pc'} t1 t2) =
   let q' , obs-t sq1 tq sq2 , p'≈q' = cong {C[]} p≈ₒq .p-to-q t1
   in par q' pc' , obs-t (s-map par-L sq1) (par-B tq t2) (s-map par-L sq2), par-respects-≈ p'≈q' ≈-refl
-p-to-q (cong {par-R pc C[]} {q = q} p≈ₒq) (par-L {p' = pc'} t) =
-  par pc' (subst C[] q) , trans-to-obs (par-L t) , par-respects-≈ ≈-refl (≈ₒ-to-≈ (cong {C[]} p≈ₒq))
-p-to-q (cong {par-R pc C[]} {q = q} p≈ₒq) (par-R t) =
+p-to-q (cong {par-R pc C[]} p≈ₒq) (par-L {p' = pc'} t) =
+  par pc' (subst C[] _) , trans-to-obs (par-L t) , par-respects-≈ ≈-refl (≈ₒ-to-≈ (cong {C[]} p≈ₒq))
+p-to-q (cong {par-R pc C[]} p≈ₒq) (par-R t) =
   let q' , obs-t s1 tq s2 , p'≈q' = cong {C[]} p≈ₒq .p-to-q t
   in par pc q' , obs-t (s-map par-R s1) (par-R tq) (s-map par-R s2) , par-respects-≈ ≈-refl p'≈q'
 p-to-q (cong {par-R pc C[]} p≈ₒq) (par-B {pl' = pc'} t1 t2) =
   let q' , obs-t sq1 tq sq2 , p'≈q' = cong {C[]} p≈ₒq .p-to-q t2
   in par pc' q' , obs-t (s-map par-R sq1) (par-B t1 tq) (s-map par-R sq2), par-respects-≈ ≈-refl p'≈q'
-p-to-q (cong {indet C[] pc} p≈ₒq) (indet {q = pc'} {s = false} t) = pc' , trans-to-obs (indet {s = false} t) , ≈-refl
+p-to-q (cong {indet C[] pc} p≈ₒq) (indet {s = false} t) = _ , trans-to-obs (indet {s = false} t) , ≈-refl
 p-to-q (cong {indet C[] pc} p≈ₒq) (indet {s = true} t) with cong {C[]} p≈ₒq .p-to-q t
 ... | q' , obs-t self tq s2 , p'≈q' = q' , obs-t self (indet tq) s2 , p'≈q'
 ... | q' , obs-t (cons ts s1) tq s2 , p'≈q' = q' , obs-t (cons (indet ts) s1) tq s2 , p'≈q'
-p-to-q (cong {rename f C[]} p≈ₒq) (rename {a = a} t) =
+p-to-q (cong {rename f C[]} p≈ₒq) (rename t) =
   let q' , obs-t sq1 tq sq2 , p'≈q' = cong {C[]} p≈ₒq .p-to-q t
   in rename f q' , obs-t (s-map rename sq1) (rename tq) (s-map rename sq2) , rename-respects-≈ p'≈q'
 p-to-q (cong {hide f C[]} p≈ₒq) (hide {z = z} t) =
@@ -110,3 +110,4 @@ p-to-q (cong {hide f C[]} p≈ₒq) (hide {z = z} t) =
   in hide f q' , obs-t (s-map hide s1) (hide {z = z} tq) (s-map hide s2) , hide-respects-≈ p'≈q'
 p-to-q (cong {replace} p≈ₒq) = p≈ₒq .p-to-q
 q-to-p (cong p≈ₒq) = cong (sym p≈ₒq) .p-to-q
+ 

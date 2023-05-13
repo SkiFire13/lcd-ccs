@@ -37,6 +37,6 @@ IsEquivalence.trans (isEquivalence) = trans
 
 -- Useful property
 p~p+d : forall {p} -> p ~ indet₂ p ccs.deadlock
-p-to-q (p~p+d {p}) {p' = p'} t = p' , indet t , reflexive
+p-to-q (p~p+d {p}) t = _ , indet t , reflexive
 q-to-p (p~p+d {p}) (indet {s = false} (indet {s = ()} _))
-q-to-p (p~p+d {p}) {p' = p'} (indet {s = true} t) = p' , t , reflexive
+q-to-p (p~p+d {p}) (indet {s = true} t) = _ , t , reflexive

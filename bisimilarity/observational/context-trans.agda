@@ -32,24 +32,5 @@ p-to-q (̂≈-to-≈ₒ c (obs-c C[p]≈C[q])) {a = recv _} t with C[p]≈C[q] C
 ... | _ , recv self (indet {s = false} (indet {s = ()} _)) _ , _
 ... | q' , recv (cons (indet {s = true} tq) s1) tq' s2 , p'≈q' = q' , obs-t (cons tq s1) tq' s2 , p'≈q'
 ... | _ , recv (cons (indet {s = false} (indet {s = ()} _)) _) _ _ , _
-p-to-q (̂≈-to-≈ₒ c (obs-c C[p]≈C[q])) {a = tau} t with C[p]≈C[q] C[] .p-to-q (indet t)
-  where C[] = indet replace ccs.deadlock
-... | _ , tau (cons (indet {s = false} (indet {s = ()} _)) _) , _
-... | qd' , tau (cons (indet {s = true} tq) s) , p'≈qd' = qd' , obs-t self tq s , p'≈qd'
-... | qd' , tau self , p'≈qd' with C[p]≈C[q] C[] .p-to-q (indet t)
-  where C[] = indet replace (chan (send c) ccs.deadlock)
-... | _ , tau (cons (indet {s = false} ()) _) , _
-... | qc' , tau (cons (indet {s = true} tq) s) , p'≈qc' = qc' , obs-t self tq s , p'≈qc'
-... | qc' , tau self , p'≈qc' with C[p]≈C[q] C[] .p-to-q (indet t)
-  where C[] = indet replace (chan tau ccs.deadlock)
-... | qt' , tau (cons (indet {s = false} chan) (cons (indet {s = ()} _) _)) , p'≈qt'
-... | qt' , tau (cons (indet {s = false} chan) self) , p'≈qt' =
-  let _ , tqt , _ = ≈-trans (≈-sym p'≈qc') p'≈qt' .p-to-q (indet {s = false} chan)
-  in w-deadlock-elim tqt
-  where
-  w-deadlock-elim : forall {S p} -> WeakTrans ccs.deadlock (send c) p -> S
-  w-deadlock-elim (send self (indet {s = ()} _) _)
-  w-deadlock-elim (send (cons (indet {s = ()} _) _) _ _)
-... | qt' , tau (cons (indet {s = true} tq) s) , p'≈qt' = qt' , obs-t self tq s , p'≈qt'
-... | qt' , tau self , p'≈qt' = {!   !}
+p-to-q (̂≈-to-≈ₒ c (obs-c C[p]≈C[q])) {a = tau} t = {!   !}
 q-to-p (̂≈-to-≈ₒ c oc) = ̂≈-to-≈ₒ c (̂≈-sym oc) .p-to-q

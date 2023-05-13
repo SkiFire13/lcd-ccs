@@ -12,7 +12,7 @@ module bisimilarity.observational.context-indet {C N : Set} {penv : ccs.proc.PEn
 open import ccs.common {C} {N} {penv} as ccs
 open import bisimilarity.context {C} {N} {penv}
 open import bisimilarity.observational.context {C} {N} {penv} renaming (cong to ̂≈-cong; sym to ̂≈-sym)
-open import bisimilarity.observational.indet {C} {N} {penv}
+open import bisimilarity.observational.indet {C} {N} {penv} renaming (cong to ≈ᵢ-cong)
 open import bisimilarity.weak.base {C} {N} {penv}
 open import bisimilarity.weak.properties {C} {N} {penv} renaming (sym to ≈-sym; trans to ≈-trans)
 
@@ -20,4 +20,4 @@ open import bisimilarity.weak.properties {C} {N} {penv} renaming (sym to ≈-sym
 ̂≈-to-≈ᵢ (obs-c C[p]≈C[q]) = obs-i \ r -> C[p]≈C[q] (indet replace r)
 
 ≈ᵢ-to-̂≈ : forall {p q} -> p ≈ᵢ q -> p ̂≈ q
-≈ᵢ-to-̂≈ p≈ᵢq = {!   !}
+≈ᵢ-to-̂≈ p≈ᵢq = ≈-cong-to-̂≈ ≈ᵢ-to-≈ ≈ᵢ-cong p≈ᵢq

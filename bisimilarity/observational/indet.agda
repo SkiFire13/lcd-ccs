@@ -1,4 +1,5 @@
 {-# OPTIONS --guardedness #-}
+{-# OPTIONS --allow-unsolved-metas #-}
 
 open import Data.Bool
 open import Data.Product
@@ -15,7 +16,7 @@ open import bisimilarity.strong.congruence {C} {N} {penv} renaming (cong to ~-co
 open import bisimilarity.strong.properties {C} {N} {penv} using () renaming (reflexive to ~-refl)
 open import bisimilarity.weak.base {C} {N} {penv}
 open import bisimilarity.weak.congruence {C} {N} {penv}
-open import bisimilarity.weak.properties {C} {N} {penv} using (~-to-≈; p≈p+d) renaming (reflexive to ≈-refl; sym to ≈-sym; trans to ≈-trans)
+open import bisimilarity.weak.properties {C} {N} {penv} using (p≈p+d) renaming (reflexive to ≈-refl; sym to ≈-sym; trans to ≈-trans)
 
 -- Observational congruence defined as a closure over weak bisimilarity in contexts
 record _≈ᵢ_ (p : Proc) (q : Proc) : Set₁ where

@@ -48,15 +48,15 @@ q-to-p (cong p~q) = p-to-q (cong (sym p~q))
 
 -- Helper to prove that compose is the same as composing subst under strong bisimilarity
 ss~sc : forall {C1[] C2[] p} -> subst C1[] (subst C2[] p) ~ subst (compose C1[] C2[]) p
-ss~sc {chan a c} = cong {chan a replace} (ss~sc {c})
-ss~sc {par-L c p} = cong {par-L replace p} (ss~sc {c})
-ss~sc {par-R p c} = cong {par-R p replace} (ss~sc {c})
-p-to-q (ss~sc {indet c _}) (indet {q = p'} {s = s} t) with s
-... | true = let q' , t' , p'~q' = ss~sc {c} .p-to-q t in q' , indet t' , p'~q'
-... | false = p' , indet {s = false} t , reflexive
-q-to-p (ss~sc {indet c _}) (indet {q = p'} {s = s} t) with s
-... | true = let q' , t' , p'~q' = ss~sc {c} .q-to-p t in q' , indet t' , p'~q'
-... | false = p' , indet {s = false} t , reflexive
-ss~sc {rename f c} = cong {rename f replace} (ss~sc {c})
-ss~sc {hide f c} = cong {hide f replace} (ss~sc {c})
+ss~sc {chan a C[]} = cong {chan a replace} (ss~sc {C[]})
+ss~sc {par-L C[] p} = cong {par-L replace p} (ss~sc {C[]})
+ss~sc {par-R p C[]} = cong {par-R p replace} (ss~sc {C[]})
+p-to-q (ss~sc {indet C[] _}) (indet {s = s} t) with s
+... | true = let q' , t' , p'~q' = ss~sc {C[]} .p-to-q t in q' , indet {s = true} t' , p'~q'
+... | false = _ , indet {s = false} t , reflexive
+q-to-p (ss~sc {indet C[] _}) (indet {s = s} t) with s
+... | true = let q' , t' , p'~q' = ss~sc {C[]} .q-to-p t in q' , indet {s = true} t' , p'~q'
+... | false = _ , indet {s = false} t , reflexive
+ss~sc {rename f C[]} = cong {rename f replace} (ss~sc {C[]})
+ss~sc {hide f C[]} = cong {hide f replace} (ss~sc {C[]})
 ss~sc {replace} = reflexive
