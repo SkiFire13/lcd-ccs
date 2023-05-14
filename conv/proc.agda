@@ -1,7 +1,8 @@
 open import Data.Bool
 open import Data.Unit
+open import Relation.Binary.Definitions using (DecidableEquality)
 
-module conv.proc {C N X V : Set} {n-fv : N -> X -> Bool} where
+module conv.proc {C N X V : Set} {n-fv : N -> X -> Bool} {_≡?_ : DecidableEquality X} where
 
 -- The type of the channels (C) in the converted CCS
 record Conv-C : Set where
@@ -15,18 +16,15 @@ record Conv-N : Set where
   constructor conv-n
   field
     name : N
-    args : (x : X) -> {_ : T (n-fv name x)} -> V
+    args : (x : X) -> T (n-fv name x) -> V
 
 -- open import later to shadow `chan`
 open import ccs.proc {Conv-C} {Conv-N} as ccs
-open import ccs-vp.proc {C} {N} {X} {V} {n-fv} as vp
+open import ccs-vp.proc {C} {N} {X} {V} {n-fv} {_≡?_} as vp
 
 -- Convert a CCS VP process to a normal CCS Process
 -- the implementation is below, after a couple of helper co-recursive functions
 conv-proc : vp.Proc -> ccs.Proc
-
-conv-recv : C -> (V -> vp.Proc) -> V -> ccs.Proc
-conv-recv c f = \ v -> chan (recv (conv-c c v)) (conv-proc (f v))
 
 conv-indet : {S : Set} -> (S -> vp.Proc) -> S -> ccs.Proc
 conv-indet f = \ s -> conv-proc (f s)
@@ -37,15 +35,15 @@ conv-rename f = \ (conv-c c v) -> conv-c (f c) v
 conv-hide : (C -> Bool) -> Conv-C -> Bool
 conv-hide f = \ (conv-c c _) -> f c
 
-conv-proc (send c v p) = chan (send (conv-c c v)) (conv-proc p)
-conv-proc (recv c f)   = indet (conv-recv c f)
-conv-proc (tau p)      = chan (tau) (conv-proc p)
-conv-proc (par p q)    = par (conv-proc p) (conv-proc q)
-conv-proc (indet f)    = indet (conv-indet f)
-conv-proc (const n xs) = const (conv-n n xs)
-conv-proc (rename f p) = rename (conv-rename f) (conv-proc p)
-conv-proc (hide f p)   = hide (conv-hide f) (conv-proc p)
-conv-proc (if b p)     = if b then (conv-proc p) else ccs.deadlock
+conv-proc (send c e p)   = chan (send (conv-c c (eval e))) (conv-proc p)
+conv-proc (recv c x p)   = indet \ v -> conv-proc (bind-proc' x v p)
+conv-proc (tau p)        = chan (tau) (conv-proc p)
+conv-proc (par p q)      = par (conv-proc p) (conv-proc q)
+conv-proc (indet f)      = indet (conv-indet f)
+conv-proc (const n args) = const (conv-n n (eval args))
+conv-proc (rename f p)   = rename (conv-rename f) (conv-proc p)
+conv-proc (hide f p)     = hide (conv-hide f) (conv-proc p)
+conv-proc (if b p)       = if (eval b) then (conv-proc p) else ccs.deadlock
 
 -- Convert transition operations in CCS VP into channel operations in CCS
 conv-act : vp.Act -> ccs.Act

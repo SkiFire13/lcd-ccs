@@ -1,31 +1,37 @@
 open import Data.Bool
 open import Data.Empty
+open import Relation.Binary.Definitions using (DecidableEquality)
 
 import ccs-vp.proc
 
-module ccs-vp.trans {C N X V : Set} {n-fv : N -> X -> Bool} {penv : ccs-vp.proc.PEnv {C} {N} {X} {V} {n-fv}} where
+module ccs-vp.trans {C N X V : Set} {n-fv : N -> X -> Bool}
+  {_≡?_ : DecidableEquality X} {penv : ccs-vp.proc.PEnv {C} {N} {X} {V} {n-fv} {_≡?_}}
+  where
 
-open import ccs-vp.proc {C} {N} {X} {V} {n-fv}
+open import ccs-vp.proc {C} {N} {X} {V} {n-fv} {_≡?_}
 
 private
   variable
-    {p q p'} : Proc
-    {pl pr pl' pr'} : Proc
     {a} : Act
     {c} : C
     {n} : N
+    {x} : X
     {v} : V
+    {p q p'} : Proc
+    {pl pr pl' pr'} : Proc
+    {precv} : ProcFV (add-fv x empty-fv)
+    {e} : (VEnv empty-fv -> V)
 
 -- A transition between two CCS VP processes through an action.
 data Trans : Proc -> Act -> Proc -> Set₁ where
-  send   : Trans (send c v p) (send c v) p
-  recv   : forall {f} -> Trans (recv c f) (recv c v) (f v)
+  send   : Trans (send c e p) (send c (eval e)) p
+  recv   : Trans (recv c x precv) (recv c v) (bind-proc' x v precv)
   tau    : Trans (tau p) tau p
   par-L  : Trans pl a p' -> Trans (par pl pr) a (par p' pr)
   par-R  : Trans pr a p' -> Trans (par pl pr) a (par pl p')
   par-B  : Trans pl a pl' -> Trans pr (flip-act a) pr' -> Trans (par pl pr) tau (par pl' pr')
   indet  : forall {S f} {s : S} -> Trans (f s) a q -> Trans (indet f) a q
-  const  : forall {f} -> Trans (penv n f) a p -> Trans (const n f) a p
+  const  : forall {args} -> Trans (penv n (eval args)) a p -> Trans (const n args) a p
   rename : forall {f} -> Trans p a q -> Trans (rename f p) (map-act f a) (rename f q)
   hide   : forall {f} {z : T (filter-act f a)} -> Trans p a q -> Trans (hide f p) a (hide f q)
-  if     : Trans p a q -> Trans (if true p) a q
+  if     : forall {eb} -> Trans p a q -> T (eval eb) -> Trans (if eb p) a q
