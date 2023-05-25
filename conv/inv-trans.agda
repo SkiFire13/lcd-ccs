@@ -17,7 +17,7 @@ open import ccs-vp.common C N X V n-fv penv as vp
 -- a transition relation between two CCS processes then it's not guaranteed that
 -- there's a transition between CCS VP processes that can be converted into them. 
 NaiveInvConv : Set₁
-NaiveInvConv = ∀ {p1 a p2} → conv-proc p1 -[ conv-act a ]→ conv-proc p2 → p1 -[ a ]→ᵥ p2
+NaiveInvConv = ∀ {p1 a p2} → (conv-proc p1 -[ conv-act a ]→ conv-proc p2) → (p1 -[ a ]→ᵥ p2)
 inv-conv-need-exists : ¬ NaiveInvConv
 inv-conv-need-exists f with () <- f {tau vp.deadlock} {tau} {if true vp.deadlock} chan
 

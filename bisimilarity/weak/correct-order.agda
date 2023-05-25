@@ -14,8 +14,8 @@ open import bisimilarity.weak.properties C N penv
 record _≈ₒ_ (p : Proc) (q : Proc) : Set₁ where
   coinductive
   field
-    p-to-q : ∀ {a p'} → p -[ a ]→ p' → ∃[ q' ] (q =[ a ]⇒ q' × p' ≈ₒ q')
-    q-to-p : ∀ {a q'} → q -[ a ]→ q' → ∃[ p' ] (p =[ a ]⇒ p' × p' ≈ₒ q')
+    p-to-q : ∀ {a p'} → (p -[ a ]→ p') → ∃[ q' ] ((q =[ a ]⇒ q') × p' ≈ₒ q')
+    q-to-p : ∀ {a q'} → (q -[ a ]→ q') → ∃[ p' ] ((p =[ a ]⇒ p') × p' ≈ₒ q')
 open _≈ₒ_ public
 
 -- Prove symmetry for _≈ₒ_ because otherwise Agda termination checker will fail in the next theorem

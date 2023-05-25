@@ -11,7 +11,7 @@ open import bisimilarity.weak.base C N penv
 
 -- (Half) the property of a weak string bisimulation
 StringBisimulationProperty : (Proc → Proc → Set₁) → Proc → Proc → Set₁
-StringBisimulationProperty R p q = ∀ {a p'} → p =[ a ]⇒ p' → ∃[ q' ] (q =[ a ]⇒ q' × R p' q')
+StringBisimulationProperty R p q = ∀ {a p'} → (p =[ a ]⇒ p') → ∃[ q' ] ((q =[ a ]⇒ q') × R p' q')
 
 -- Weak bisimilarity defined coinductively
 record _≈ₛ_ (p : Proc) (q : Proc) : Set₁ where
@@ -22,20 +22,20 @@ record _≈ₛ_ (p : Proc) (q : Proc) : Set₁ where
 open _≈ₛ_ public
 
 -- Utilities to help prove the following implications
-p-to-q-tau : ∀ {p q p'} → p ≈ q → p -[tau]→* p' → ∃[ q' ] (q =[ tau ]⇒ q' × p' ≈ q')
+p-to-q-tau : ∀ {p q p'} → p ≈ q → (p -[tau]→* p') → ∃[ q' ] (q =[ tau ]⇒ q' × p' ≈ q')
 p-to-q-tau {q = q} p≈q self = q , tau self , p≈q
 p-to-q-tau {q = q} p≈q (cons t s') =
   let q1 , r1 , p'≈q1 = p≈q .p-to-q t
       q2 , r2 , p'≈q2 = p-to-q-tau p'≈q1 s'
   in q2 , join-tau r1 r2 , p'≈q2
-p-to-q-split : ∀ {p1 p2 p3 p4 q a} → p1 ≈ q → p1 -[tau]→* p2 → p2 -[ a ]→ p3 → p3 -[tau]→* p4
+p-to-q-split : ∀ {p1 p2 p3 p4 q a} → p1 ≈ q → (p1 -[tau]→* p2) → (p2 -[ a ]→ p3) → (p3 -[tau]→* p4)
               → ∃[ q' ] (q =[ a ]⇒ q' × p4 ≈ q')
 p-to-q-split p≈q s1 t s2 =
   let q1 , r1 , p'≈q1 = p-to-q-tau p≈q s1
       q2 , r2 , p'≈q2 = p'≈q1 .p-to-q t
       q3 , r3 , p'≈q3 = p-to-q-tau p'≈q2 s2
   in q3 , join r1 r2 r3 , p'≈q3
-p-to-q-weak : ∀ {p q a p'} → p ≈ q → p =[ a ]⇒ p' → ∃[ q' ] (q =[ a ]⇒ q' × p' ≈ q')
+p-to-q-weak : ∀ {p q a p'} → p ≈ q → (p =[ a ]⇒ p') → ∃[ q' ] ((q =[ a ]⇒ q') × p' ≈ q')
 p-to-q-weak p≈q (send s1 t s2) = p-to-q-split p≈q s1 t s2
 p-to-q-weak p≈q (recv s1 t s2) = p-to-q-split p≈q s1 t s2
 p-to-q-weak p≈q (tau s) = p-to-q-tau p≈q s

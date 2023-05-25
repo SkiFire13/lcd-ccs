@@ -24,23 +24,23 @@ record _=[_]=>ₒ_ (p1 : Proc) (a : Act) (p4 : Proc) : Set₁ where
     t  : p2 -[ a ]→ p3
     s2 : p3 -[tau]→* p4
 
-trans-to-obs : ∀ {p a q} → p -[ a ]→ q → p =[ a ]=>ₒ q
+trans-to-obs : ∀ {p a q} → (p -[ a ]→ q) → (p =[ a ]=>ₒ q)
 trans-to-obs t = obs-t self t self
 
-obs-to-weak : ∀ {p a q} → p =[ a ]=>ₒ q → p =[ a ]⇒ q
+obs-to-weak : ∀ {p a q} → (p =[ a ]=>ₒ q) → (p =[ a ]⇒ q)
 obs-to-weak (obs-t s1 t s2) = join (tau s1) (trans-to-weak t) (tau s2)
 
-merge-weak-tau : ∀ {p1 p2 p3 a} → p1 =[ a ]=>ₒ p2 → p2 =[ tau ]⇒ p3 → p1 =[ a ]=>ₒ p3
+merge-weak-tau : ∀ {p1 p2 p3 a} → (p1 =[ a ]=>ₒ p2) → (p2 =[ tau ]⇒ p3) → (p1 =[ a ]=>ₒ p3)
 merge-weak-tau (obs-t s1 t s2) (tau s3) = obs-t s1 t (concat s2 s3)
 
-merge-weak-tau' : ∀ {p1 p2 p3 a} → p1 =[ tau ]=>ₒ p2 → p2 =[ a ]⇒ p3 → p1 =[ a ]=>ₒ p3
+merge-weak-tau' : ∀ {p1 p2 p3 a} → (p1 =[ tau ]=>ₒ p2) → (p2 =[ a ]⇒ p3) → (p1 =[ a ]=>ₒ p3)
 merge-weak-tau' (obs-t s1 t s2) (send s3 t' s4) = obs-t (concat s1 (cons t (concat s2 s3))) t' s4
 merge-weak-tau' (obs-t s1 t s2) (recv s3 t' s4) = obs-t (concat s1 (cons t (concat s2 s3))) t' s4
 merge-weak-tau' (obs-t s1 t s2) (tau s3) = obs-t s1 t (concat s2 s3)
 
 -- Observational weak bisimilarity property
 ObsBisProperty : (Proc → Proc → Set₁) → Proc → Proc → Set₁
-ObsBisProperty R p q = ∀ {a p'} → p -[ a ]→ p' → ∃[ q' ] (q =[ a ]=>ₒ q' × R p' q')
+ObsBisProperty R p q = ∀ {a p'} → (p -[ a ]→ p') → ∃[ q' ] ((q =[ a ]=>ₒ q') × R p' q')
 
 -- Observational congruence defined as weak bisimilarity but with a forced strong transition
 record _≈ₒ_ (p : Proc) (q : Proc) : Set₁ where
