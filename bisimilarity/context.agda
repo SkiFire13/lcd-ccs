@@ -33,3 +33,7 @@ compose (indet c q) c2 = indet (compose c c2) q
 compose (rename f c) c2 = rename f (compose c c2)
 compose (hide f c) c2 = hide f (compose c c2)
 compose replace c2 = c2
+
+-- The type of a witness of a bisimilarity being a congruence
+Cong : (Proc → Proc → Set₁) → Set₁
+Cong _≡ₓ_ = ∀ {C[] p q} → p ≡ₓ q → subst C[] p ≡ₓ subst C[] q

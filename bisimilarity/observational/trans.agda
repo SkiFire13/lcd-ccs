@@ -7,7 +7,6 @@ import ccs.proc
 module bisimilarity.observational.trans (C N : Set) (penv : ccs.proc.PEnv C N) where
 
 open import ccs.common C N penv
-open import bisimilarity.cong C N penv
 open import bisimilarity.context C N penv
 open import bisimilarity.weak.base C N penv
 open import bisimilarity.weak.congruence C N penv
