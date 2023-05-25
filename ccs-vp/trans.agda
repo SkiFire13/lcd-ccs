@@ -17,15 +17,15 @@ private
     {v} : V
 
 -- A transition between two CCS VP processes through an action.
-data Trans : Proc → Act → Proc → Set₁ where
-  send   : Trans (send c v p) (send c v) p
-  recv   : ∀ {f} → Trans (recv c f) (recv c v) (f v)
-  tau    : Trans (tau p) tau p
-  par-L  : Trans pl a p' → Trans (par pl pr) a (par p' pr)
-  par-R  : Trans pr a p' → Trans (par pl pr) a (par pl p')
-  par-B  : Trans pl a pl' → Trans pr (flip-act a) pr' → Trans (par pl pr) tau (par pl' pr')
-  indet  : ∀ {S f} {s : S} → Trans (f s) a q → Trans (indet f) a q
-  const  : ∀ {f} → Trans (penv n f) a p → Trans (const n f) a p
-  rename : ∀ {f} → Trans p a q → Trans (rename f p) (map-act f a) (rename f q)
-  hide   : ∀ {f} {z : T (filter-act f a)} → Trans p a q → Trans (hide f p) a (hide f q)
-  if     : Trans p a q → Trans (if true p) a q
+data _-[_]→ᵥ_ : Proc → Act → Proc → Set₁ where
+  send   : send c v p -[ send c v ]→ᵥ p
+  recv   : ∀ {f} → recv c f -[ recv c v ]→ᵥ f v
+  tau    : tau p -[ tau ]→ᵥ p
+  par-L  : pl -[ a ]→ᵥ p' → par pl pr -[ a ]→ᵥ par p' pr
+  par-R  : pr -[ a ]→ᵥ p' → par pl pr -[ a ]→ᵥ par pl p'
+  par-B  : pl -[ a ]→ᵥ pl' → pr -[ flip-act a ]→ᵥ pr' → par pl pr -[ tau ]→ᵥ par pl' pr'
+  indet  : ∀ {S f} {s : S} → f s -[ a ]→ᵥ q → indet f -[ a ]→ᵥ q
+  const  : ∀ {f} → penv n f -[ a ]→ᵥ p → const n f -[ a ]→ᵥ p
+  rename : ∀ {f} → p -[ a ]→ᵥ q → rename f p -[ map-act f a ]→ᵥ rename f q
+  hide   : ∀ {f} {z : T (filter-act f a)} → p -[ a ]→ᵥ q → hide f p -[ a ]→ᵥ hide f q
+  if     : p -[ a ]→ᵥ q → if true p -[ a ]→ᵥ q

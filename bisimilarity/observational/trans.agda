@@ -16,31 +16,31 @@ open import bisimilarity.weak.properties C N penv using () renaming (reflexive t
 open import bisimilarity.weak.string C N penv
 
 -- An observable (weak) transition
-record ObsTrans (p1 : Proc) (a : Act) (p4 : Proc) : Set₁ where
+record _=[_]=>ₒ_ (p1 : Proc) (a : Act) (p4 : Proc) : Set₁ where
   constructor obs-t
   field
     {p2 p3} : Proc
-    s1 : TauSeq p1 p2
-    t  : Trans p2 a p3
-    s2 : TauSeq p3 p4
+    s1 : p1 -[tau]→* p2
+    t  : p2 -[ a ]→ p3
+    s2 : p3 -[tau]→* p4
 
-trans-to-obs : ∀ {p a q} → Trans p a q → ObsTrans p a q
+trans-to-obs : ∀ {p a q} → p -[ a ]→ q → p =[ a ]=>ₒ q
 trans-to-obs t = obs-t self t self
 
-obs-to-weak : ∀ {p a q} → ObsTrans p a q → WeakTrans p a q
+obs-to-weak : ∀ {p a q} → p =[ a ]=>ₒ q → p =[ a ]⇒ q
 obs-to-weak (obs-t s1 t s2) = join (tau s1) (trans-to-weak t) (tau s2)
 
-merge-weak-tau : ∀ {p1 p2 p3 a} → ObsTrans p1 a p2 → WeakTrans p2 tau p3 → ObsTrans p1 a p3
+merge-weak-tau : ∀ {p1 p2 p3 a} → p1 =[ a ]=>ₒ p2 → p2 =[ tau ]⇒ p3 → p1 =[ a ]=>ₒ p3
 merge-weak-tau (obs-t s1 t s2) (tau s3) = obs-t s1 t (concat s2 s3)
 
-merge-weak-tau' : ∀ {p1 p2 p3 a} → ObsTrans p1 tau p2 → WeakTrans p2 a p3 → ObsTrans p1 a p3
+merge-weak-tau' : ∀ {p1 p2 p3 a} → p1 =[ tau ]=>ₒ p2 → p2 =[ a ]⇒ p3 → p1 =[ a ]=>ₒ p3
 merge-weak-tau' (obs-t s1 t s2) (send s3 t' s4) = obs-t (concat s1 (cons t (concat s2 s3))) t' s4
 merge-weak-tau' (obs-t s1 t s2) (recv s3 t' s4) = obs-t (concat s1 (cons t (concat s2 s3))) t' s4
 merge-weak-tau' (obs-t s1 t s2) (tau s3) = obs-t s1 t (concat s2 s3)
 
 -- Observational weak bisimilarity property
 ObsBisProperty : (Proc → Proc → Set₁) → Proc → Proc → Set₁
-ObsBisProperty R p q = ∀ {a p'} → Trans p a p' → ∃[ q' ] (ObsTrans q a q' × R p' q')
+ObsBisProperty R p q = ∀ {a p'} → p -[ a ]→ p' → ∃[ q' ] (q =[ a ]=>ₒ q' × R p' q')
 
 -- Observational congruence defined as weak bisimilarity but with a forced strong transition
 record _≈ₒ_ (p : Proc) (q : Proc) : Set₁ where
@@ -110,4 +110,3 @@ p-to-q (cong {hide f C[]} p≈ₒq) (hide {z = z} t) =
   in hide f q' , obs-t (s-map hide s1) (hide {z = z} tq) (s-map hide s2) , hide-respects-≈ p'≈q'
 p-to-q (cong {replace} p≈ₒq) = p≈ₒq .p-to-q
 q-to-p (cong p≈ₒq) = cong (sym p≈ₒq) .p-to-q
- 
