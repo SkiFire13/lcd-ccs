@@ -14,7 +14,7 @@ open import bisimilarity.strong.base C N penv
 open import bisimilarity.strong.congruence C N penv renaming (cong to ~-cong)
 open import bisimilarity.strong.properties C N penv using () renaming (reflexive to ~-refl)
 open import bisimilarity.weak.base C N penv
-open import bisimilarity.weak.properties C N penv using (~-to-≈) renaming (reflexive to ≈-refl; sym to ≈-sym; trans to ≈-trans)
+open import bisimilarity.weak.properties C N penv using (~→≈) renaming (reflexive to ≈-refl; sym to ≈-sym; trans to ≈-trans)
 
 -- Observational congruence defined as a closure over weak bisimilarity in contexts
 record _̂≈_ (p : Proc) (q : Proc) : Set₁ where
@@ -34,16 +34,16 @@ trans : ∀ {p q s} → p ̂≈ q → q ̂≈ s → p ̂≈ s
 trans (obs-c C[p]≈C[q]) (obs-c C[q]≈C[s]) = obs-c λ C[] → ≈-trans (C[p]≈C[q] C[]) (C[q]≈C[s] C[])
 
 -- Prove that ̂≈ implies ≈, even though it is pretty obvious
-̂≈-to-≈ : ∀ {p q} → p ̂≈ q → p ≈ q
-̂≈-to-≈ (obs-c C[p]≈C[q]) = C[p]≈C[q] replace
+̂≈→≈ : ∀ {p q} → p ̂≈ q → p ≈ q
+̂≈→≈ (obs-c C[p]≈C[q]) = C[p]≈C[q] replace
 
 -- Prove that ̂≈ is a congruence
 cong : Cong _̂≈_
 cong {C[]} {p} {q} (obs-c C[p]≈C[q]) = obs-c λ C'[] →
-  let t1 = ~-to-≈ (ss~sc {C'[]} {C[]} {p})
+  let t1 = ~→≈ (ss~sc {C'[]} {C[]} {p})
       t2 = C[p]≈C[q] (compose C'[] C[])
-      t3 = ~-to-≈ (ss~sc {C'[]} {C[]} {q})
+      t3 = ~→≈ (ss~sc {C'[]} {C[]} {q})
   in ≈-trans (≈-trans t1 t2) (≈-sym t3)
 
-≈-cong-to-̂≈ : ∀ {_≈ₓ_ p q} → (∀ {p' q'} → p' ≈ₓ q' → p' ≈ q') → Cong _≈ₓ_ → p ≈ₓ q → p ̂≈ q
-≈-cong-to-̂≈ {_≈ₓ_} ≈ₓ-to-≈ Cong≈ₓ p≈ₓq = obs-c λ _ → ≈ₓ-to-≈ (Cong≈ₓ p≈ₓq)
+≈-cong→̂≈ : ∀ {_≈ₓ_ p q} → (∀ {p' q'} → p' ≈ₓ q' → p' ≈ q') → Cong _≈ₓ_ → p ≈ₓ q → p ̂≈ q
+≈-cong→̂≈ {_≈ₓ_} ≈ₓ→≈ Cong≈ₓ p≈ₓq = obs-c λ _ → ≈ₓ→≈ (Cong≈ₓ p≈ₓq)

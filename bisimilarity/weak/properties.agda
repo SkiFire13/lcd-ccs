@@ -16,30 +16,30 @@ open import bisimilarity.weak.string C N penv
 -- Properties of weak bisimilarity
 
 reflexive : ∀ {p} → p ≈ p
-p-to-q (reflexive {p}) {p' = p'} t = p' , trans-to-weak t , reflexive
-q-to-p (reflexive {p}) {p' = p'} t = p' , trans-to-weak t , reflexive
+p⇒q (reflexive {p}) {p' = p'} t = p' , trans→weak t , reflexive
+q⇒p (reflexive {p}) {p' = p'} t = p' , trans→weak t , reflexive
 
 sym : ∀ {p q} → p ≈ q → q ≈ p
-p-to-q (sym {p} {q} p≈q) = p≈q .q-to-p
-q-to-p (sym {p} {q} p≈q) = p≈q .p-to-q
+p⇒q (sym {p} {q} p≈q) = p≈q .q⇒p
+q⇒p (sym {p} {q} p≈q) = p≈q .p⇒q
 
 trans : ∀ {p q s} → p ≈ q → q ≈ s → p ≈ s
-p-to-q (trans {p} {q} {s} p≈q q≈s) tp =
-  let q' , tq , p'≈q' = p≈q .p-to-q tp
-      s' , ts , q'≈ₛs' = ≈-to-≈ₛ q≈s .p-to-q tq
-      q'≈s' = ≈ₛ-to-≈ q'≈ₛs'
+p⇒q (trans {p} {q} {s} p≈q q≈s) tp =
+  let q' , tq , p'≈q' = p≈q .p⇒q tp
+      s' , ts , q'≈ₛs' = ≈→≈ₛ q≈s .p⇒q tq
+      q'≈s' = ≈ₛ→≈ q'≈ₛs'
   in s' , ts , trans p'≈q' q'≈s'
-q-to-p (trans {p} {q} {s} p≈q q≈s) = p-to-q (trans (sym q≈s) (sym p≈q))
+q⇒p (trans {p} {q} {s} p≈q q≈s) = p⇒q (trans (sym q≈s) (sym p≈q))
 
 -- Conversion from strong to weak bisimilarity
-~-to-≈ : ∀ {p q} → p ~ q → p ≈ q
-p-to-q (~-to-≈ p~q) t =
-  let q' , t' , p'~q' = p~q .p-to-q t
-  in q' , trans-to-weak t' , ~-to-≈ p'~q'
-q-to-p (~-to-≈ p~q) = p-to-q (~-to-≈ (~-sym p~q))
+~→≈ : ∀ {p q} → p ~ q → p ≈ q
+p⇒q (~→≈ p~q) t =
+  let q' , t' , p'~q' = p~q .p⇒q t
+  in q' , trans→weak t' , ~→≈ p'~q'
+q⇒p (~→≈ p~q) = p⇒q (~→≈ (~-sym p~q))
 
 -- Useful property
 p≈p+d : ∀ {p} → p ≈ p + ccs.deadlock
-p-to-q (p≈p+d) {p' = p'} t = p' , trans-to-weak (indet t) , reflexive
-q-to-p (p≈p+d) (indet {q = p'} {s = true} t) = p' , trans-to-weak t , reflexive
-q-to-p (p≈p+d) (indet {s = false} (indet {s = ()} _))
+p⇒q (p≈p+d) {p' = p'} t = p' , trans→weak (indet t) , reflexive
+q⇒p (p≈p+d) (indet {q = p'} {s = true} t) = p' , trans→weak t , reflexive
+q⇒p (p≈p+d) (indet {s = false} (indet {s = ()} _))

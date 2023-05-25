@@ -13,22 +13,22 @@ open import bisimilarity.strong.base C N penv
 -- Properties of strong bisimilarity
 
 reflexive : ∀ {p} → p ~ p
-p-to-q (reflexive {p}) {p' = p'} t = p' , t , reflexive
-q-to-p (reflexive {p}) {p' = p'} t = p' , t , reflexive
+p⇒q (reflexive {p}) {p' = p'} t = p' , t , reflexive
+q⇒p (reflexive {p}) {p' = p'} t = p' , t , reflexive
 
 sym : ∀ {p q} → p ~ q → q ~ p
-p-to-q (sym {p} {q} p~q) = p~q .q-to-p
-q-to-p (sym {p} {q} p~q) = p~q .p-to-q
+p⇒q (sym {p} {q} p~q) = p~q .q⇒p
+q⇒p (sym {p} {q} p~q) = p~q .p⇒q
 
 trans : ∀ {p q s} → p ~ q → q ~ s → p ~ s
-p-to-q (trans {p} {q} {s} p~q q~s) tp =
-  let q' , tq , p'~q' = p~q .p-to-q tp
-      s' , ts , q'~s' = q~s .p-to-q tq
+p⇒q (trans {p} {q} {s} p~q q~s) tp =
+  let q' , tq , p'~q' = p~q .p⇒q tp
+      s' , ts , q'~s' = q~s .p⇒q tq
   in s' , ts , trans p'~q' q'~s'
-q-to-p (trans {p} {q} {s} p~q q~s) = p-to-q (trans (sym q~s) (sym p~q))
+q⇒p (trans {p} {q} {s} p~q q~s) = p⇒q (trans (sym q~s) (sym p~q))
 
 -- Useful property
 p~p+d : ∀ {p} → p ~ p + ccs.deadlock
-p-to-q (p~p+d {p}) t = _ , indet t , reflexive
-q-to-p (p~p+d {p}) (indet {s = false} (indet {s = ()} _))
-q-to-p (p~p+d {p}) (indet {s = true} t) = _ , t , reflexive
+p⇒q (p~p+d {p}) t = _ , indet t , reflexive
+q⇒p (p~p+d {p}) (indet {s = false} (indet {s = ()} _))
+q⇒p (p~p+d {p}) (indet {s = true} t) = _ , t , reflexive

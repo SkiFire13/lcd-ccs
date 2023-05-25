@@ -17,40 +17,40 @@ StringBisimulationProperty R p q = ∀ {a p'} → (p =[ a ]⇒ p') → ∃[ q' ]
 record _≈ₛ_ (p : Proc) (q : Proc) : Set₁ where
   coinductive
   field
-    p-to-q : StringBisimulationProperty _≈ₛ_ p q
-    q-to-p : StringBisimulationProperty _≈ₛ_ q p
+    p⇒q : StringBisimulationProperty _≈ₛ_ p q
+    q⇒p : StringBisimulationProperty _≈ₛ_ q p
 open _≈ₛ_ public
 infixl 5 _≈ₛ_
 
 -- Utilities to help prove the following implications
-p-to-q-tau : ∀ {p q p'} → p ≈ q → (p -[tau]→* p') → ∃[ q' ] (q =[ tau ]⇒ q' × p' ≈ q')
-p-to-q-tau {q = q} p≈q self = q , tau self , p≈q
-p-to-q-tau {q = q} p≈q (cons t s') =
-  let q1 , r1 , p'≈q1 = p≈q .p-to-q t
-      q2 , r2 , p'≈q2 = p-to-q-tau p'≈q1 s'
+p⇒q-tau : ∀ {p q p'} → p ≈ q → (p -[tau]→* p') → ∃[ q' ] (q =[ tau ]⇒ q' × p' ≈ q')
+p⇒q-tau {q = q} p≈q self = q , tau self , p≈q
+p⇒q-tau {q = q} p≈q (cons t s') =
+  let q1 , r1 , p'≈q1 = p≈q .p⇒q t
+      q2 , r2 , p'≈q2 = p⇒q-tau p'≈q1 s'
   in q2 , join-tau r1 r2 , p'≈q2
-p-to-q-split : ∀ {p1 p2 p3 p4 q a} → p1 ≈ q → (p1 -[tau]→* p2) → (p2 -[ a ]→ p3) → (p3 -[tau]→* p4)
+p⇒q-split : ∀ {p1 p2 p3 p4 q a} → p1 ≈ q → (p1 -[tau]→* p2) → (p2 -[ a ]→ p3) → (p3 -[tau]→* p4)
               → ∃[ q' ] (q =[ a ]⇒ q' × p4 ≈ q')
-p-to-q-split p≈q s1 t s2 =
-  let q1 , r1 , p'≈q1 = p-to-q-tau p≈q s1
-      q2 , r2 , p'≈q2 = p'≈q1 .p-to-q t
-      q3 , r3 , p'≈q3 = p-to-q-tau p'≈q2 s2
+p⇒q-split p≈q s1 t s2 =
+  let q1 , r1 , p'≈q1 = p⇒q-tau p≈q s1
+      q2 , r2 , p'≈q2 = p'≈q1 .p⇒q t
+      q3 , r3 , p'≈q3 = p⇒q-tau p'≈q2 s2
   in q3 , join r1 r2 r3 , p'≈q3
-p-to-q-weak : ∀ {p q a p'} → p ≈ q → (p =[ a ]⇒ p') → ∃[ q' ] ((q =[ a ]⇒ q') × p' ≈ q')
-p-to-q-weak p≈q (send s1 t s2) = p-to-q-split p≈q s1 t s2
-p-to-q-weak p≈q (recv s1 t s2) = p-to-q-split p≈q s1 t s2
-p-to-q-weak p≈q (tau s) = p-to-q-tau p≈q s
+p⇒q-weak : ∀ {p q a p'} → p ≈ q → (p =[ a ]⇒ p') → ∃[ q' ] ((q =[ a ]⇒ q') × p' ≈ q')
+p⇒q-weak p≈q (send s1 t s2) = p⇒q-split p≈q s1 t s2
+p⇒q-weak p≈q (recv s1 t s2) = p⇒q-split p≈q s1 t s2
+p⇒q-weak p≈q (tau s) = p⇒q-tau p≈q s
 
 -- Weak string bisimilarity implies weak bisimilarity
-≈ₛ-to-≈ : ∀ {p q} → p ≈ₛ q → p ≈ q
-p-to-q (≈ₛ-to-≈ p≈ₛq) t =
-  let q' , t' , p'≈ₛq' = p≈ₛq .p-to-q (trans-to-weak t)
-  in q' , t' , ≈ₛ-to-≈ p'≈ₛq'
-q-to-p (≈ₛ-to-≈ p≈ₛq) t =
-  let p' , t' , q'≈ₛp' = p≈ₛq .q-to-p (trans-to-weak t)
-  in p' , t' , ≈ₛ-to-≈ q'≈ₛp'
+≈ₛ→≈ : ∀ {p q} → p ≈ₛ q → p ≈ q
+p⇒q (≈ₛ→≈ p≈ₛq) t =
+  let q' , t' , p'≈ₛq' = p≈ₛq .p⇒q (trans→weak t)
+  in q' , t' , ≈ₛ→≈ p'≈ₛq'
+q⇒p (≈ₛ→≈ p≈ₛq) t =
+  let p' , t' , q'≈ₛp' = p≈ₛq .q⇒p (trans→weak t)
+  in p' , t' , ≈ₛ→≈ q'≈ₛp'
 
 -- Weak bisimilarity implies weak string bisimilarity
-≈-to-≈ₛ : ∀ {p q} → p ≈ q → p ≈ₛ q
-q-to-p (≈-to-≈ₛ p≈q) = p-to-q (≈-to-≈ₛ record { p-to-q = p≈q .q-to-p ; q-to-p = p≈q .p-to-q })
-p-to-q (≈-to-≈ₛ p≈q) t = let q' , t' , p'≈q' = p-to-q-weak p≈q t in q' , t' , ≈-to-≈ₛ p'≈q'
+≈→≈ₛ : ∀ {p q} → p ≈ q → p ≈ₛ q
+q⇒p (≈→≈ₛ p≈q) = p⇒q (≈→≈ₛ record { p⇒q = p≈q .q⇒p ; q⇒p = p≈q .p⇒q })
+p⇒q (≈→≈ₛ p≈q) t = let q' , t' , p'≈q' = p⇒q-weak p≈q t in q' , t' , ≈→≈ₛ p'≈q'

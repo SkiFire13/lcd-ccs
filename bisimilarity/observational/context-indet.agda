@@ -16,8 +16,8 @@ open import bisimilarity.observational.indet C N penv renaming (cong to ≈ᵢ-c
 open import bisimilarity.weak.base C N penv
 open import bisimilarity.weak.properties C N penv renaming (sym to ≈-sym; trans to ≈-trans)
 
-̂≈-to-≈ᵢ : ∀ {p q} → p ̂≈ q → p ≈ᵢ q
-̂≈-to-≈ᵢ (obs-c C[p]≈C[q]) = obs-i λ r → C[p]≈C[q] (indet replace r)
+̂≈→≈ᵢ : ∀ {p q} → p ̂≈ q → p ≈ᵢ q
+̂≈→≈ᵢ (obs-c C[p]≈C[q]) = obs-i λ r → C[p]≈C[q] (indet replace r)
 
-≈ᵢ-to-̂≈ : ∀ {p q} → p ≈ᵢ q → p ̂≈ q
-≈ᵢ-to-̂≈ p≈ᵢq = ≈-cong-to-̂≈ ≈ᵢ-to-≈ ≈ᵢ-cong p≈ᵢq
+≈ᵢ→̂≈ : ∀ {p q} → p ≈ᵢ q → p ̂≈ q
+≈ᵢ→̂≈ p≈ᵢq = ≈-cong→̂≈ ≈ᵢ→≈ ≈ᵢ-cong p≈ᵢq

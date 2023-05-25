@@ -16,7 +16,7 @@ BisimulationProperty R p q = ∀ {a p'} → (p -[ a ]→ p') → ∃[ q' ] ((q -
 record _~_ (p : Proc) (q : Proc) : Set₁ where
   coinductive
   field
-    p-to-q : BisimulationProperty _~_ p q
-    q-to-p : BisimulationProperty _~_ q p
+    p⇒q : BisimulationProperty _~_ p q
+    q⇒p : BisimulationProperty _~_ q p
 open _~_ public
 infixl 5 _~_

@@ -34,10 +34,10 @@ data _=[_]⇒_ : Proc → Act → Proc → Set₁ where
   tau  : (p1 -[tau]→* p2) → (p1 =[ tau ]⇒ p2)
 
 -- Convert a normal transition to a weak transition
-trans-to-weak : (p -[ a ]→ q) → (p =[ a ]⇒ q)
-trans-to-weak {a = send c} t = send self t self
-trans-to-weak {a = recv c} t = recv self t self
-trans-to-weak {a = tau} t = tau (cons t self)
+trans→weak : (p -[ a ]→ q) → (p =[ a ]⇒ q)
+trans→weak {a = send c} t = send self t self
+trans→weak {a = recv c} t = recv self t self
+trans→weak {a = tau} t = tau (cons t self)
 
 -- Joins a weak transitions with two tau weak transitions
 join : (p1 =[ tau ]⇒ p2) → (p2 =[ a ]⇒ p3) → (p3 =[ tau ]⇒ p4) → (p1 =[ a ]⇒ p4)
