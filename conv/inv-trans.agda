@@ -13,7 +13,7 @@ open import ccs-vp.common C N X V n-fv penv as vp
 -- a transition relation between two CCS processes then it's not guaranteed that
 -- there's a transition between CCS VP processes that can be converted into them. 
 inv-conv-need-exists : ¬ (∀ {p1 a p2} → (conv-proc p1 -[ conv-act a ]→ conv-proc p2) → (p1 -[ a ]→ᵥ p2))
-inv-conv-need-exists f with () <- f {tau vp.deadlock} {tau} {if true vp.deadlock} chan
+inv-conv-need-exists f with () ← f {tau vp.deadlock} {tau} {if true vp.deadlock} chan
 
 -- Prove some guarantees about composing functions on channel/transition operation that Agda can't prove.
 
@@ -48,28 +48,28 @@ inv-conv-trans' {p1} {a} t with {conv-proc p1} | {conv-act a} | inspect conv-pro
 inv-conv-trans' {send _ _ p} {send _ _} chan | [ refl ] | [ refl ] = p , refl , send
 inv-conv-trans' {recv _ f} {recv _ v} (indet chan) | [ refl ] | [ refl ] = f v , refl , recv
 inv-conv-trans' {tau p} {tau} chan | [ refl ] | [ refl ] = p , refl , tau
-inv-conv-trans' {par pl pr} (par-L tl) | [ refl ] | [ e2 ] with refl <- e2
-  with pl' , refl , tl' <- inv-conv-trans' tl = par pl' pr , refl , par-L tl'
-inv-conv-trans' {par pl pr} (par-R tr) | [ refl ] | [ e2 ] with refl <- e2
-  with pr' , refl , tr' <- inv-conv-trans' tr = par pl pr' , refl , par-R tr'
+inv-conv-trans' {par pl pr} (par-L tl) | [ refl ] | [ e2 ] with refl ← e2
+  with pl' , refl , tl' ← inv-conv-trans' tl = par pl' pr , refl , par-L tl'
+inv-conv-trans' {par pl pr} (par-R tr) | [ refl ] | [ e2 ] with refl ← e2
+  with pr' , refl , tr' ← inv-conv-trans' tr = par pl pr' , refl , par-R tr'
 inv-conv-trans' {par pl pr} {tau} (par-B {a = ca} tl tr) | [ refl ] | [ refl ]
-  with a , refl <- inv-conv-act {ca}
+  with a , refl ← inv-conv-act {ca}
   rewrite inv-flip-eq {a}
-  with pl' , refl , tl' <- inv-conv-trans' tl
-  with pr' , refl , tr' <- inv-conv-trans' tr
+  with pl' , refl , tl' ← inv-conv-trans' tl
+  with pr' , refl , tr' ← inv-conv-trans' tr
   = par pl' pr' , refl , par-B tl' tr'
 inv-conv-trans' {indet f} {a} (indet {s = s} t) | [ refl ] | [ refl ]
-  with p' , refl , t' <- inv-conv-trans' t = p' , refl , indet {s = s} t'
+  with p' , refl , t' ← inv-conv-trans' t = p' , refl , indet {s = s} t'
 inv-conv-trans' {const n args} (const t) | [ refl ] | [ refl ]
-  with p' , refl , t' <- inv-conv-trans' t = p' , refl , const t'
+  with p' , refl , t' ← inv-conv-trans' t = p' , refl , const t'
 inv-conv-trans' {rename f p} (rename {a = ca} t) | [ refl ] | [ e ]
-  with a , refl <- inv-conv-act {ca}
+  with a , refl ← inv-conv-act {ca}
   rewrite inv-rename-eq e
-  with p' , refl , t' <- inv-conv-trans' t
+  with p' , refl , t' ← inv-conv-trans' t
   = rename f p' , refl , rename t'
 inv-conv-trans' {hide f p} {a} (hide {z = z} t) | [ refl ] | [ refl ]
   rewrite inv-filter-eq {f} {a}
-  with p' , refl , t' <- inv-conv-trans' t = hide f p' , refl , hide {z = z} t'
+  with p' , refl , t' ← inv-conv-trans' t = hide f p' , refl , hide {z = z} t'
 inv-conv-trans' {if false _} (indet {s = ()} _) | [ refl ] | [ refl ]
 inv-conv-trans' {if true p} t | [ refl ] | [ refl ]
-  with p' , refl , t' <- inv-conv-trans' t = p' , refl , if t'
+  with p' , refl , t' ← inv-conv-trans' t = p' , refl , if t'
