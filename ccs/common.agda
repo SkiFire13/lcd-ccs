@@ -1,6 +1,3 @@
-open import Data.Bool
-open import Data.Empty
-
 import ccs.proc
 
 -- C = Set of the Channels

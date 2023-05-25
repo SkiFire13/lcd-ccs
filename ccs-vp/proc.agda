@@ -1,5 +1,6 @@
 open import Data.Bool
 open import Data.Empty
+open import Data.Unit
 
 module ccs-vp.proc (C N X V : Set) (n-fv : N → X → Bool) where
 
@@ -12,7 +13,7 @@ data Proc : Set₁ where
   indet  : {S : Set} → (S → Proc) → Proc
   const  : (n : N) → ((x : X) → {_ : T (n-fv n x)} → V) → Proc
   rename : (C → C) → Proc → Proc
-  hide   : (C → Bool) → Proc → Proc
+  hide   : (C → Set) → Proc → Proc
   if     : Bool → Proc → Proc
 
 -- The "desugaring" of the deadlock CCS VP Process
@@ -37,10 +38,10 @@ map-act f (send c v) = send (f c) v
 map-act f (recv c v) = recv (f c) v
 map-act f tau = tau
 
-filter-act : (C → Bool) → Act → Bool
+filter-act : (C → Set) → Act → Set
 filter-act f (send c _) = f c
 filter-act f (recv c _) = f c
-filter-act f tau = true
+filter-act f tau = ⊤
 
 PEnv : Set₁
 PEnv = (n : N) → ((x : X) → {_ : T (n-fv n x)} → V) → Proc

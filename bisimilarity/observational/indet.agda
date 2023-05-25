@@ -1,7 +1,6 @@
 {-# OPTIONS --guardedness #-}
 {-# OPTIONS --allow-unsolved-metas #-}
 
-open import Data.Bool
 open import Data.Product
 
 import ccs.proc
@@ -40,45 +39,45 @@ trans (obs-i p+r≈q+r) (obs-i q+r≈s+r) = obs-i λ r → ≈-trans (p+r≈q+r 
 ≈ᵢ→≈ (obs-i p+r≈q+r) = ≈-trans (≈-trans p≈p+d (p+r≈q+r ccs.deadlock)) (≈-sym p≈p+d)
 
 cong : Cong _≈ᵢ_
-p⇒q (closure (cong p≈ᵢq) r) (indet {q = r'} {s = false} t) =
+p⇒q (closure (cong p≈ᵢq) r) (indet {q = r'} {s = right} t) =
   r' , trans→weak (indet t) , ≈-refl
-p⇒q (closure (cong {chan c C[]} {q = q} p≈ᵢq) r) (indet {s = true} chan) =
+p⇒q (closure (cong {chan c C[]} {q = q} p≈ᵢq) r) (indet {s = left} chan) =
   subst C[] q , trans→weak (indet chan) , ≈ᵢ→≈ (cong p≈ᵢq)
-p⇒q (closure (cong {par-L C[] pc} {q = q} p≈ᵢq) r) (indet {s = true} t) with t
+p⇒q (closure (cong {par-L C[] pc} {q = q} p≈ᵢq) r) (indet {s = left} t) with t
 ... | par-L tl = {!   !}
 ... | par-R {p' = pc'} tr =
   par (subst C[] q) pc' , trans→weak (indet (par-R tr)) , par-respects-≈ (≈ᵢ→≈ (cong {C[]} p≈ᵢq)) ≈-refl
 ... | par-B tl tr = {!   !}
-p⇒q (closure (cong {par-R pc C[]} p≈ᵢq) r) (indet {s = true} t) = {!   !}
+p⇒q (closure (cong {par-R pc C[]} p≈ᵢq) r) (indet {s = left} t) = {!   !}
 p⇒q (closure (cong {indet C[] pc} p≈ᵢq) r) t =
   ≈-trans (≈-trans helper (cong p≈ᵢq .closure (pc + r))) (≈-sym helper) .p⇒q t
   where
   helper : ∀ {p1 p2 p3} → (p1 + p2) + p3 ≈ p1 + (p2 + p3)
-  p⇒q helper (indet {s = true} (indet {s = true} t)) = -, trans→weak (indet t) , ≈-refl
-  p⇒q helper (indet {s = true} (indet {s = false} t)) = -, trans→weak (indet (indet t)), ≈-refl
-  p⇒q helper (indet {s = false} t) = -, trans→weak (indet (indet t)) , ≈-refl
-  q⇒p helper (indet {s = true} t) = -, trans→weak (indet (indet t)) , ≈-refl
-  q⇒p helper (indet {s = false} (indet {s = true} t)) = -, trans→weak (indet (indet t)) , ≈-refl
-  q⇒p helper (indet {s = false} (indet {s = false} t)) = -, trans→weak (indet t), ≈-refl
-p⇒q (closure (cong {rename f C[]} p≈ᵢq) r) (indet {s = true} t) = {!   !}
-p⇒q (closure (cong {hide f C[]} p≈ᵢq) r) (indet {s = true} (hide {z = z} t)) with
-  cong {C[]} p≈ᵢq .closure ccs.deadlock .p⇒q (indet {s = true} t)
+  p⇒q helper (indet {s = left} (indet {s = left} t)) = -, trans→weak (indet t) , ≈-refl
+  p⇒q helper (indet {s = left} (indet {s = right} t)) = -, trans→weak (indet (indet t)), ≈-refl
+  p⇒q helper (indet {s = right} t) = -, trans→weak (indet (indet t)) , ≈-refl
+  q⇒p helper (indet {s = left} t) = -, trans→weak (indet (indet t)) , ≈-refl
+  q⇒p helper (indet {s = right} (indet {s = left} t)) = -, trans→weak (indet (indet t)) , ≈-refl
+  q⇒p helper (indet {s = right} (indet {s = right} t)) = -, trans→weak (indet t), ≈-refl
+p⇒q (closure (cong {rename f C[]} p≈ᵢq) r) (indet {s = left} t) = {!   !}
+p⇒q (closure (cong {hide f C[]} p≈ᵢq) r) (indet {s = left} (hide {z = z} t)) with
+  cong {C[]} p≈ᵢq .closure ccs.deadlock .p⇒q (indet {s = left} t)
 ... | foo = {!   !}
--- ... | q' , send self (indet {s = true} tq) s2 , p'≈q' =
+-- ... | q' , send self (indet {s = left} tq) s2 , p'≈q' =
 --   hide f q' , send self (indet (hide {z = z} tq)) (s-map hide s2), hide-respects-≈ p'≈q'
--- ... | _ , send self (indet {s = false} (indet {s = ()} _)) _ , _
--- ... | q' , send (cons (indet {s = true} tq) s1) tq' s2 , p'≈q' =
+-- ... | _ , send self (indet {s = right} (indet {s = ()} _)) _ , _
+-- ... | q' , send (cons (indet {s = left} tq) s1) tq' s2 , p'≈q' =
 --   hide f q' , send (cons (indet (hide tq)) (s-map hide s1)) (hide {z = z} tq') (s-map hide s2), hide-respects-≈ p'≈q'
--- ... | _ , send (cons (indet {s = false} (indet {s = ()} _)) _) _ _ , _
--- ... | q' , recv self (indet {s = true} tq) s2 , p'≈q' =
+-- ... | _ , send (cons (indet {s = right} (indet {s = ()} _)) _) _ _ , _
+-- ... | q' , recv self (indet {s = left} tq) s2 , p'≈q' =
 --   hide f q' , recv self (indet (hide {z = z} tq)) (s-map hide s2), hide-respects-≈ p'≈q'
--- ... | _ , recv self (indet {s = false} (indet {s = ()} _)) _ , _
--- ... | q' , recv (cons (indet {s = true} tq) s1) tq' s2 , p'≈q' =
+-- ... | _ , recv self (indet {s = right} (indet {s = ()} _)) _ , _
+-- ... | q' , recv (cons (indet {s = left} tq) s1) tq' s2 , p'≈q' =
 --   hide f q' , recv (cons (indet (hide tq)) (s-map hide s1)) (hide {z = z} tq') (s-map hide s2), hide-respects-≈ p'≈q'
--- ... | _ , recv (cons (indet {s = false} (indet {s = ()} _)) _) _ _ , _
--- ... | q' , tau (cons (indet {s = true} tq) s) , p'≈q' =
+-- ... | _ , recv (cons (indet {s = right} (indet {s = ()} _)) _) _ _ , _
+-- ... | q' , tau (cons (indet {s = left} tq) s) , p'≈q' =
 --   hide f q' , tau (cons (indet (hide tq)) (s-map hide s)) , hide-respects-≈ p'≈q'
--- ... | _ , tau (cons (indet {s = false} (indet {s = ()} _)) _) , _
+-- ... | _ , tau (cons (indet {s = right} (indet {s = ()} _)) _) , _
 -- ... | q' , tau self , p'≈q' = {!   !}
-p⇒q (closure (cong {replace} p≈ᵢq) r) (indet {s = true} t) = p≈ᵢq .closure r .p⇒q (indet t)
+p⇒q (closure (cong {replace} p≈ᵢq) r) (indet {s = left} t) = p≈ᵢq .closure r .p⇒q (indet t)
 q⇒p (closure (cong p≈ᵢq) r) = cong (sym p≈ᵢq) .closure r .p⇒q

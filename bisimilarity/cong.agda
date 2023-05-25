@@ -1,6 +1,3 @@
-open import Data.Bool
-open import Data.Empty
-
 import ccs.proc
 
 module bisimilarity.cong (C N : Set) (penv : ccs.proc.PEnv C N) where

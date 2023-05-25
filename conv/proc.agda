@@ -1,5 +1,4 @@
 open import Data.Bool
-open import Data.Unit
 
 module conv.proc (C N X V : Set) (n-fv : N → X → Bool) where
 
@@ -34,7 +33,7 @@ conv-indet f = λ s → conv-proc (f s)
 conv-rename : (C → C) → Conv-C → Conv-C
 conv-rename f = λ (conv-c c v) → conv-c (f c) v
 
-conv-hide : (C → Bool) → Conv-C → Bool
+conv-hide : (C → Set) → Conv-C → Set
 conv-hide f = λ (conv-c c _) → f c
 
 conv-proc (send c v p) = chan (send (conv-c c v)) (conv-proc p)

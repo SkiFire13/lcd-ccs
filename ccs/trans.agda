@@ -1,6 +1,3 @@
-open import Data.Bool
-open import Data.Empty
-
 import ccs.proc
 
 module ccs.trans (C N : Set) (penv : ccs.proc.PEnv C N) where
@@ -23,4 +20,4 @@ data _-[_]→_ : Proc → Act → Proc → Set₁ where
   indet   : ∀ {S f} {s : S} → (f s -[ a ]→ q) → (indet f -[ a ]→ q)
   const   : (penv n -[ a ]→ p) → (const n -[ a ]→ p)
   rename  : ∀ {f} → (p -[ a ]→ q) → (rename f p -[ map-act f a ]→ rename f q)
-  hide    : ∀ {f} {z : T (filter-act f a)} → (p -[ a ]→ q) → (hide f p -[ a ]→ hide f q)
+  hide    : ∀ {f} {z : filter-act f a} → (p -[ a ]→ q) → (hide f p -[ a ]→ hide f q)

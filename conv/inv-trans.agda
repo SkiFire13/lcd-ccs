@@ -1,7 +1,6 @@
 open import Data.Bool
 open import Relation.Binary.PropositionalEquality
 open import Relation.Nullary
-open import Data.Unit
 open import Data.Product
 
 import ccs-vp.proc

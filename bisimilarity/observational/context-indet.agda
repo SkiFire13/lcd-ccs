@@ -1,10 +1,5 @@
 {-# OPTIONS --guardedness #-}
 
-open import Data.Bool
-open import Data.Empty
-open import Data.Product
-open import Relation.Binary.PropositionalEquality
-
 import ccs.proc
 
 module bisimilarity.observational.context-indet (C N : Set) (penv : ccs.proc.PEnv C N) where

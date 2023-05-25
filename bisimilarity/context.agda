@@ -1,6 +1,3 @@
-open import Data.Bool
-open import Data.Empty
-
 import ccs.proc
 
 module bisimilarity.context (C N : Set) (penv : ccs.proc.PEnv C N) where
@@ -14,7 +11,7 @@ data Context : Set₁ where
   par-R   : Proc → Context → Context
   indet   : Context → Proc → Context
   rename  : (C → C) → Context → Context
-  hide    : (C → Bool) → Context → Context
+  hide    : (C → Set) → Context → Context
   replace : Context
 
 -- Substitute a process inside a context

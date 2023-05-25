@@ -1,5 +1,4 @@
 open import Data.Bool
-open import Data.Empty
 
 import ccs-vp.proc
 

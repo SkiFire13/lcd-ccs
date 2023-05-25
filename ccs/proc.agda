@@ -1,5 +1,5 @@
-open import Data.Bool
 open import Data.Empty
+open import Data.Unit
 
 module ccs.proc (C N : Set) where
 
@@ -16,14 +16,17 @@ data Proc : Set₁ where
   indet   : {S : Set} → (S → Proc) → Proc
   const   : N → Proc
   rename  : (C → C) → Proc → Proc
-  hide    : (C → Bool) → Proc → Proc
+  hide    : (C → Set) → Proc → Proc
 
 -- The "desugaring" of the deadlock CCS Process
 deadlock = indet ⊥-elim
 
 -- A non-deterministic choice with 2 options
+data Indet₂ : Set where
+  left right : Indet₂
+
 _+_ : Proc → Proc → Proc
-p + q = indet {Bool} λ { true → p ; false → q }
+p + q = indet {Indet₂} λ { left → p ; right → q }
 
 infixl 6 _+_
 
@@ -38,10 +41,10 @@ map-act f (send c) = send (f c)
 map-act f (recv c) = recv (f c)
 map-act f tau = tau
 
-filter-act : (C → Bool) → Act → Bool
+filter-act : (C → Set) → Act → Set
 filter-act f (send c) = f c
 filter-act f (recv c) = f c
-filter-act f tau = true
+filter-act f tau = ⊤
 
 PEnv : Set₁
 PEnv = N → Proc

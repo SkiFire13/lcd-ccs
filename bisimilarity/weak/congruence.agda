@@ -1,6 +1,5 @@
 {-# OPTIONS --guardedness #-}
 
-open import Data.Bool
 open import Data.Empty
 open import Data.Product
 open import Relation.Nullary
@@ -17,14 +16,14 @@ open import bisimilarity.weak.properties C N penv
 
 -- Prove that ≈ is not a congruence
 ≈-not-cong : {c : C} → ¬ ∀ {C[] p q} → p ≈ q → subst C[] p ≈ subst C[] q
-≈-not-cong {c} cong with cong {C[]} τd≈d .p⇒q (indet {s = true} chan)
+≈-not-cong {c} cong with cong {C[]} τd≈d .p⇒q (indet {s = left} chan)
   where
   τd≈d : chan tau ccs.deadlock ≈ ccs.deadlock
   p⇒q τd≈d chan = ccs.deadlock , tau self , reflexive
   q⇒p τd≈d (indet {s = ()} _)
   C[] = indet replace (chan (send c) ccs.deadlock)
-... | _ , tau (cons (indet {s = true} (indet {s = ()} _)) _) , _
-... | _ , tau self , d≈C[d] with d≈C[d] .q⇒p (indet {s = false} chan)
+... | _ , tau (cons (indet {s = left} (indet {s = ()} _)) _) , _
+... | _ , tau self , d≈C[d] with d≈C[d] .q⇒p (indet {s = right} chan)
 ...   | _ , send self (indet {s = ()} _) _ , _
 ...   | _ , send (cons (indet {s = ()} _) _) _ _ , _
 

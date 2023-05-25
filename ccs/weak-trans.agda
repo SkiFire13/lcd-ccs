@@ -1,7 +1,3 @@
-open import Data.Bool
-open import Data.Sum
-open import Data.Unit
-
 import ccs.proc
 
 module ccs.weak-trans (C N : Set) (penv : ccs.proc.PEnv C N) where
@@ -75,7 +71,7 @@ w-par-B (recv sl1 tl sl2) (send sr1 tr sr2) =
 w-par-B (tau sl) (tau sr) = tau (concat (s-map par-L sl) (s-map par-R sr))
 
 -- Like Trans.hide but for weak transitions
-w-hide : ∀ {f} → {z : T (filter-act f a)} → (p =[ a ]⇒ q) → (hide f p =[ a ]⇒ hide f q)
+w-hide : ∀ {f} → {z : filter-act f a} → (p =[ a ]⇒ q) → (hide f p =[ a ]⇒ hide f q)
 w-hide {z = z} (send s1 t s2) = send (s-map hide s1) (hide {z = z} t) (s-map hide s2)
 w-hide {z = z} (recv s1 t s2) = recv (s-map hide s1) (hide {z = z} t) (s-map hide s2)
 w-hide (tau s) = tau (s-map hide s)

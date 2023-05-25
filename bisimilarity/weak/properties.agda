@@ -1,6 +1,5 @@
 {-# OPTIONS --guardedness #-}
 
-open import Data.Bool
 open import Data.Product
 
 import ccs.proc
@@ -41,5 +40,5 @@ q⇒p (~→≈ p~q) = p⇒q (~→≈ (~-sym p~q))
 -- Useful property
 p≈p+d : ∀ {p} → p ≈ p + ccs.deadlock
 p⇒q (p≈p+d) {p' = p'} t = p' , trans→weak (indet t) , reflexive
-q⇒p (p≈p+d) (indet {q = p'} {s = true} t) = p' , trans→weak t , reflexive
-q⇒p (p≈p+d) (indet {s = false} (indet {s = ()} _))
+q⇒p (p≈p+d) (indet {q = p'} {s = left} t) = p' , trans→weak t , reflexive
+q⇒p (p≈p+d) (indet {s = right} (indet {s = ()} _))

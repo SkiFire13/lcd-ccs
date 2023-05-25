@@ -1,6 +1,5 @@
 {-# OPTIONS --guardedness #-}
 
-open import Data.Bool
 open import Data.Product
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; inspect; [_])
 
@@ -33,8 +32,8 @@ cong : Cong _~_
 p⇒q (cong {chan a C[]} p~q) chan = subst C[] _ , chan , cong p~q
 cong {par-L C[] r} p~q = par-respects-~ (cong p~q) reflexive
 cong {par-R r C[]} p~q = par-respects-~ reflexive (cong p~q)
-p⇒q (cong {indet C[] r} p~q) (indet {s = false} t) = -, indet {s = false} t , reflexive
-p⇒q (cong {indet C[] r} p~q) (indet {s = true} t) =
+p⇒q (cong {indet C[] r} p~q) (indet {s = right} t) = -, indet t , reflexive
+p⇒q (cong {indet C[] r} p~q) (indet {s = left} t) =
   let q' , t' , p'~q' = cong p~q .p⇒q t
   in q' , indet t' , p'~q'
 p⇒q (cong {rename f C[]} p~q) (rename {a = a} t) =
@@ -52,11 +51,11 @@ ss~sc {chan a C[]} = cong {chan a replace} (ss~sc {C[]})
 ss~sc {par-L C[] p} = cong {par-L replace p} (ss~sc {C[]})
 ss~sc {par-R p C[]} = cong {par-R p replace} (ss~sc {C[]})
 p⇒q (ss~sc {indet C[] _}) (indet {s = s} t) with s
-... | true = let q' , t' , p'~q' = ss~sc {C[]} .p⇒q t in q' , indet {s = true} t' , p'~q'
-... | false = _ , indet {s = false} t , reflexive
+... | left = let q' , t' , p'~q' = ss~sc {C[]} .p⇒q t in q' , indet t' , p'~q'
+... | right = _ , indet {s = right} t , reflexive
 q⇒p (ss~sc {indet C[] _}) (indet {s = s} t) with s
-... | true = let q' , t' , p'~q' = ss~sc {C[]} .q⇒p t in q' , indet {s = true} t' , p'~q'
-... | false = _ , indet {s = false} t , reflexive
+... | left = let q' , t' , p'~q' = ss~sc {C[]} .q⇒p t in q' , indet t' , p'~q'
+... | right = _ , indet {s = right} t , reflexive
 ss~sc {rename f C[]} = cong {rename f replace} (ss~sc {C[]})
 ss~sc {hide f C[]} = cong {hide f replace} (ss~sc {C[]})
 ss~sc {replace} = reflexive
