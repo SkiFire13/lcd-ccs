@@ -7,10 +7,10 @@ open import Relation.Binary.Structures using (IsEquivalence)
 
 import ccs.proc
 
-module bisimilarity.strong.properties {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
+module bisimilarity.strong.properties (C N : Set) (penv : ccs.proc.PEnv C N) where
 
-open import ccs.common {C} {N} {penv} as ccs
-open import bisimilarity.strong.base {C} {N} {penv}
+open import ccs.common C N penv as ccs
+open import bisimilarity.strong.base C N penv
 
 -- Properties of strong bisimilarity
 

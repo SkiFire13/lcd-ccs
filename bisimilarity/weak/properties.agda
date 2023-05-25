@@ -7,13 +7,13 @@ open import Relation.Binary.Structures using (IsEquivalence)
 
 import ccs.proc
 
-module bisimilarity.weak.properties {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
+module bisimilarity.weak.properties (C N : Set) (penv : ccs.proc.PEnv C N) where
 
-open import ccs.common {C} {N} {penv} as ccs
-open import bisimilarity.strong.base {C} {N} {penv}
-open import bisimilarity.strong.properties {C} {N} {penv} using () renaming (sym to ~-sym)
-open import bisimilarity.weak.base {C} {N} {penv}
-open import bisimilarity.weak.string {C} {N} {penv}
+open import ccs.common C N penv as ccs
+open import bisimilarity.strong.base C N penv
+open import bisimilarity.strong.properties C N penv using () renaming (sym to ~-sym)
+open import bisimilarity.weak.base C N penv
+open import bisimilarity.weak.string C N penv
 
 -- Properties of weak bisimilarity
 

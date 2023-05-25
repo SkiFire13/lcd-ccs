@@ -5,16 +5,16 @@ open import Data.Product
 
 import ccs.proc
 
-module bisimilarity.observational.context {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
+module bisimilarity.observational.context (C N : Set) (penv : ccs.proc.PEnv C N) where
 
-open import ccs.common {C} {N} {penv} as ccs
-open import bisimilarity.cong {C} {N} {penv}
-open import bisimilarity.context {C} {N} {penv}
-open import bisimilarity.strong.base {C} {N} {penv}
-open import bisimilarity.strong.congruence {C} {N} {penv} renaming (cong to ~-cong)
-open import bisimilarity.strong.properties {C} {N} {penv} using () renaming (reflexive to ~-refl)
-open import bisimilarity.weak.base {C} {N} {penv}
-open import bisimilarity.weak.properties {C} {N} {penv} using (~-to-≈) renaming (reflexive to ≈-refl; sym to ≈-sym; trans to ≈-trans)
+open import ccs.common C N penv as ccs
+open import bisimilarity.cong C N penv
+open import bisimilarity.context C N penv
+open import bisimilarity.strong.base C N penv
+open import bisimilarity.strong.congruence C N penv renaming (cong to ~-cong)
+open import bisimilarity.strong.properties C N penv using () renaming (reflexive to ~-refl)
+open import bisimilarity.weak.base C N penv
+open import bisimilarity.weak.properties C N penv using (~-to-≈) renaming (reflexive to ≈-refl; sym to ≈-sym; trans to ≈-trans)
 
 -- Observational congruence defined as a closure over weak bisimilarity in contexts
 record _̂≈_ (p : Proc) (q : Proc) : Set₁ where

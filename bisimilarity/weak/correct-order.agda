@@ -4,11 +4,11 @@ open import Data.Product
 
 import ccs.proc
 
-module bisimilarity.weak.correct-order {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
+module bisimilarity.weak.correct-order (C N : Set) (penv : ccs.proc.PEnv C N) where
 
-open import ccs.common {C} {N} {penv}
-open import bisimilarity.weak.base {C} {N} {penv}
-open import bisimilarity.weak.properties {C} {N} {penv}
+open import ccs.common C N penv
+open import bisimilarity.weak.base C N penv
+open import bisimilarity.weak.properties C N penv
 
 -- Weak bisimilarity defined coinductively
 record _≈ₒ_ (p : Proc) (q : Proc) : Set₁ where

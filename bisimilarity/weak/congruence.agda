@@ -7,13 +7,13 @@ open import Relation.Nullary
 
 import ccs.proc
 
-module bisimilarity.weak.congruence {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
+module bisimilarity.weak.congruence (C N : Set) (penv : ccs.proc.PEnv C N) where
 
-open import ccs.common {C} {N} {penv} as ccs
-open import bisimilarity.cong {C} {N} {penv}
-open import bisimilarity.context {C} {N} {penv} as ctx
-open import bisimilarity.weak.base {C} {N} {penv}
-open import bisimilarity.weak.properties {C} {N} {penv}
+open import ccs.common C N penv as ccs
+open import bisimilarity.cong C N penv
+open import bisimilarity.context C N penv as ctx
+open import bisimilarity.weak.base C N penv
+open import bisimilarity.weak.properties C N penv
 
 -- Prove that ≈ is not a congruence
 ≈-not-cong : {c : C} → ¬ ∀ {C[] p q} → p ≈ q → subst C[] p ≈ subst C[] q

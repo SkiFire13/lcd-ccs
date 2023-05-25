@@ -7,14 +7,14 @@ open import Relation.Binary.PropositionalEquality
 
 import ccs.proc
 
-module bisimilarity.observational.context-trans {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
+module bisimilarity.observational.context-trans (C N : Set) (penv : ccs.proc.PEnv C N) where
 
-open import ccs.common {C} {N} {penv} as ccs
-open import bisimilarity.context {C} {N} {penv}
-open import bisimilarity.observational.context {C} {N} {penv} renaming (sym to ̂≈-sym)
-open import bisimilarity.observational.trans {C} {N} {penv} renaming (cong to ≈ₒ-cong)
-open import bisimilarity.weak.base {C} {N} {penv}
-open import bisimilarity.weak.properties {C} {N} {penv} renaming (sym to ≈-sym; trans to ≈-trans)
+open import ccs.common C N penv as ccs
+open import bisimilarity.context C N penv
+open import bisimilarity.observational.context C N penv renaming (sym to ̂≈-sym)
+open import bisimilarity.observational.trans C N penv renaming (cong to ≈ₒ-cong)
+open import bisimilarity.weak.base C N penv
+open import bisimilarity.weak.properties C N penv renaming (sym to ≈-sym; trans to ≈-trans)
 
 ≈ₒ-to-̂≈ : ∀ {p q} → p ≈ₒ q → p ̂≈ q
 ≈ₒ-to-̂≈ p≈ₒq = ≈-cong-to-̂≈ ≈ₒ-to-≈ ≈ₒ-cong p≈ₒq

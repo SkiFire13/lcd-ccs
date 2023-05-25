@@ -6,12 +6,12 @@ open import Data.Product
 
 import ccs-vp.proc
 
-module conv.inv-trans {C N X V : Set} {n-fv : N → X → Bool} {penv : ccs-vp.proc.PEnv {C} {N} {X} {V} {n-fv}} where
+module conv.inv-trans (C N X V : Set) (n-fv : N → X → Bool) (penv : ccs-vp.proc.PEnv C N X V n-fv) where
 
-open import conv.proc {C} {N} {X} {V} {n-fv}
+open import conv.proc C N X V n-fv
 
-open import ccs.common {Conv-C} {Conv-N} {conv-penv penv} as ccs
-open import ccs-vp.common {C} {N} {X} {V} {n-fv} {penv} as vp
+open import ccs.common Conv-C Conv-N (conv-penv penv) as ccs
+open import ccs-vp.common C N X V n-fv penv as vp
 
 -- Prove that the converse of `conv-trans` is not true, that is if there's
 -- a transition relation between two CCS processes then it's not guaranteed that

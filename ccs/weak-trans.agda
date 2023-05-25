@@ -4,10 +4,10 @@ open import Data.Unit
 
 import ccs.proc
 
-module ccs.weak-trans {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
+module ccs.weak-trans (C N : Set) (penv : ccs.proc.PEnv C N) where
 
-open import ccs.proc {C} {N}
-open import ccs.trans {C} {N} {penv}
+open import ccs.proc C N
+open import ccs.trans C N penv
 
 private
   variable

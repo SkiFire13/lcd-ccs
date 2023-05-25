@@ -4,10 +4,10 @@ open import Data.Product
 
 import ccs.proc
 
-module bisimilarity.weak.string {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
+module bisimilarity.weak.string (C N : Set) (penv : ccs.proc.PEnv C N) where
 
-open import ccs.common {C} {N} {penv}
-open import bisimilarity.weak.base {C} {N} {penv}
+open import ccs.common C N penv
+open import bisimilarity.weak.base C N penv
 
 -- (Half) the property of a weak string bisimulation
 StringBisimulationProperty : (Proc → Proc → Set₁) → Proc → Proc → Set₁

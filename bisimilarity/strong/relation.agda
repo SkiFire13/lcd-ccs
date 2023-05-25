@@ -4,10 +4,10 @@ open import Data.Product
 
 import ccs.proc
 
-module bisimilarity.strong.relation {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
+module bisimilarity.strong.relation (C N : Set) (penv : ccs.proc.PEnv C N) where
 
-open import ccs.common {C} {N} {penv}
-open import bisimilarity.strong.base {C} {N} {penv}
+open import ccs.common C N penv
+open import bisimilarity.strong.base C N penv
 
 -- Definition of a strong bisimulation
 record Bisimulation : Set₂ where

@@ -6,13 +6,13 @@ open import Relation.Binary.PropositionalEquality using (_≡_; refl; inspect; [
 
 import ccs.proc
 
-module bisimilarity.strong.congruence {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
+module bisimilarity.strong.congruence (C N : Set) (penv : ccs.proc.PEnv C N) where
 
-open import ccs.common {C} {N} {penv}
-open import bisimilarity.cong {C} {N} {penv}
-open import bisimilarity.context {C} {N} {penv}
-open import bisimilarity.strong.base {C} {N} {penv}
-open import bisimilarity.strong.properties {C} {N} {penv}
+open import ccs.common C N penv
+open import bisimilarity.cong C N penv
+open import bisimilarity.context C N penv
+open import bisimilarity.strong.base C N penv
+open import bisimilarity.strong.properties C N penv
 
 -- Helper for cong
 par-respects-~ : ∀ {pl pr ql qr} → pl ~ ql → pr ~ qr → par pl pr ~ par ql qr

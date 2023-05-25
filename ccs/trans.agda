@@ -3,9 +3,9 @@ open import Data.Empty
 
 import ccs.proc
 
-module ccs.trans {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
+module ccs.trans (C N : Set) (penv : ccs.proc.PEnv C N) where
 
-open import ccs.proc {C} {N}
+open import ccs.proc C N
 
 private
   variable

@@ -1,7 +1,7 @@
 open import Data.Bool
 open import Data.Empty
 
-module ccs-vp.proc {C N X V : Set} {n-fv : N → X → Bool} where
+module ccs-vp.proc (C N X V : Set) (n-fv : N → X → Bool) where
 
 -- A CCS VP Process
 data Proc : Set₁ where

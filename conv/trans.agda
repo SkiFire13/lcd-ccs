@@ -2,12 +2,12 @@ open import Data.Bool
 
 import ccs-vp.proc
 
-module conv.trans {C N X V : Set} {n-fv : N → X → Bool} {penv : ccs-vp.proc.PEnv {C} {N} {X} {V} {n-fv}} where
+module conv.trans (C N X V : Set) (n-fv : N → X → Bool) (penv : ccs-vp.proc.PEnv C N X V n-fv) where
 
-open import conv.proc {C} {N} {X} {V} {n-fv}
+open import conv.proc C N X V n-fv
 
-open import ccs.common {Conv-C} {Conv-N} {conv-penv penv} as ccs
-open import ccs-vp.common {C} {N} {X} {V} {n-fv} {penv} as vp
+open import ccs.common Conv-C Conv-N (conv-penv penv) as ccs
+open import ccs-vp.common C N X V n-fv penv as vp
 
 -- Convert a transition from CCS VP to CCS, or in other words,
 -- prove that if there's a transition between two CCS VP processes

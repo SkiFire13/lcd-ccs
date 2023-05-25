@@ -3,9 +3,9 @@ open import Data.Empty
 
 import ccs-vp.proc
 
-module ccs-vp.trans {C N X V : Set} {n-fv : N → X → Bool} {penv : ccs-vp.proc.PEnv {C} {N} {X} {V} {n-fv}} where
+module ccs-vp.trans (C N X V : Set) (n-fv : N → X → Bool) (penv : ccs-vp.proc.PEnv C N X V n-fv) where
 
-open import ccs-vp.proc {C} {N} {X} {V} {n-fv}
+open import ccs-vp.proc C N X V n-fv
 
 private
   variable

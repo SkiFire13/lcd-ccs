@@ -1,7 +1,7 @@
 open import Data.Bool
 open import Data.Unit
 
-module conv.proc {C N X V : Set} {n-fv : N → X → Bool} where
+module conv.proc (C N X V : Set) (n-fv : N → X → Bool) where
 
 -- The type of the channels (C) in the converted CCS
 record Conv-C : Set where
@@ -18,8 +18,8 @@ record Conv-N : Set where
     args : (x : X) → {_ : T (n-fv name x)} → V
 
 -- open import later to shadow `chan`
-open import ccs.proc {Conv-C} {Conv-N} as ccs
-open import ccs-vp.proc {C} {N} {X} {V} {n-fv} as vp
+open import ccs.proc Conv-C Conv-N as ccs
+open import ccs-vp.proc C N X V n-fv as vp
 
 -- Convert a CCS VP process to a normal CCS Process
 -- the implementation is below, after a couple of helper co-recursive functions

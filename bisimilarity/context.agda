@@ -3,9 +3,9 @@ open import Data.Empty
 
 import ccs.proc
 
-module bisimilarity.context {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
+module bisimilarity.context (C N : Set) (penv : ccs.proc.PEnv C N) where
 
-open import ccs.common {C} {N} {penv} hiding (deadlock)
+open import ccs.common C N penv hiding (deadlock)
 
 -- A process context
 data Context : Set₁ where

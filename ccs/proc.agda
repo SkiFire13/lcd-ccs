@@ -1,7 +1,7 @@
 open import Data.Bool
 open import Data.Empty
 
-module ccs.proc {C N : Set} where
+module ccs.proc (C N : Set) where
 
 -- An action
 data Act : Set where

@@ -4,10 +4,10 @@ open import Data.Product
 
 import ccs.proc
 
-module bisimilarity.weak.relation {C N : Set} {penv : ccs.proc.PEnv {C} {N}} where
+module bisimilarity.weak.relation (C N : Set) (penv : ccs.proc.PEnv C N) where
 
-open import ccs.common {C} {N} {penv}
-open import bisimilarity.weak.base {C} {N} {penv}
+open import ccs.common C N penv
+open import bisimilarity.weak.base C N penv
 
 -- Definition of a weak bisimulation
 record Bisimulation : Set₂ where
