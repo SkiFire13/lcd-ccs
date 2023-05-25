@@ -11,7 +11,7 @@ open import bisimilarity.weak.base C N penv
 
 -- (Half) the property of a weak string bisimulation
 StringBisimulationProperty : (Proc → Proc → Set₁) → Proc → Proc → Set₁
-StringBisimulationProperty R p q = ∀ {a p'} → (p =[ a ]⇒ p') → ∃[ q' ] ((q =[ a ]⇒ q') × R p' q')
+StringBisimulationProperty _R_ p q = ∀ {a p'} → (p =[ a ]⇒ p') → ∃[ q' ] ((q =[ a ]⇒ q') × p' R q')
 
 -- Weak bisimilarity defined coinductively
 record _≈ₛ_ (p : Proc) (q : Proc) : Set₁ where

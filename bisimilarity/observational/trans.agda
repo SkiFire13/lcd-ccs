@@ -37,14 +37,14 @@ merge-weak-tau' (obs-t s1 t s2) (recv s3 t' s4) = obs-t (concat s1 (cons t (conc
 merge-weak-tau' (obs-t s1 t s2) (tau s3) = obs-t s1 t (concat s2 s3)
 
 -- Observational weak bisimilarity property
-ObsBisProperty : (Proc → Proc → Set₁) → Proc → Proc → Set₁
-ObsBisProperty R p q = ∀ {a p'} → (p -[ a ]→ p') → ∃[ q' ] ((q =[ a ]=>ₒ q') × R p' q')
+ObsBisBisimulationProperty : (Proc → Proc → Set₁) → Proc → Proc → Set₁
+ObsBisBisimulationProperty _R_ p q = ∀ {a p'} → (p -[ a ]→ p') → ∃[ q' ] ((q =[ a ]=>ₒ q') × p' R q')
 
 -- Observational congruence defined as weak bisimilarity but with a forced strong transition
 record _≈ₒ_ (p : Proc) (q : Proc) : Set₁ where
   field
-    p⇒q : ObsBisProperty _≈_ p q
-    q⇒p : ObsBisProperty _≈_ q p
+    p⇒q : ObsBisBisimulationProperty _≈_ p q
+    q⇒p : ObsBisBisimulationProperty _≈_ q p
 open _≈ₒ_ public
 infixl 5 _≈ₒ_
 

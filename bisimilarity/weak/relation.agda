@@ -12,10 +12,10 @@ open import bisimilarity.weak.base C N penv
 -- Definition of a weak bisimulation
 record Bisimulation : Set₂ where
   field
-    R : Proc → Proc → Set₁
-    p⇒q : ∀ {p q} → R p q → BisimulationProperty R p q
-    q⇒p : ∀ {p q} → R p q → BisimulationProperty R q p
-open Bisimulation
+    _R_ : Proc → Proc → Set₁
+    p⇒q : ∀ {p q} → p R q → BisimulationProperty _R_ p q
+    q⇒p : ∀ {p q} → p R q → BisimulationProperty _R_ q p
+open Bisimulation renaming (_R_ to R)
 
 -- Definition of weak bisimilarity 
 record _≈ᵣ_ (p : Proc) (q : Proc) : Set₂ where
