@@ -2,8 +2,6 @@
 
 open import Data.Bool
 open import Data.Product
-open import Relation.Binary.Definitions using (Reflexive; Symmetric; Transitive)
-open import Relation.Binary.Structures using (IsEquivalence)
 
 import ccs.proc
 
@@ -17,27 +15,21 @@ open import bisimilarity.weak.string C N penv
 
 -- Properties of weak bisimilarity
 
-reflexive : Reflexive _≈_ -- ∀ {p q} → p ≈ p
+reflexive : ∀ {p} → p ≈ p
 p-to-q (reflexive {p}) {p' = p'} t = p' , trans-to-weak t , reflexive
 q-to-p (reflexive {p}) {p' = p'} t = p' , trans-to-weak t , reflexive
 
-sym : Symmetric _≈_ -- ∀ {p q} → p ≈ q → q ≈ p
+sym : ∀ {p q} → p ≈ q → q ≈ p
 p-to-q (sym {p} {q} p≈q) = p≈q .q-to-p
 q-to-p (sym {p} {q} p≈q) = p≈q .p-to-q
 
-trans : Transitive _≈_ -- ∀ {p q s} → p ≈ q → q ≈ s → p ≈ s
+trans : ∀ {p q s} → p ≈ q → q ≈ s → p ≈ s
 p-to-q (trans {p} {q} {s} p≈q q≈s) tp =
   let q' , tq , p'≈q' = p≈q .p-to-q tp
       s' , ts , q'≈ₛs' = ≈-to-≈ₛ q≈s .p-to-q tq
       q'≈s' = ≈ₛ-to-≈ q'≈ₛs'
   in s' , ts , trans p'≈q' q'≈s'
 q-to-p (trans {p} {q} {s} p≈q q≈s) = p-to-q (trans (sym q≈s) (sym p≈q))
-
--- Agda's equivalence class, just to assert that ≈ is effectively an equivalence
-isEquivalence : IsEquivalence _≈_
-IsEquivalence.refl (isEquivalence) = reflexive
-IsEquivalence.sym (isEquivalence) = sym
-IsEquivalence.trans (isEquivalence) = trans
 
 -- Conversion from strong to weak bisimilarity
 ~-to-≈ : ∀ {p q} → p ~ q → p ≈ q
