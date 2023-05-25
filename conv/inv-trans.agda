@@ -32,10 +32,10 @@ inv-rename-eq {send _ _} {send _ _} refl = refl
 inv-rename-eq {recv _ _} {recv _ _} refl = refl
 inv-rename-eq {tau} {tau} refl = refl
 
-inv-filter-eq : ∀ {f a} → ccs.filter-act (conv-hide f) (conv-act a) ≡ vp.filter-act f a
-inv-filter-eq {f} {send c _} = refl
-inv-filter-eq {f} {recv c _} = refl
-inv-filter-eq {f} {tau} = refl
+inv-filter-eq : ∀ {a f} → ccs.filter-act (conv-hide f) (conv-act a) ≡ vp.filter-act f a
+inv-filter-eq {send c _} = refl
+inv-filter-eq {recv c _} = refl
+inv-filter-eq {tau} = refl
 
 -- Prove the less-strong version of the previous (false) theorem, that is
 -- if a CCS VP process converted to CCS has a relation with another CCS process
@@ -68,7 +68,7 @@ inv-conv-trans' {rename f p} (rename {a = ca} t) | [ refl ] | [ e ]
   with p' , refl , t' ← inv-conv-trans' t
   = rename f p' , refl , rename t'
 inv-conv-trans' {hide f p} {a} (hide {z = z} t) | [ refl ] | [ refl ]
-  rewrite inv-filter-eq {f} {a}
+  rewrite inv-filter-eq {a} {f}
   with p' , refl , t' ← inv-conv-trans' t = hide f p' , refl , hide {z = z} t'
 inv-conv-trans' {if false _} (indet {s = ()} _) | [ refl ] | [ refl ]
 inv-conv-trans' {if true p} t | [ refl ] | [ refl ]
