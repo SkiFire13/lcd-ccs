@@ -14,7 +14,7 @@ record Conv-N : Set where
   constructor conv-n
   field
     name : N
-    args : (x : X) → {_ : n-fv name x} → V
+    args : (x : X) → n-fv name x → V
 
 -- open import later to shadow `chan`
 open import ccs.proc Conv-C Conv-N as ccs

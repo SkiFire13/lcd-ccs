@@ -9,7 +9,7 @@ data Proc : Set₁ where
   tau    : Proc → Proc
   par    : Proc → Proc → Proc
   indet  : {S : Set} → (S → Proc) → Proc
-  const  : (n : N) → ((x : X) → {_ : n-fv n x} → V) → Proc
+  const  : (n : N) → ((x : X) → n-fv n x → V) → Proc
   rename : (C → C) → Proc → Proc
   hide   : (Filter C) → Proc → Proc
   if     : Bool → Proc → Proc
@@ -42,4 +42,4 @@ filter-act f (recv c _) = f c
 filter-act f tau = T
 
 PEnv : Set₁
-PEnv = (n : N) → ((x : X) → {_ : n-fv n x} → V) → Proc
+PEnv = (n : N) → ((x : X) → n-fv n x → V) → Proc
