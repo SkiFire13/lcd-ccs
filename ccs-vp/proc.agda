@@ -11,7 +11,7 @@ data Proc : Set₁ where
   indet  : {S : Set} → (S → Proc) → Proc
   const  : (n : N) → ((x : X) → {_ : n-fv n x} → V) → Proc
   rename : (C → C) → Proc → Proc
-  hide   : (C → Set) → Proc → Proc
+  hide   : (Filter C) → Proc → Proc
   if     : Bool → Proc → Proc
 
 -- The "desugaring" of the deadlock CCS VP Process
@@ -36,7 +36,7 @@ map-act f (send c v) = send (f c) v
 map-act f (recv c v) = recv (f c) v
 map-act f tau = tau
 
-filter-act : (C → Set) → Act → Set
+filter-act : (Filter C) → Filter Act
 filter-act f (send c _) = f c
 filter-act f (recv c _) = f c
 filter-act f tau = T

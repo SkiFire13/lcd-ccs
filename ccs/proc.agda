@@ -15,7 +15,7 @@ data Proc : Set₁ where
   indet   : {S : Set} → (S → Proc) → Proc
   const   : N → Proc
   rename  : (C → C) → Proc → Proc
-  hide    : (C → Set) → Proc → Proc
+  hide    : (Filter C) → Proc → Proc
 
 -- The "desugaring" of the deadlock CCS Process
 deadlock = indet ⊥-elim
@@ -40,7 +40,7 @@ map-act f (send c) = send (f c)
 map-act f (recv c) = recv (f c)
 map-act f tau = tau
 
-filter-act : (C → Set) → Act → Set
+filter-act : (Filter C) → Filter Act
 filter-act f (send c) = f c
 filter-act f (recv c) = f c
 filter-act f tau = T
