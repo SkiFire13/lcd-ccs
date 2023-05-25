@@ -46,7 +46,7 @@ inv-conv-trans' : ∀ {p1 a cp2}
                   → ∃[ p2 ] (cp2 ≡ conv-proc p2 × p1 -[ a ]→ᵥ p2)
 inv-conv-trans' {p1} {a} t with {conv-proc p1} | {conv-act a} | inspect conv-proc p1 | inspect conv-act a
 inv-conv-trans' {send _ _ p} {send _ _} chan | [ refl ] | [ refl ] = p , refl , send
-inv-conv-trans' {recv _ f} {recv _ v} (indet chan) | [ refl ] | [ refl ] = f v , refl , recv
+inv-conv-trans' {recv _ f} {recv _ v} (indet _ chan) | [ refl ] | [ refl ] = f v , refl , recv
 inv-conv-trans' {tau p} {tau} chan | [ refl ] | [ refl ] = p , refl , tau
 inv-conv-trans' {par pl pr} (par-L tl) | [ refl ] | [ e2 ] with refl ← e2
   with pl' , refl , tl' ← inv-conv-trans' tl = par pl' pr , refl , par-L tl'
@@ -58,8 +58,8 @@ inv-conv-trans' {par pl pr} {tau} (par-B {a = ca} tl tr) | [ refl ] | [ refl ]
   with pl' , refl , tl' ← inv-conv-trans' tl
   with pr' , refl , tr' ← inv-conv-trans' tr
   = par pl' pr' , refl , par-B tl' tr'
-inv-conv-trans' {indet f} {a} (indet {s = s} t) | [ refl ] | [ refl ]
-  with p' , refl , t' ← inv-conv-trans' t = p' , refl , indet {s = s} t'
+inv-conv-trans' {indet f} {a} (indet s t) | [ refl ] | [ refl ]
+  with p' , refl , t' ← inv-conv-trans' t = p' , refl , indet s t'
 inv-conv-trans' {const n args} (const t) | [ refl ] | [ refl ]
   with p' , refl , t' ← inv-conv-trans' t = p' , refl , const t'
 inv-conv-trans' {rename f p} (rename {a = ca} t) | [ refl ] | [ e ]
@@ -69,6 +69,6 @@ inv-conv-trans' {rename f p} (rename {a = ca} t) | [ refl ] | [ e ]
 inv-conv-trans' {hide f p} {a} (hide z t) | [ refl ] | [ refl ]
   rewrite inv-filter-eq {a} {f}
   with p' , refl , t' ← inv-conv-trans' t = hide f p' , refl , hide z t'
-inv-conv-trans' {if false _} (indet {s = ()} _) | [ refl ] | [ refl ]
+inv-conv-trans' {if false _} (indet () _) | [ refl ] | [ refl ]
 inv-conv-trans' {if true p} t | [ refl ] | [ refl ]
   with p' , refl , t' ← inv-conv-trans' t = p' , refl , if t'

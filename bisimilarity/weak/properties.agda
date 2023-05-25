@@ -39,6 +39,6 @@ q⇒p (~→≈ p~q) = p⇒q (~→≈ (~-sym p~q))
 
 -- Useful property
 p≈p+d : ∀ {p} → p ≈ p + ccs.deadlock
-p⇒q (p≈p+d) {p' = p'} t = p' , trans→weak (indet t) , reflexive
-q⇒p (p≈p+d) (indet {q = p'} {s = left} t) = p' , trans→weak t , reflexive
-q⇒p (p≈p+d) (indet {s = right} (indet {s = ()} _))
+p⇒q (p≈p+d) t = _ , trans→weak (indet left t) , reflexive
+q⇒p (p≈p+d) (indet left t) = _ , trans→weak t , reflexive
+q⇒p (p≈p+d) (indet right (indet () _))

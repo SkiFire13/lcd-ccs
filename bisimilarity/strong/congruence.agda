@@ -30,10 +30,10 @@ cong : Cong _~_
 p⇒q (cong {chan a C[]} p~q) chan = subst C[] _ , chan , cong p~q
 cong {par-L C[] r} p~q = par-respects-~ (cong p~q) reflexive
 cong {par-R r C[]} p~q = par-respects-~ reflexive (cong p~q)
-p⇒q (cong {indet C[] r} p~q) (indet {s = right} t) = _ , indet t , reflexive
-p⇒q (cong {indet C[] r} p~q) (indet {s = left} t) =
+p⇒q (cong {indet C[] r} p~q) (indet right t) = _ , indet right t , reflexive
+p⇒q (cong {indet C[] r} p~q) (indet left t) =
   let q' , t' , p'~q' = cong p~q .p⇒q t
-  in q' , indet t' , p'~q'
+  in q' , indet left t' , p'~q'
 p⇒q (cong {rename f C[]} p~q) (rename {a = a} t) =
   let q' , t' , p'~q' = (cong {C[]} p~q) .p⇒q t
   in rename f q' , rename {a = a} t' , cong p'~q'
@@ -48,12 +48,12 @@ ss~sc : ∀ {C1[] C2[] p} → subst C1[] (subst C2[] p) ~ subst (compose C1[] C2
 ss~sc {chan a C[]} = cong {chan a replace} (ss~sc {C[]})
 ss~sc {par-L C[] p} = cong {par-L replace p} (ss~sc {C[]})
 ss~sc {par-R p C[]} = cong {par-R p replace} (ss~sc {C[]})
-p⇒q (ss~sc {indet C[] _}) (indet {s = s} t) with s
-... | left = let q' , t' , p'~q' = ss~sc {C[]} .p⇒q t in q' , indet t' , p'~q'
-... | right = _ , indet {s = right} t , reflexive
-q⇒p (ss~sc {indet C[] _}) (indet {s = s} t) with s
-... | left = let q' , t' , p'~q' = ss~sc {C[]} .q⇒p t in q' , indet t' , p'~q'
-... | right = _ , indet {s = right} t , reflexive
+p⇒q (ss~sc {indet C[] _}) (indet s t) with s
+... | left = let q' , t' , p'~q' = ss~sc {C[]} .p⇒q t in q' , indet left t' , p'~q'
+... | right = _ , indet right t , reflexive
+q⇒p (ss~sc {indet C[] _}) (indet s t) with s
+... | left = let q' , t' , p'~q' = ss~sc {C[]} .q⇒p t in q' , indet left t' , p'~q'
+... | right = _ , indet right t , reflexive
 ss~sc {rename f C[]} = cong {rename f replace} (ss~sc {C[]})
 ss~sc {hide f C[]} = cong {hide f replace} (ss~sc {C[]})
 ss~sc {replace} = reflexive

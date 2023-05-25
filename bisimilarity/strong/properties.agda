@@ -28,6 +28,6 @@ q⇒p (trans {p} {q} {s} p~q q~s) = p⇒q (trans (sym q~s) (sym p~q))
 
 -- Useful property
 p~p+d : ∀ {p} → p ~ p + ccs.deadlock
-p⇒q (p~p+d {p}) t = _ , indet t , reflexive
-q⇒p (p~p+d {p}) (indet {s = right} (indet {s = ()} _))
-q⇒p (p~p+d {p}) (indet {s = left} t) = _ , t , reflexive
+p⇒q p~p+d t = _ , indet left t , reflexive
+q⇒p p~p+d (indet right (indet () _))
+q⇒p p~p+d (indet left t) = _ , t , reflexive

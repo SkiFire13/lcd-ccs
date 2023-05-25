@@ -97,10 +97,10 @@ p⇒q (cong {par-R pc C[]} p≈ₒq) (par-R t) =
 p⇒q (cong {par-R pc C[]} p≈ₒq) (par-B {pl' = pc'} t1 t2) =
   let q' , obs-t sq1 tq sq2 , p'≈q' = cong {C[]} p≈ₒq .p⇒q t2
   in par pc' q' , obs-t (s-map par-R sq1) (par-B t1 tq) (s-map par-R sq2), par-respects-≈ ≈-refl p'≈q'
-p⇒q (cong {indet C[] pc} p≈ₒq) (indet {s = right} t) = _ , trans→obs (indet t) , ≈-refl
-p⇒q (cong {indet C[] pc} p≈ₒq) (indet {s = left} t) with cong {C[]} p≈ₒq .p⇒q t
-... | q' , obs-t self tq s2 , p'≈q' = q' , obs-t self (indet tq) s2 , p'≈q'
-... | q' , obs-t (cons ts s1) tq s2 , p'≈q' = q' , obs-t (cons (indet ts) s1) tq s2 , p'≈q'
+p⇒q (cong {indet C[] pc} p≈ₒq) (indet right t) = _ , trans→obs (indet right t) , ≈-refl
+p⇒q (cong {indet C[] pc} p≈ₒq) (indet left t) with cong {C[]} p≈ₒq .p⇒q t
+... | q' , obs-t self tq s2 , p'≈q' = q' , obs-t self (indet left tq) s2 , p'≈q'
+... | q' , obs-t (cons ts s1) tq s2 , p'≈q' = q' , obs-t (cons (indet left ts) s1) tq s2 , p'≈q'
 p⇒q (cong {rename f C[]} p≈ₒq) (rename t) =
   let q' , obs-t sq1 tq sq2 , p'≈q' = cong {C[]} p≈ₒq .p⇒q t
   in rename f q' , obs-t (s-map rename sq1) (rename tq) (s-map rename sq2) , rename-respects-≈ p'≈q'

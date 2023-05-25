@@ -23,7 +23,7 @@ data _-[_]→ᵥ_ : Proc → Act → Proc → Set₁ where
   par-L  : (pl -[ a ]→ᵥ p') → (par pl pr -[ a ]→ᵥ par p' pr)
   par-R  : (pr -[ a ]→ᵥ p') → (par pl pr -[ a ]→ᵥ par pl p')
   par-B  : (pl -[ a ]→ᵥ pl') → (pr -[ flip-act a ]→ᵥ pr') → (par pl pr -[ tau ]→ᵥ par pl' pr')
-  indet  : ∀ {S f} {s : S} → (f s -[ a ]→ᵥ q) → (indet f -[ a ]→ᵥ q)
+  indet  : ∀ {S f} (s : S) → (f s -[ a ]→ᵥ q) → (indet f -[ a ]→ᵥ q)
   const  : ∀ {f} → (penv n f -[ a ]→ᵥ p) → (const n f -[ a ]→ᵥ p)
   rename : ∀ {f} → (p -[ a ]→ᵥ q) → (rename f p -[ map-act f a ]→ᵥ rename f q)
   hide   : ∀ {f} → filter-act f a → (p -[ a ]→ᵥ q) → (hide f p -[ a ]→ᵥ hide f q)

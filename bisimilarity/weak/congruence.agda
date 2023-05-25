@@ -13,16 +13,16 @@ open import bisimilarity.weak.properties C N penv
 
 -- Prove that ≈ is not a congruence
 ≈-not-cong : {c : C} → ¬ ∀ {C[] p q} → p ≈ q → subst C[] p ≈ subst C[] q
-≈-not-cong {c} cong with cong {C[]} τd≈d .p⇒q (indet {s = left} chan)
+≈-not-cong {c} cong with cong {C[]} τd≈d .p⇒q (indet left chan)
   where
   τd≈d : chan tau ccs.deadlock ≈ ccs.deadlock
   p⇒q τd≈d chan = ccs.deadlock , tau self , reflexive
-  q⇒p τd≈d (indet {s = ()} _)
+  q⇒p τd≈d (indet () _)
   C[] = indet replace (chan (send c) ccs.deadlock)
-... | _ , tau (cons (indet {s = left} (indet {s = ()} _)) _) , _
-... | _ , tau self , d≈C[d] with d≈C[d] .q⇒p (indet {s = right} chan)
-...   | _ , send self (indet {s = ()} _) _ , _
-...   | _ , send (cons (indet {s = ()} _) _) _ _ , _
+... | _ , tau (cons (indet left (indet () _)) _) , _
+... | _ , tau self , d≈C[d] with d≈C[d] .q⇒p (indet right chan)
+...   | _ , send self (indet () _) _ , _
+...   | _ , send (cons (indet () _) _) _ _ , _
 
 -- Prove that the c requisite above is required, otherwise ≈ becomes always true
 ¬c→≈-always-true : ¬ C → ∀ {p q} → p ≈ q
