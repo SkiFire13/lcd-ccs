@@ -13,6 +13,7 @@ Filter S = S → Set
 
 -- Unit
 record T : Set where
+  constructor tt
 
 -- Empty
 data ⊥ : Set where

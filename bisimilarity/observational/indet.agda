@@ -59,20 +59,20 @@ p⇒q (closure (cong {indet C[] pc} p≈ᵢq) r) t =
   q⇒p helper (indet {s = right} (indet {s = left} t)) = _ , trans→weak (indet (indet t)) , ≈-refl
   q⇒p helper (indet {s = right} (indet {s = right} t)) = _ , trans→weak (indet t), ≈-refl
 p⇒q (closure (cong {rename f C[]} p≈ᵢq) r) (indet {s = left} t) = {!   !}
-p⇒q (closure (cong {hide f C[]} p≈ᵢq) r) (indet {s = left} (hide {z = z} t)) with
+p⇒q (closure (cong {hide f C[]} p≈ᵢq) r) (indet {s = left} (hide z t)) with
   cong {C[]} p≈ᵢq .closure ccs.deadlock .p⇒q (indet {s = left} t)
 ... | foo = {!   !}
 -- ... | q' , send self (indet {s = left} tq) s2 , p'≈q' =
---   hide f q' , send self (indet (hide {z = z} tq)) (s-map hide s2), hide-respects-≈ p'≈q'
+--   hide f q' , send self (indet (hide z tq)) (s-map hide s2), hide-respects-≈ p'≈q'
 -- ... | _ , send self (indet {s = right} (indet {s = ()} _)) _ , _
 -- ... | q' , send (cons (indet {s = left} tq) s1) tq' s2 , p'≈q' =
---   hide f q' , send (cons (indet (hide tq)) (s-map hide s1)) (hide {z = z} tq') (s-map hide s2), hide-respects-≈ p'≈q'
+--   hide f q' , send (cons (indet (hide tq)) (s-map hide s1)) (hide z tq') (s-map hide s2), hide-respects-≈ p'≈q'
 -- ... | _ , send (cons (indet {s = right} (indet {s = ()} _)) _) _ _ , _
 -- ... | q' , recv self (indet {s = left} tq) s2 , p'≈q' =
---   hide f q' , recv self (indet (hide {z = z} tq)) (s-map hide s2), hide-respects-≈ p'≈q'
+--   hide f q' , recv self (indet (hide z tq)) (s-map hide s2), hide-respects-≈ p'≈q'
 -- ... | _ , recv self (indet {s = right} (indet {s = ()} _)) _ , _
 -- ... | q' , recv (cons (indet {s = left} tq) s1) tq' s2 , p'≈q' =
---   hide f q' , recv (cons (indet (hide tq)) (s-map hide s1)) (hide {z = z} tq') (s-map hide s2), hide-respects-≈ p'≈q'
+--   hide f q' , recv (cons (indet (hide tq)) (s-map hide s1)) (hide z tq') (s-map hide s2), hide-respects-≈ p'≈q'
 -- ... | _ , recv (cons (indet {s = right} (indet {s = ()} _)) _) _ _ , _
 -- ... | q' , tau (cons (indet {s = left} tq) s) , p'≈q' =
 --   hide f q' , tau (cons (indet (hide tq)) (s-map hide s)) , hide-respects-≈ p'≈q'

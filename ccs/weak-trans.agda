@@ -1,3 +1,5 @@
+open import Base
+
 import ccs.proc
 
 module ccs.weak-trans (C N : Set) (penv : ccs.proc.PEnv C N) where
@@ -71,10 +73,10 @@ w-par-B (recv sl1 tl sl2) (send sr1 tr sr2) =
 w-par-B (tau sl) (tau sr) = tau (concat (s-map par-L sl) (s-map par-R sr))
 
 -- Like Trans.hide but for weak transitions
-w-hide : ∀ {f} → {z : filter-act f a} → (p =[ a ]⇒ q) → (hide f p =[ a ]⇒ hide f q)
-w-hide {z = z} (send s1 t s2) = send (s-map hide s1) (hide {z = z} t) (s-map hide s2)
-w-hide {z = z} (recv s1 t s2) = recv (s-map hide s1) (hide {z = z} t) (s-map hide s2)
-w-hide (tau s) = tau (s-map hide s)
+w-hide : ∀ {f} → filter-act f a → (p =[ a ]⇒ q) → (hide f p =[ a ]⇒ hide f q)
+w-hide z (send s1 t s2) = send (s-map (hide tt) s1) (hide z t) (s-map (hide tt) s2)
+w-hide z (recv s1 t s2) = recv (s-map (hide tt) s1) (hide z t) (s-map (hide tt) s2)
+w-hide tt (tau s) = tau (s-map (hide tt) s)
 
 -- Like Trans.rename but for weak transitions
 w-rename : ∀ {f} → (p =[ a ]⇒ q) → (rename f p =[ map-act f a ]⇒ rename f q)

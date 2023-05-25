@@ -37,9 +37,9 @@ p⇒q (cong {indet C[] r} p~q) (indet {s = left} t) =
 p⇒q (cong {rename f C[]} p~q) (rename {a = a} t) =
   let q' , t' , p'~q' = (cong {C[]} p~q) .p⇒q t
   in rename f q' , rename {a = a} t' , cong p'~q'
-p⇒q (cong {hide f C[]} p~q) (hide {z = z} t) =
+p⇒q (cong {hide f C[]} p~q) (hide z t) =
   let q' , t' , p'~q' = (cong {C[]} p~q) .p⇒q t
-  in hide f q' , hide {z = z} t' , cong p'~q'
+  in hide f q' , hide z t' , cong p'~q'
 p⇒q (cong {replace} p~q) = p~q .p⇒q
 q⇒p (cong p~q) = p⇒q (cong (sym p~q))
 

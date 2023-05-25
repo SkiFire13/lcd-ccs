@@ -56,9 +56,9 @@ p⇒q (par-respects-≈ pl~ql pr~qr) (par-B {a} {pl' = pl'} {pr' = pr'} tl tr) =
 q⇒p (par-respects-≈ pl~ql pr~qr) = p⇒q (par-respects-≈ (sym pl~ql) (sym pr~qr))
 
 hide-respects-≈ : ∀ {f p q} → p ≈ q → hide f p ≈ hide f q
-p⇒q (hide-respects-≈ {f} p≈q) (hide {z = z} t) =
+p⇒q (hide-respects-≈ {f} p≈q) (hide z t) =
   let q' , t' , p'≈q' = p≈q .p⇒q t
-  in hide f q' , w-hide {z = z} t' , hide-respects-≈ p'≈q'
+  in hide f q' , w-hide z t' , hide-respects-≈ p'≈q'
 q⇒p (hide-respects-≈ p≈q) = p⇒q (hide-respects-≈ (sym p≈q))
 
 rename-respects-≈ : ∀ {f p q} → p ≈ q → rename f p ≈ rename f q

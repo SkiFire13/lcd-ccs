@@ -66,9 +66,9 @@ inv-conv-trans' {rename f p} (rename {a = ca} t) | [ refl ] | [ e ]
   with a , refl ← inv-conv-act {ca}
   rewrite inv-rename-eq e
   with p' , refl , t' ← inv-conv-trans' t = rename f p' , refl , rename t'
-inv-conv-trans' {hide f p} {a} (hide {z = z} t) | [ refl ] | [ refl ]
+inv-conv-trans' {hide f p} {a} (hide z t) | [ refl ] | [ refl ]
   rewrite inv-filter-eq {a} {f}
-  with p' , refl , t' ← inv-conv-trans' t = hide f p' , refl , hide {z = z} t'
+  with p' , refl , t' ← inv-conv-trans' t = hide f p' , refl , hide z t'
 inv-conv-trans' {if false _} (indet {s = ()} _) | [ refl ] | [ refl ]
 inv-conv-trans' {if true p} t | [ refl ] | [ refl ]
   with p' , refl , t' ← inv-conv-trans' t = p' , refl , if t'

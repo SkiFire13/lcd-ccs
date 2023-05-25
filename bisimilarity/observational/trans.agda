@@ -104,8 +104,8 @@ p⇒q (cong {indet C[] pc} p≈ₒq) (indet {s = left} t) with cong {C[]} p≈�
 p⇒q (cong {rename f C[]} p≈ₒq) (rename t) =
   let q' , obs-t sq1 tq sq2 , p'≈q' = cong {C[]} p≈ₒq .p⇒q t
   in rename f q' , obs-t (s-map rename sq1) (rename tq) (s-map rename sq2) , rename-respects-≈ p'≈q'
-p⇒q (cong {hide f C[]} p≈ₒq) (hide {z = z} t) =
+p⇒q (cong {hide f C[]} p≈ₒq) (hide z t) =
   let q' , obs-t s1 tq s2 , p'≈q' = cong {C[]} p≈ₒq .p⇒q t
-  in hide f q' , obs-t (s-map hide s1) (hide {z = z} tq) (s-map hide s2) , hide-respects-≈ p'≈q'
+  in hide f q' , obs-t (s-map (hide tt) s1) (hide z tq) (s-map (hide tt) s2) , hide-respects-≈ p'≈q'
 p⇒q (cong {replace} p≈ₒq) = p≈ₒq .p⇒q
 q⇒p (cong p≈ₒq) = cong (sym p≈ₒq) .p⇒q
