@@ -6,7 +6,7 @@ open import Data.Product
 
 import ccs-vp.proc
 
-module conv.inv-trans {C N X V : Set} {n-fv : N -> X -> Bool} {penv : ccs-vp.proc.PEnv {C} {N} {X} {V} {n-fv}} where
+module conv.inv-trans {C N X V : Set} {n-fv : N → X → Bool} {penv : ccs-vp.proc.PEnv {C} {N} {X} {V} {n-fv}} where
 
 open import conv.proc {C} {N} {X} {V} {n-fv}
 
@@ -17,30 +17,30 @@ open import ccs-vp.common {C} {N} {X} {V} {n-fv} {penv} as vp
 -- a transition relation between two CCS processes then it's not guaranteed that
 -- there's a transition between CCS VP processes that can be converted into them. 
 NaiveInvConv : Set₁
-NaiveInvConv = forall {p1 a p2} 
-              -> ccs.Trans (conv-proc p1) (conv-act a) (conv-proc p2)
-              -> vp.Trans p1 a p2
+NaiveInvConv = ∀ {p1 a p2} 
+              → ccs.Trans (conv-proc p1) (conv-act a) (conv-proc p2)
+              → vp.Trans p1 a p2
 inv-conv-need-exists : ¬ NaiveInvConv
 inv-conv-need-exists f with () <- f {tau vp.deadlock} {tau} {if true vp.deadlock} chan
 
 -- Prove some guarantees about composing functions on channel/transition operation that Agda can't prove.
 
-inv-conv-act : forall {ca} -> ∃[ a ] (ca ≡ conv-act a)
+inv-conv-act : ∀ {ca} → ∃[ a ] (ca ≡ conv-act a)
 inv-conv-act {send (conv-c c v)} = send c v , refl
 inv-conv-act {recv (conv-c c v)} = recv c v , refl
 inv-conv-act {tau} = tau , refl
 
-inv-flip-eq : forall {a} -> ccs.flip-act (conv-act a) ≡ conv-act (vp.flip-act a)
+inv-flip-eq : ∀ {a} → ccs.flip-act (conv-act a) ≡ conv-act (vp.flip-act a)
 inv-flip-eq {send _ _} = refl
 inv-flip-eq {recv _ _} = refl
 inv-flip-eq {tau} = refl
 
-inv-rename-eq : forall {a a' f} -> conv-act a ≡ ccs.map-act (conv-rename f) (conv-act a') -> a ≡ vp.map-act f a'
+inv-rename-eq : ∀ {a a' f} → conv-act a ≡ ccs.map-act (conv-rename f) (conv-act a') → a ≡ vp.map-act f a'
 inv-rename-eq {send _ _} {send _ _} refl = refl
 inv-rename-eq {recv _ _} {recv _ _} refl = refl
 inv-rename-eq {tau} {tau} refl = refl
 
-inv-filter-eq : forall {f a} -> ccs.filter-act (conv-hide f) (conv-act a) ≡ vp.filter-act f a
+inv-filter-eq : ∀ {f a} → ccs.filter-act (conv-hide f) (conv-act a) ≡ vp.filter-act f a
 inv-filter-eq {f} {send c _} = refl
 inv-filter-eq {f} {recv c _} = refl
 inv-filter-eq {f} {tau} = refl
@@ -49,9 +49,9 @@ inv-filter-eq {f} {tau} = refl
 -- if a CCS VP process converted to CCS has a relation with another CCS process
 -- then there exists a corresponding relation between the initial CCS VP process
 -- and some other CCS VP process that can be converted in the initial second CCS process.
-inv-conv-trans' : forall {p1 a cp2} 
-               -> ccs.Trans (conv-proc p1) (conv-act a) cp2
-               -> ∃[ p2 ] (cp2 ≡ conv-proc p2 × vp.Trans p1 a p2)
+inv-conv-trans' : ∀ {p1 a cp2} 
+               → ccs.Trans (conv-proc p1) (conv-act a) cp2
+               → ∃[ p2 ] (cp2 ≡ conv-proc p2 × vp.Trans p1 a p2)
 inv-conv-trans' {p1} {a} t with {conv-proc p1} | {conv-act a} | inspect conv-proc p1 | inspect conv-act a
 inv-conv-trans' {send _ _ p} {send _ _} chan | [ refl ] | [ refl ] = p , refl , send
 inv-conv-trans' {recv _ f} {recv _ v} (indet chan) | [ refl ] | [ refl ] = f v , refl , recv

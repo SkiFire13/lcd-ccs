@@ -24,23 +24,23 @@ record ObsTrans (p1 : Proc) (a : Act) (p4 : Proc) : Set₁ where
     t  : Trans p2 a p3
     s2 : TauSeq p3 p4
 
-trans-to-obs : forall {p a q} -> Trans p a q -> ObsTrans p a q
+trans-to-obs : ∀ {p a q} → Trans p a q → ObsTrans p a q
 trans-to-obs t = obs-t self t self
 
-obs-to-weak : forall {p a q} -> ObsTrans p a q -> WeakTrans p a q
+obs-to-weak : ∀ {p a q} → ObsTrans p a q → WeakTrans p a q
 obs-to-weak (obs-t s1 t s2) = join (tau s1) (trans-to-weak t) (tau s2)
 
-merge-weak-tau : forall {p1 p2 p3 a} -> ObsTrans p1 a p2 -> WeakTrans p2 tau p3 -> ObsTrans p1 a p3
+merge-weak-tau : ∀ {p1 p2 p3 a} → ObsTrans p1 a p2 → WeakTrans p2 tau p3 → ObsTrans p1 a p3
 merge-weak-tau (obs-t s1 t s2) (tau s3) = obs-t s1 t (concat s2 s3)
 
-merge-weak-tau' : forall {p1 p2 p3 a} -> ObsTrans p1 tau p2 -> WeakTrans p2 a p3 -> ObsTrans p1 a p3
+merge-weak-tau' : ∀ {p1 p2 p3 a} → ObsTrans p1 tau p2 → WeakTrans p2 a p3 → ObsTrans p1 a p3
 merge-weak-tau' (obs-t s1 t s2) (send s3 t' s4) = obs-t (concat s1 (cons t (concat s2 s3))) t' s4
 merge-weak-tau' (obs-t s1 t s2) (recv s3 t' s4) = obs-t (concat s1 (cons t (concat s2 s3))) t' s4
 merge-weak-tau' (obs-t s1 t s2) (tau s3) = obs-t s1 t (concat s2 s3)
 
 -- Observational weak bisimilarity property
-ObsBisProperty : (Proc -> Proc -> Set₁) -> Proc -> Proc -> Set₁
-ObsBisProperty R p q = forall {a p'} -> Trans p a p' -> ∃[ q' ] (ObsTrans q a q' × R p' q')
+ObsBisProperty : (Proc → Proc → Set₁) → Proc → Proc → Set₁
+ObsBisProperty R p q = ∀ {a p'} → Trans p a p' → ∃[ q' ] (ObsTrans q a q' × R p' q')
 
 -- Observational congruence defined as weak bisimilarity but with a forced strong transition
 record _≈ₒ_ (p : Proc) (q : Proc) : Set₁ where
@@ -50,7 +50,7 @@ record _≈ₒ_ (p : Proc) (q : Proc) : Set₁ where
 open _≈ₒ_ public
 
 -- Prove that ≈ₒ implies ≈, even though it is pretty obvious
-≈ₒ-to-≈ : forall {p q} -> p ≈ₒ q -> p ≈ q
+≈ₒ-to-≈ : ∀ {p q} → p ≈ₒ q → p ≈ q
 p-to-q (≈ₒ-to-≈ p≈ₒq) t =
   let q' , t' , p'≈q' = p≈ₒq .p-to-q t
   in q' , obs-to-weak t' , p'≈q'
@@ -59,15 +59,15 @@ q-to-p (≈ₒ-to-≈ p≈ₒq) t =
   in p' , obs-to-weak t' , p'≈q'
 
 -- Prove that ≈ₒ is an equivalence
-reflexive : forall {p} -> p ≈ₒ p
+reflexive : ∀ {p} → p ≈ₒ p
 p-to-q reflexive {p' = p'} t = p' , trans-to-obs t , ≈-refl
 q-to-p reflexive {p' = p'} t = p' , trans-to-obs t , ≈-refl
 
-sym : forall {p q} -> p ≈ₒ q -> q ≈ₒ p
+sym : ∀ {p q} → p ≈ₒ q → q ≈ₒ p
 p-to-q (sym p≈ₒq) = p≈ₒq .q-to-p
 q-to-p (sym p≈ₒq) = p≈ₒq .p-to-q
 
-trans : forall {p q s} -> p ≈ₒ q -> q ≈ₒ s -> p ≈ₒ s
+trans : ∀ {p q s} → p ≈ₒ q → q ≈ₒ s → p ≈ₒ s
 p-to-q (trans p≈ₒq q≈ₒs) t with p≈ₒq .p-to-q t
 ... | q' , obs-t self tq s , p'≈q' =
   let s' , ts , q''≈s' = q≈ₒs .p-to-q tq

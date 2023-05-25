@@ -22,21 +22,21 @@ open import bisimilarity.weak.properties {C} {N} {penv} using (p≈p+d) renaming
 record _≈ᵢ_ (p : Proc) (q : Proc) : Set₁ where
   constructor obs-i
   field
-    closure : (r : Proc) -> indet₂ p r ≈ indet₂ q r
+    closure : (r : Proc) → indet₂ p r ≈ indet₂ q r
 open _≈ᵢ_ public
 
 -- Prove that ≈ᵢ is an equivalence
-reflexive : forall {p} -> p ≈ᵢ p
-reflexive = obs-i \ _ -> ≈-refl
+reflexive : ∀ {p} → p ≈ᵢ p
+reflexive = obs-i λ _ → ≈-refl
 
-sym : forall {p q} -> p ≈ᵢ q -> q ≈ᵢ p
-sym (obs-i p+r≈q+r) = obs-i \ r -> ≈-sym (p+r≈q+r r)
+sym : ∀ {p q} → p ≈ᵢ q → q ≈ᵢ p
+sym (obs-i p+r≈q+r) = obs-i λ r → ≈-sym (p+r≈q+r r)
 
-trans : forall {p q s} -> p ≈ᵢ q -> q ≈ᵢ s -> p ≈ᵢ s
-trans (obs-i p+r≈q+r) (obs-i q+r≈s+r) = obs-i \ r -> ≈-trans (p+r≈q+r r) (q+r≈s+r r)
+trans : ∀ {p q s} → p ≈ᵢ q → q ≈ᵢ s → p ≈ᵢ s
+trans (obs-i p+r≈q+r) (obs-i q+r≈s+r) = obs-i λ r → ≈-trans (p+r≈q+r r) (q+r≈s+r r)
 
 -- Prove that ≈ᵢ implies ≈, even though it is pretty obvious
-≈ᵢ-to-≈ : forall {p q} -> p ≈ᵢ q -> p ≈ q
+≈ᵢ-to-≈ : ∀ {p q} → p ≈ᵢ q → p ≈ q
 ≈ᵢ-to-≈ (obs-i p+r≈q+r) = ≈-trans (≈-trans p≈p+d (p+r≈q+r ccs.deadlock)) (≈-sym p≈p+d)
 
 cong : Cong _≈ᵢ_
@@ -53,7 +53,7 @@ p-to-q (closure (cong {par-R pc C[]} p≈ᵢq) r) (indet {s = true} t) = {!   !}
 p-to-q (closure (cong {indet C[] pc} p≈ᵢq) r) t =
   ≈-trans (≈-trans helper (cong p≈ᵢq .closure (indet₂ pc r))) (≈-sym helper) .p-to-q t
   where
-  helper : forall {p1 p2 p3} -> indet₂ (indet₂ p1 p2) p3 ≈ indet₂ p1 (indet₂ p2 p3)
+  helper : ∀ {p1 p2 p3} → indet₂ (indet₂ p1 p2) p3 ≈ indet₂ p1 (indet₂ p2 p3)
   p-to-q helper (indet {s = true} (indet {s = true} t)) = -, trans-to-weak (indet t) , ≈-refl
   p-to-q helper (indet {s = true} (indet {s = false} t)) = -, trans-to-weak (indet (indet t)), ≈-refl
   p-to-q helper (indet {s = false} t) = -, trans-to-weak (indet (indet t)) , ≈-refl

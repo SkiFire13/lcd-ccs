@@ -20,30 +20,30 @@ open import bisimilarity.weak.properties {C} {N} {penv} using (~-to-≈) renamin
 record _̂≈_ (p : Proc) (q : Proc) : Set₁ where
   constructor obs-c
   field
-    closure : (C[] : Context) -> (subst C[] p) ≈ (subst C[] q)
+    closure : (C[] : Context) → (subst C[] p) ≈ (subst C[] q)
 open _̂≈_ public
 
 -- Prove that ̂≈ is an equivalence
-reflexive : forall {p} -> p ̂≈ p
-reflexive = obs-c \ _ -> ≈-refl
+reflexive : ∀ {p} → p ̂≈ p
+reflexive = obs-c λ _ → ≈-refl
 
-sym : forall {p q} -> p ̂≈ q -> q ̂≈ p
-sym (obs-c C[p]≈C[q]) = obs-c \ C[] -> ≈-sym (C[p]≈C[q] C[])
+sym : ∀ {p q} → p ̂≈ q → q ̂≈ p
+sym (obs-c C[p]≈C[q]) = obs-c λ C[] → ≈-sym (C[p]≈C[q] C[])
 
-trans : forall {p q s} -> p ̂≈ q -> q ̂≈ s -> p ̂≈ s
-trans (obs-c C[p]≈C[q]) (obs-c C[q]≈C[s]) = obs-c \ C[] -> ≈-trans (C[p]≈C[q] C[]) (C[q]≈C[s] C[])
+trans : ∀ {p q s} → p ̂≈ q → q ̂≈ s → p ̂≈ s
+trans (obs-c C[p]≈C[q]) (obs-c C[q]≈C[s]) = obs-c λ C[] → ≈-trans (C[p]≈C[q] C[]) (C[q]≈C[s] C[])
 
 -- Prove that ̂≈ implies ≈, even though it is pretty obvious
-̂≈-to-≈ : forall {p q} -> p ̂≈ q -> p ≈ q
+̂≈-to-≈ : ∀ {p q} → p ̂≈ q → p ≈ q
 ̂≈-to-≈ (obs-c C[p]≈C[q]) = C[p]≈C[q] replace
 
 -- Prove that ̂≈ is a congruence
 cong : Cong _̂≈_
-cong {C[]} {p} {q} (obs-c C[p]≈C[q]) = obs-c \ C'[] ->
+cong {C[]} {p} {q} (obs-c C[p]≈C[q]) = obs-c λ C'[] →
   let t1 = ~-to-≈ (ss~sc {C'[]} {C[]} {p})
       t2 = C[p]≈C[q] (compose C'[] C[])
       t3 = ~-to-≈ (ss~sc {C'[]} {C[]} {q})
   in ≈-trans (≈-trans t1 t2) (≈-sym t3)
 
-≈-cong-to-̂≈ : forall {_≈ₓ_ p q} -> (forall {p' q'} -> p' ≈ₓ q' -> p' ≈ q') -> Cong _≈ₓ_ -> p ≈ₓ q -> p ̂≈ q
-≈-cong-to-̂≈ {_≈ₓ_} ≈ₓ-to-≈ Cong≈ₓ p≈ₓq = obs-c \ _ -> ≈ₓ-to-≈ (Cong≈ₓ p≈ₓq)
+≈-cong-to-̂≈ : ∀ {_≈ₓ_ p q} → (∀ {p' q'} → p' ≈ₓ q' → p' ≈ q') → Cong _≈ₓ_ → p ≈ₓ q → p ̂≈ q
+≈-cong-to-̂≈ {_≈ₓ_} ≈ₓ-to-≈ Cong≈ₓ p≈ₓq = obs-c λ _ → ≈ₓ-to-≈ (Cong≈ₓ p≈ₓq)

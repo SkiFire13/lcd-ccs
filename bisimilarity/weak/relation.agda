@@ -12,9 +12,9 @@ open import bisimilarity.weak.base {C} {N} {penv}
 -- Definition of a weak bisimulation
 record Bisimulation : Set₂ where
   field
-    R : Proc -> Proc -> Set₁
-    p-to-q : forall {p q} -> R p q -> BisimulationProperty R p q
-    q-to-p : forall {p q} -> R p q -> BisimulationProperty R q p
+    R : Proc → Proc → Set₁
+    p-to-q : ∀ {p q} → R p q → BisimulationProperty R p q
+    q-to-p : ∀ {p q} → R p q → BisimulationProperty R q p
 open Bisimulation
 
 -- Definition of weak bisimilarity 
@@ -25,7 +25,7 @@ record _≈ᵣ_ (p : Proc) (q : Proc) : Set₂ where
     r : b .R p q
 
 -- Weak bisimilarity (defined with a relation) implies weak bisimilarity (coinductive)
-≈ᵣ-to-≈ : forall {p q} -> p ≈ᵣ q -> p ≈ q
+≈ᵣ-to-≈ : ∀ {p q} → p ≈ᵣ q → p ≈ q
 p-to-q (≈ᵣ-to-≈ (bisimilar R r)) t =
   let q' , t' , r' = R .p-to-q r t
   in q' , t' , ≈ᵣ-to-≈ (bisimilar R r')
@@ -33,7 +33,7 @@ q-to-p (≈ᵣ-to-≈ (bisimilar R r)) t =
   let p' , t' , r' = R .q-to-p r t
   in p' , t' , ≈ᵣ-to-≈ (bisimilar R r')
 -- Weak bisimilarity (coinductive) implies weak bisimilarity (defined with a relation)
-≈-to-≈ᵣ : forall {p q} -> p ≈ q -> p ≈ᵣ q
+≈-to-≈ᵣ : ∀ {p q} → p ≈ q → p ≈ᵣ q
 ≈-to-≈ᵣ {p} {q} p≈q = bisimilar bis p≈q
   where
   bis : Bisimulation

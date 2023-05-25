@@ -15,7 +15,7 @@ open import bisimilarity.strong.base {C} {N} {penv}
 open import bisimilarity.strong.properties {C} {N} {penv}
 
 -- Helper for cong
-par-respects-~ : forall {pl pr ql qr} -> pl ~ ql -> pr ~ qr -> par pl pr ~ par ql qr
+par-respects-~ : ∀ {pl pr ql qr} → pl ~ ql → pr ~ qr → par pl pr ~ par ql qr
 q-to-p (par-respects-~ pl~ql pr~qr) = p-to-q (par-respects-~ (sym pl~ql) (sym pr~qr))
 p-to-q (par-respects-~ {qr = qr} pl~ql pr~qr) (par-L {p' = p'} t) =
   let q' , t' , p'~q' = pl~ql .p-to-q t
@@ -47,7 +47,7 @@ p-to-q (cong {replace} p~q) = p~q .p-to-q
 q-to-p (cong p~q) = p-to-q (cong (sym p~q))
 
 -- Helper to prove that compose is the same as composing subst under strong bisimilarity
-ss~sc : forall {C1[] C2[] p} -> subst C1[] (subst C2[] p) ~ subst (compose C1[] C2[]) p
+ss~sc : ∀ {C1[] C2[] p} → subst C1[] (subst C2[] p) ~ subst (compose C1[] C2[]) p
 ss~sc {chan a C[]} = cong {chan a replace} (ss~sc {C[]})
 ss~sc {par-L C[] p} = cong {par-L replace p} (ss~sc {C[]})
 ss~sc {par-R p C[]} = cong {par-R p replace} (ss~sc {C[]})

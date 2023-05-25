@@ -14,15 +14,15 @@ open import bisimilarity.strong.base {C} {N} {penv}
 
 -- Properties of strong bisimilarity
 
-reflexive : Reflexive _~_ -- forall {p q} -> p ~ p
+reflexive : Reflexive _~_ -- ∀ {p q} → p ~ p
 p-to-q (reflexive {p}) {p' = p'} t = p' , t , reflexive
 q-to-p (reflexive {p}) {p' = p'} t = p' , t , reflexive
 
-sym : Symmetric _~_ -- forall {p q} -> p ~ q -> q ~ p
+sym : Symmetric _~_ -- ∀ {p q} → p ~ q → q ~ p
 p-to-q (sym {p} {q} p~q) = p~q .q-to-p
 q-to-p (sym {p} {q} p~q) = p~q .p-to-q
 
-trans : Transitive _~_ -- forall {p q s} -> p ~ q -> q ~ s -> p ~ s
+trans : Transitive _~_ -- ∀ {p q s} → p ~ q → q ~ s → p ~ s
 p-to-q (trans {p} {q} {s} p~q q~s) tp =
   let q' , tq , p'~q' = p~q .p-to-q tp
       s' , ts , q'~s' = q~s .p-to-q tq
@@ -36,7 +36,7 @@ IsEquivalence.sym (isEquivalence) = sym
 IsEquivalence.trans (isEquivalence) = trans
 
 -- Useful property
-p~p+d : forall {p} -> p ~ indet₂ p ccs.deadlock
+p~p+d : ∀ {p} → p ~ indet₂ p ccs.deadlock
 p-to-q (p~p+d {p}) t = _ , indet t , reflexive
 q-to-p (p~p+d {p}) (indet {s = false} (indet {s = ()} _))
 q-to-p (p~p+d {p}) (indet {s = true} t) = _ , t , reflexive

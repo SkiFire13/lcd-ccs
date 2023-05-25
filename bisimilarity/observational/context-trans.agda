@@ -16,10 +16,10 @@ open import bisimilarity.observational.trans {C} {N} {penv} renaming (cong to �
 open import bisimilarity.weak.base {C} {N} {penv}
 open import bisimilarity.weak.properties {C} {N} {penv} renaming (sym to ≈-sym; trans to ≈-trans)
 
-≈ₒ-to-̂≈ : forall {p q} -> p ≈ₒ q -> p ̂≈ q
+≈ₒ-to-̂≈ : ∀ {p q} → p ≈ₒ q → p ̂≈ q
 ≈ₒ-to-̂≈ p≈ₒq = ≈-cong-to-̂≈ ≈ₒ-to-≈ ≈ₒ-cong p≈ₒq
 
-̂≈-to-≈ₒ : (c : C) -> forall {p q} -> p ̂≈ q -> p ≈ₒ q
+̂≈-to-≈ₒ : (c : C) → ∀ {p q} → p ̂≈ q → p ≈ₒ q
 p-to-q (̂≈-to-≈ₒ c (obs-c C[p]≈C[q])) {a = send _} t with C[p]≈C[q] C[] .p-to-q (indet t)
   where C[] = indet replace ccs.deadlock
 ... | q' , send self (indet {s = true} tq) s2 , p'≈q' = q' , obs-t self tq s2 , p'≈q'

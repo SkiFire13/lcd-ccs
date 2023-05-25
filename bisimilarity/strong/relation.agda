@@ -12,9 +12,9 @@ open import bisimilarity.strong.base {C} {N} {penv}
 -- Definition of a strong bisimulation
 record Bisimulation : Set₂ where
   field
-    R : Proc -> Proc -> Set₁
-    p-to-q : forall {p q} -> R p q -> BisimulationProperty R p q
-    q-to-p : forall {p q} -> R p q -> BisimulationProperty R q p
+    R : Proc → Proc → Set₁
+    p-to-q : ∀ {p q} → R p q → BisimulationProperty R p q
+    q-to-p : ∀ {p q} → R p q → BisimulationProperty R q p
 open Bisimulation
 
 -- Definition of strong bisimilarity 
@@ -24,14 +24,14 @@ record _~ᵣ_ (p : Proc) (q : Proc) : Set₂ where
     b : Bisimulation
     r : b .R p q
 
-~ᵣ-to-~ : forall {p q} -> p ~ᵣ q -> p ~ q
+~ᵣ-to-~ : ∀ {p q} → p ~ᵣ q → p ~ q
 p-to-q (~ᵣ-to-~ (bisimilar R r)) t =
   let q' , t' , r' = R .p-to-q r t
   in q' , t' , ~ᵣ-to-~ (bisimilar R r')
 q-to-p (~ᵣ-to-~ (bisimilar R r)) t =
   let p' , t' , r' = R .q-to-p r t
   in p' , t' , ~ᵣ-to-~ (bisimilar R r')
-~-to-~ᵣ : forall {p q} -> p ~ q -> p ~ᵣ q
+~-to-~ᵣ : ∀ {p q} → p ~ q → p ~ᵣ q
 ~-to-~ᵣ {p} {q} p~q = bisimilar bis p~q
   where
   bis : Bisimulation
