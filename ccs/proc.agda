@@ -1,5 +1,4 @@
-open import Data.Empty
-open import Data.Unit
+open import Base
 
 module ccs.proc (C N : Set) where
 
@@ -44,7 +43,7 @@ map-act f tau = tau
 filter-act : (C → Set) → Act → Set
 filter-act f (send c) = f c
 filter-act f (recv c) = f c
-filter-act f tau = ⊤
+filter-act f tau = T
 
 PEnv : Set₁
 PEnv = N → Proc

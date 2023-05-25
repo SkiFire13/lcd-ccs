@@ -1,7 +1,6 @@
 {-# OPTIONS --guardedness #-}
 
-open import Data.Product
-open import Relation.Binary.PropositionalEquality using (_≡_; refl; inspect; [_])
+open import Base
 
 import ccs.proc
 
@@ -32,7 +31,7 @@ cong : Cong _~_
 p⇒q (cong {chan a C[]} p~q) chan = subst C[] _ , chan , cong p~q
 cong {par-L C[] r} p~q = par-respects-~ (cong p~q) reflexive
 cong {par-R r C[]} p~q = par-respects-~ reflexive (cong p~q)
-p⇒q (cong {indet C[] r} p~q) (indet {s = right} t) = -, indet t , reflexive
+p⇒q (cong {indet C[] r} p~q) (indet {s = right} t) = _ , indet t , reflexive
 p⇒q (cong {indet C[] r} p~q) (indet {s = left} t) =
   let q' , t' , p'~q' = cong p~q .p⇒q t
   in q' , indet t' , p'~q'

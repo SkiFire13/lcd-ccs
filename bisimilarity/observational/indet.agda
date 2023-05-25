@@ -1,7 +1,7 @@
 {-# OPTIONS --guardedness #-}
 {-# OPTIONS --allow-unsolved-metas #-}
 
-open import Data.Product
+open import Base
 
 import ccs.proc
 
@@ -53,12 +53,12 @@ p⇒q (closure (cong {indet C[] pc} p≈ᵢq) r) t =
   ≈-trans (≈-trans helper (cong p≈ᵢq .closure (pc + r))) (≈-sym helper) .p⇒q t
   where
   helper : ∀ {p1 p2 p3} → (p1 + p2) + p3 ≈ p1 + (p2 + p3)
-  p⇒q helper (indet {s = left} (indet {s = left} t)) = -, trans→weak (indet t) , ≈-refl
-  p⇒q helper (indet {s = left} (indet {s = right} t)) = -, trans→weak (indet (indet t)), ≈-refl
-  p⇒q helper (indet {s = right} t) = -, trans→weak (indet (indet t)) , ≈-refl
-  q⇒p helper (indet {s = left} t) = -, trans→weak (indet (indet t)) , ≈-refl
-  q⇒p helper (indet {s = right} (indet {s = left} t)) = -, trans→weak (indet (indet t)) , ≈-refl
-  q⇒p helper (indet {s = right} (indet {s = right} t)) = -, trans→weak (indet t), ≈-refl
+  p⇒q helper (indet {s = left} (indet {s = left} t)) = _ , trans→weak (indet t) , ≈-refl
+  p⇒q helper (indet {s = left} (indet {s = right} t)) = _ , trans→weak (indet (indet t)), ≈-refl
+  p⇒q helper (indet {s = right} t) = _ , trans→weak (indet (indet t)) , ≈-refl
+  q⇒p helper (indet {s = left} t) = _ , trans→weak (indet (indet t)) , ≈-refl
+  q⇒p helper (indet {s = right} (indet {s = left} t)) = _ , trans→weak (indet (indet t)) , ≈-refl
+  q⇒p helper (indet {s = right} (indet {s = right} t)) = _ , trans→weak (indet t), ≈-refl
 p⇒q (closure (cong {rename f C[]} p≈ᵢq) r) (indet {s = left} t) = {!   !}
 p⇒q (closure (cong {hide f C[]} p≈ᵢq) r) (indet {s = left} (hide {z = z} t)) with
   cong {C[]} p≈ᵢq .closure ccs.deadlock .p⇒q (indet {s = left} t)

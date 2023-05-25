@@ -1,6 +1,6 @@
 {-# OPTIONS --guardedness #-}
 
-open import Data.Product
+open import Base
 
 import ccs.proc
 

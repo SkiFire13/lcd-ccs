@@ -1,6 +1,6 @@
-open import Data.Bool
+open import Base
 
-module conv.proc (C N X V : Set) (n-fv : N → X → Bool) where
+module conv.proc (C N X V : Set) (n-fv : N → Filter X) where
 
 -- The type of the channels (C) in the converted CCS
 record Conv-C : Set where
@@ -14,7 +14,7 @@ record Conv-N : Set where
   constructor conv-n
   field
     name : N
-    args : (x : X) → {_ : T (n-fv name x)} → V
+    args : (x : X) → {_ : n-fv name x} → V
 
 -- open import later to shadow `chan`
 open import ccs.proc Conv-C Conv-N as ccs

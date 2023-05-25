@@ -1,8 +1,8 @@
-open import Data.Bool
+open import Base
 
 import ccs-vp.proc
 
-module conv.trans (C N X V : Set) (n-fv : N → X → Bool) (penv : ccs-vp.proc.PEnv C N X V n-fv) where
+module conv.trans (C N X V : Set) (n-fv : N → Filter X) (penv : ccs-vp.proc.PEnv C N X V n-fv) where
 
 open import conv.proc C N X V n-fv
 
