@@ -20,6 +20,7 @@ record _≈ₛ_ (p : Proc) (q : Proc) : Set₁ where
     p-to-q : StringBisimulationProperty _≈ₛ_ p q
     q-to-p : StringBisimulationProperty _≈ₛ_ q p
 open _≈ₛ_ public
+infixl 5 _≈ₛ_
 
 -- Utilities to help prove the following implications
 p-to-q-tau : ∀ {p q p'} → p ≈ q → (p -[tau]→* p') → ∃[ q' ] (q =[ tau ]⇒ q' × p' ≈ q')

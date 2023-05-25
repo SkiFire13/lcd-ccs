@@ -48,6 +48,7 @@ record _≈ₒ_ (p : Proc) (q : Proc) : Set₁ where
     p-to-q : ObsBisProperty _≈_ p q
     q-to-p : ObsBisProperty _≈_ q p
 open _≈ₒ_ public
+infixl 5 _≈ₒ_
 
 -- Prove that ≈ₒ implies ≈, even though it is pretty obvious
 ≈ₒ-to-≈ : ∀ {p q} → p ≈ₒ q → p ≈ q

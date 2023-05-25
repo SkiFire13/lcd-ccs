@@ -24,6 +24,8 @@ record _~ᵣ_ (p : Proc) (q : Proc) : Set₂ where
     b : Bisimulation
     r : b .R p q
 
+infixl 5 _~ᵣ_
+
 ~ᵣ-to-~ : ∀ {p q} → p ~ᵣ q → p ~ q
 p-to-q (~ᵣ-to-~ (bisimilar R r)) t =
   let q' , t' , r' = R .p-to-q r t

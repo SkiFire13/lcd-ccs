@@ -28,7 +28,7 @@ p-to-q (trans {p} {q} {s} p~q q~s) tp =
 q-to-p (trans {p} {q} {s} p~q q~s) = p-to-q (trans (sym q~s) (sym p~q))
 
 -- Useful property
-p~p+d : ∀ {p} → p ~ indet₂ p ccs.deadlock
+p~p+d : ∀ {p} → p ~ p + ccs.deadlock
 p-to-q (p~p+d {p}) t = _ , indet t , reflexive
 q-to-p (p~p+d {p}) (indet {s = false} (indet {s = ()} _))
 q-to-p (p~p+d {p}) (indet {s = true} t) = _ , t , reflexive

@@ -39,7 +39,7 @@ p-to-q (~-to-≈ p~q) t =
 q-to-p (~-to-≈ p~q) = p-to-q (~-to-≈ (~-sym p~q))
 
 -- Useful property
-p≈p+d : ∀ {p} → p ≈ indet₂ p ccs.deadlock
+p≈p+d : ∀ {p} → p ≈ p + ccs.deadlock
 p-to-q (p≈p+d) {p' = p'} t = p' , trans-to-weak (indet t) , reflexive
 q-to-p (p≈p+d) (indet {q = p'} {s = true} t) = p' , trans-to-weak t , reflexive
 q-to-p (p≈p+d) (indet {s = false} (indet {s = ()} _))

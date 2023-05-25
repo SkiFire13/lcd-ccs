@@ -24,6 +24,8 @@ record _≈ᵣ_ (p : Proc) (q : Proc) : Set₂ where
     b : Bisimulation
     r : b .R p q
 
+infixl 5 _≈ᵣ_
+
 -- Weak bisimilarity (defined with a relation) implies weak bisimilarity (coinductive)
 ≈ᵣ-to-≈ : ∀ {p q} → p ≈ᵣ q → p ≈ q
 p-to-q (≈ᵣ-to-≈ (bisimilar R r)) t =

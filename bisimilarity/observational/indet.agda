@@ -22,7 +22,7 @@ open import bisimilarity.weak.properties C N penv using (p≈p+d) renaming (refl
 record _≈ᵢ_ (p : Proc) (q : Proc) : Set₁ where
   constructor obs-i
   field
-    closure : (r : Proc) → indet₂ p r ≈ indet₂ q r
+    closure : (r : Proc) → p + r ≈ q + r
 open _≈ᵢ_ public
 
 -- Prove that ≈ᵢ is an equivalence
@@ -51,9 +51,9 @@ p-to-q (closure (cong {par-L C[] pc} {q = q} p≈ᵢq) r) (indet {s = true} t) w
 ... | par-B tl tr = {!   !}
 p-to-q (closure (cong {par-R pc C[]} p≈ᵢq) r) (indet {s = true} t) = {!   !}
 p-to-q (closure (cong {indet C[] pc} p≈ᵢq) r) t =
-  ≈-trans (≈-trans helper (cong p≈ᵢq .closure (indet₂ pc r))) (≈-sym helper) .p-to-q t
+  ≈-trans (≈-trans helper (cong p≈ᵢq .closure (pc + r))) (≈-sym helper) .p-to-q t
   where
-  helper : ∀ {p1 p2 p3} → indet₂ (indet₂ p1 p2) p3 ≈ indet₂ p1 (indet₂ p2 p3)
+  helper : ∀ {p1 p2 p3} → (p1 + p2) + p3 ≈ p1 + (p2 + p3)
   p-to-q helper (indet {s = true} (indet {s = true} t)) = -, trans-to-weak (indet t) , ≈-refl
   p-to-q helper (indet {s = true} (indet {s = false} t)) = -, trans-to-weak (indet (indet t)), ≈-refl
   p-to-q helper (indet {s = false} t) = -, trans-to-weak (indet (indet t)) , ≈-refl

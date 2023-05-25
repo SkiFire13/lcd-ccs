@@ -19,3 +19,4 @@ record _~_ (p : Proc) (q : Proc) : Set₁ where
     p-to-q : BisimulationProperty _~_ p q
     q-to-p : BisimulationProperty _~_ q p
 open _~_ public
+infixl 5 _~_

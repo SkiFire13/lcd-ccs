@@ -17,6 +17,7 @@ record _≈ₒ_ (p : Proc) (q : Proc) : Set₁ where
     p-to-q : ∀ {a p'} → (p -[ a ]→ p') → ∃[ q' ] ((q =[ a ]⇒ q') × p' ≈ₒ q')
     q-to-p : ∀ {a q'} → (q -[ a ]→ q') → ∃[ p' ] ((p =[ a ]⇒ p') × p' ≈ₒ q')
 open _≈ₒ_ public
+infixl 5 _≈ₒ_
 
 -- Prove symmetry for _≈ₒ_ because otherwise Agda termination checker will fail in the next theorem
 ≈ₒ-sym : ∀ {p q} → p ≈ₒ q → q ≈ₒ p

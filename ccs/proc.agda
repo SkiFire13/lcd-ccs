@@ -22,8 +22,10 @@ data Proc : Set₁ where
 deadlock = indet ⊥-elim
 
 -- A non-deterministic choice with 2 options
-indet₂ : Proc → Proc → Proc
-indet₂ p q = indet {Bool} λ { true → p ; false → q }
+_+_ : Proc → Proc → Proc
+p + q = indet {Bool} λ { true → p ; false → q }
+
+infixl 6 _+_
 
 -- Utility functions used in `Trans`
 flip-act : Act → Act
