@@ -44,4 +44,4 @@ cong {C[]} {p} {q} (obs-c C[p]≈C[q]) = obs-c λ C'[] →
   in ≈-trans (≈-trans t₁ t₂) (≈-sym t₃)
 
 ≈-cong→̂≈ : ∀ {_≈ₓ_ p q} → (∀ {p' q'} → p' ≈ₓ q' → p' ≈ q') → Cong _≈ₓ_ → p ≈ₓ q → p ̂≈ q
-≈-cong→̂≈ {_≈ₓ_} ≈ₓ→≈ Cong≈ₓ p≈ₓq = obs-c λ _ → ≈ₓ→≈ (Cong≈ₓ p≈ₓq)
+≈-cong→̂≈ ≈ₓ→≈ Cong≈ₓ p≈ₓq = obs-c λ _ → ≈ₓ→≈ (Cong≈ₓ p≈ₓq)

@@ -44,7 +44,7 @@ p⇒q (cong {replace} p~q) = p~q .p⇒q
 q⇒p (cong p~q) = p⇒q (cong (sym p~q))
 
 -- Helper to prove that compose is the same as composing subst under strong bisimilarity
-ss~sc : ∀ {C₁[] c₂[] p} → subst C₁[] (subst c₂[] p) ~ subst (compose C₁[] c₂[]) p
+ss~sc : ∀ {C₁[] C₂[] p} → subst C₁[] (subst C₂[] p) ~ subst (compose C₁[] C₂[]) p
 ss~sc {chan a C[]} = cong {chan a replace} (ss~sc {C[]})
 ss~sc {par-L C[] p} = cong {par-L replace p} (ss~sc {C[]})
 ss~sc {par-R p C[]} = cong {par-R p replace} (ss~sc {C[]})
