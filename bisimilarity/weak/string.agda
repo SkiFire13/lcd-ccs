@@ -26,19 +26,19 @@ infixl 5 _≈ₛ_
 p⇒q-tau : ∀ {p q p'} → p ≈ q → (p -[tau]→* p') → ∃[ q' ] (q =[ tau ]⇒ q' × p' ≈ q')
 p⇒q-tau {q = q} p≈q self = q , tau self , p≈q
 p⇒q-tau {q = q} p≈q (cons t s') =
-  let q1 , r1 , p'≈q1 = p≈q .p⇒q t
-      q2 , r2 , p'≈q2 = p⇒q-tau p'≈q1 s'
-  in q2 , join-tau r1 r2 , p'≈q2
-p⇒q-split : ∀ {p1 p2 p3 p4 q a} → p1 ≈ q → (p1 -[tau]→* p2) → (p2 -[ a ]→ p3) → (p3 -[tau]→* p4)
-              → ∃[ q' ] (q =[ a ]⇒ q' × p4 ≈ q')
-p⇒q-split p≈q s1 t s2 =
-  let q1 , r1 , p'≈q1 = p⇒q-tau p≈q s1
-      q2 , r2 , p'≈q2 = p'≈q1 .p⇒q t
-      q3 , r3 , p'≈q3 = p⇒q-tau p'≈q2 s2
-  in q3 , join r1 r2 r3 , p'≈q3
+  let q₁ , r₁ , p'≈q₁ = p≈q .p⇒q t
+      q₂ , r₂ , p'≈q₂ = p⇒q-tau p'≈q₁ s'
+  in q₂ , join-tau r₁ r₂ , p'≈q₂
+p⇒q-split : ∀ {p₁ p₂ p₃ p₄ q a} → p₁ ≈ q → (p₁ -[tau]→* p₂) → (p₂ -[ a ]→ p₃) → (p₃ -[tau]→* p₄)
+              → ∃[ q' ] (q =[ a ]⇒ q' × p₄ ≈ q')
+p⇒q-split p≈q s₁ t s₂ =
+  let q₁ , r₁ , p'≈q₁ = p⇒q-tau p≈q s₁
+      q₂ , r₂ , p'≈q₂ = p'≈q₁ .p⇒q t
+      q₃ , r₃ , p'≈q₃ = p⇒q-tau p'≈q₂ s₂
+  in q₃ , join r₁ r₂ r₃ , p'≈q₃
 p⇒q-weak : ∀ {p q a p'} → p ≈ q → (p =[ a ]⇒ p') → ∃[ q' ] ((q =[ a ]⇒ q') × p' ≈ q')
-p⇒q-weak p≈q (send s1 t s2) = p⇒q-split p≈q s1 t s2
-p⇒q-weak p≈q (recv s1 t s2) = p⇒q-split p≈q s1 t s2
+p⇒q-weak p≈q (send s₁ t s₂) = p⇒q-split p≈q s₁ t s₂
+p⇒q-weak p≈q (recv s₁ t s₂) = p⇒q-split p≈q s₁ t s₂
 p⇒q-weak p≈q (tau s) = p⇒q-tau p≈q s
 
 -- Weak string bisimilarity implies weak bisimilarity

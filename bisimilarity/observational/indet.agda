@@ -51,7 +51,7 @@ p⇒q (closure (cong {par-R pc C[]} p≈ᵢq) r) (indet left t) = {!   !}
 p⇒q (closure (cong {indet C[] pc} p≈ᵢq) r) t =
   ≈-trans (≈-trans helper (cong p≈ᵢq .closure (pc + r))) (≈-sym helper) .p⇒q t
   where
-  helper : ∀ {p1 p2 p3} → (p1 + p2) + p3 ≈ p1 + (p2 + p3)
+  helper : ∀ {p₁ p₂ p₃} → (p₁ + p₂) + p₃ ≈ p₁ + (p₂ + p₃)
   p⇒q helper (indet left (indet left t)) = _ , trans→weak (indet left t) , ≈-refl
   p⇒q helper (indet left (indet right t)) = _ , trans→weak (indet right (indet left t)), ≈-refl
   p⇒q helper (indet right t) = _ , trans→weak (indet right (indet right t)) , ≈-refl
@@ -62,17 +62,17 @@ p⇒q (closure (cong {rename f C[]} p≈ᵢq) r) (indet left t) = {!   !}
 p⇒q (closure (cong {hide f C[]} p≈ᵢq) r) (indet left (hide z t)) with
   cong {C[]} p≈ᵢq .closure ccs.deadlock .p⇒q (indet left t)
 ... | foo = {!   !}
--- ... | q' , send self (indet left tq) s2 , p'≈q' =
---   hide f q' , send self (indet (hide z tq)) (s-map hide s2), hide-respects-≈ p'≈q'
+-- ... | q' , send self (indet left tq) s₂ , p'≈q' =
+--   hide f q' , send self (indet (hide z tq)) (s-map hide s₂), hide-respects-≈ p'≈q'
 -- ... | _ , send self (indet right (indet () _)) _ , _
--- ... | q' , send (cons (indet left tq) s1) tq' s2 , p'≈q' =
---   hide f q' , send (cons (indet (hide tq)) (s-map hide s1)) (hide z tq') (s-map hide s2), hide-respects-≈ p'≈q'
+-- ... | q' , send (cons (indet left tq) s₁) tq' s₂ , p'≈q' =
+--   hide f q' , send (cons (indet (hide tq)) (s-map hide s₁)) (hide z tq') (s-map hide s₂), hide-respects-≈ p'≈q'
 -- ... | _ , send (cons (indet right (indet () _)) _) _ _ , _
--- ... | q' , recv self (indet left tq) s2 , p'≈q' =
---   hide f q' , recv self (indet (hide z tq)) (s-map hide s2), hide-respects-≈ p'≈q'
+-- ... | q' , recv self (indet left tq) s₂ , p'≈q' =
+--   hide f q' , recv self (indet (hide z tq)) (s-map hide s₂), hide-respects-≈ p'≈q'
 -- ... | _ , recv self (indet right (indet () _)) _ , _
--- ... | q' , recv (cons (indet left tq) s1) tq' s2 , p'≈q' =
---   hide f q' , recv (cons (indet (hide tq)) (s-map hide s1)) (hide z tq') (s-map hide s2), hide-respects-≈ p'≈q'
+-- ... | q' , recv (cons (indet left tq) s₁) tq' s₂ , p'≈q' =
+--   hide f q' , recv (cons (indet (hide tq)) (s-map hide s₁)) (hide z tq') (s-map hide s₂), hide-respects-≈ p'≈q'
 -- ... | _ , recv (cons (indet right (indet () _)) _) _ _ , _
 -- ... | q' , tau (cons (indet left tq) s) , p'≈q' =
 --   hide f q' , tau (cons (indet (hide tq)) (s-map hide s)) , hide-respects-≈ p'≈q'

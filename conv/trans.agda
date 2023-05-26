@@ -12,7 +12,7 @@ open import ccs-vp.common C N X V Args penv as vp
 -- Convert a transition from CCS VP to CCS, or in other words,
 -- prove that if there's a transition between two CCS VP processes
 -- then there's a corresponding transition between the converted processes too.
-conv-trans : ∀ {p1 a p2} → (p1 -[ a ]→ᵥ p2) → (conv-proc p1 -[ conv-act a ]→ conv-proc p2)
+conv-trans : ∀ {p₁ a p₂} → (p₁ -[ a ]→ᵥ p₂) → (conv-proc p₁ -[ conv-act a ]→ conv-proc p₂)
 conv-trans send        = chan
 conv-trans recv        = indet _ chan
 conv-trans tau         = chan

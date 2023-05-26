@@ -28,13 +28,13 @@ subst replace      p = p
 
 -- Compose two processes in relation to subst
 compose : Context → Context → Context
-compose (chan a c)   c2 = chan a (compose c c2)
-compose (par-L c q)  c2 = par-L (compose c c2) q
-compose (par-R q c)  c2 = par-R q (compose c c2)
-compose (indet c q)  c2 = indet (compose c c2) q
-compose (rename f c) c2 = rename f (compose c c2)
-compose (hide f c)   c2 = hide f (compose c c2)
-compose replace      c2 = c2
+compose (chan a c)   c₂ = chan a (compose c c₂)
+compose (par-L c q)  c₂ = par-L (compose c c₂) q
+compose (par-R q c)  c₂ = par-R q (compose c c₂)
+compose (indet c q)  c₂ = indet (compose c c₂) q
+compose (rename f c) c₂ = rename f (compose c c₂)
+compose (hide f c)   c₂ = hide f (compose c c₂)
+compose replace      c₂ = c₂
 
 -- The type of a witness of a bisimilarity being a congruence
 Cong : (Proc → Proc → Set₁) → Set₁

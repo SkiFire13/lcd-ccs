@@ -12,7 +12,7 @@ open import ccs-vp.common C N X V Args penv as vp
 -- Prove that the converse of `conv-trans` is not true, that is if there's
 -- a transition relation between two CCS processes then it's not guaranteed that
 -- there's a transition between CCS VP processes that can be converted into them. 
-inv-conv-need-exists : ¬ (∀ {p1 a p2} → (conv-proc p1 -[ conv-act a ]→ conv-proc p2) → (p1 -[ a ]→ᵥ p2))
+inv-conv-need-exists : ¬ (∀ {p₁ a p₂} → (conv-proc p₁ -[ conv-act a ]→ conv-proc p₂) → (p₁ -[ a ]→ᵥ p₂))
 inv-conv-need-exists f with () ← f {tau vp.deadlock} {tau} {if true vp.deadlock} chan
 
 -- Prove some guarantees about composing functions on channel/transition operation that Agda can't prove.
@@ -41,16 +41,16 @@ inv-filter-eq {tau}      = refl
 -- if a CCS VP process converted to CCS has a relation with another CCS process
 -- then there exists a corresponding relation between the initial CCS VP process
 -- and some other CCS VP process that can be converted in the initial second CCS process.
-inv-conv-trans' : ∀ {p1 a cp2}
-                  → conv-proc p1 -[ conv-act a ]→ cp2
-                  → ∃[ p2 ] (cp2 ≡ conv-proc p2 × p1 -[ a ]→ᵥ p2)
-inv-conv-trans' {p1} {a} t with {conv-proc p1} | {conv-act a} | inspect conv-proc p1 | inspect conv-act a
+inv-conv-trans' : ∀ {p₁ a cp₂}
+                  → conv-proc p₁ -[ conv-act a ]→ cp₂
+                  → ∃[ p₂ ] (cp₂ ≡ conv-proc p₂ × p₁ -[ a ]→ᵥ p₂)
+inv-conv-trans' {p₁} {a} t with {conv-proc p₁} | {conv-act a} | inspect conv-proc p₁ | inspect conv-act a
 inv-conv-trans' {send _ _ p} {send _ _} chan | [ refl ] | [ refl ] = p , refl , send
 inv-conv-trans' {recv _ f} {recv _ v} (indet _ chan) | [ refl ] | [ refl ] = f v , refl , recv
 inv-conv-trans' {tau p} {tau} chan | [ refl ] | [ refl ] = p , refl , tau
-inv-conv-trans' {par pl pr} (par-L tl) | [ refl ] | [ e2 ] with refl ← e2
+inv-conv-trans' {par pl pr} (par-L tl) | [ refl ] | [ e₂ ] with refl ← e₂
   with pl' , refl , tl' ← inv-conv-trans' tl = par pl' pr , refl , par-L tl'
-inv-conv-trans' {par pl pr} (par-R tr) | [ refl ] | [ e2 ] with refl ← e2
+inv-conv-trans' {par pl pr} (par-R tr) | [ refl ] | [ e₂ ] with refl ← e₂
   with pr' , refl , tr' ← inv-conv-trans' tr = par pl pr' , refl , par-R tr'
 inv-conv-trans' {par pl pr} {tau} (par-B {a = ca} tl tr) | [ refl ] | [ refl ]
   with a , refl ← inv-conv-act {ca}

@@ -38,10 +38,10 @@ trans (obs-c C[p]≈C[q]) (obs-c C[q]≈C[s]) = obs-c λ C[] → ≈-trans (C[p]
 -- Prove that ̂≈ is a congruence
 cong : Cong _̂≈_
 cong {C[]} {p} {q} (obs-c C[p]≈C[q]) = obs-c λ C'[] →
-  let t1 = ~→≈ (ss~sc {C'[]} {C[]} {p})
-      t2 = C[p]≈C[q] (compose C'[] C[])
-      t3 = ~→≈ (ss~sc {C'[]} {C[]} {q})
-  in ≈-trans (≈-trans t1 t2) (≈-sym t3)
+  let t₁ = ~→≈ (ss~sc {C'[]} {C[]} {p})
+      t₂ = C[p]≈C[q] (compose C'[] C[])
+      t₃ = ~→≈ (ss~sc {C'[]} {C[]} {q})
+  in ≈-trans (≈-trans t₁ t₂) (≈-sym t₃)
 
 ≈-cong→̂≈ : ∀ {_≈ₓ_ p q} → (∀ {p' q'} → p' ≈ₓ q' → p' ≈ q') → Cong _≈ₓ_ → p ≈ₓ q → p ̂≈ q
 ≈-cong→̂≈ {_≈ₓ_} ≈ₓ→≈ Cong≈ₓ p≈ₓq = obs-c λ _ → ≈ₓ→≈ (Cong≈ₓ p≈ₓq)
