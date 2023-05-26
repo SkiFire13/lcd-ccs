@@ -33,17 +33,17 @@ infixl 6 _+_
 flip-act : Act → Act
 flip-act (send c) = recv c
 flip-act (recv c) = send c
-flip-act tau = tau
+flip-act tau      = tau
 
 map-act : (C → C) → Act → Act
 map-act f (send c) = send (f c)
 map-act f (recv c) = recv (f c)
-map-act f tau = tau
+map-act f tau      = tau
 
 filter-act : (Filter C) → Filter Act
 filter-act f (send c) = f c
 filter-act f (recv c) = f c
-filter-act f tau = T
+filter-act f tau      = T
 
 PEnv : Set₁
 PEnv = N → Proc

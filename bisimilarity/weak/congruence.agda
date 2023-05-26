@@ -28,10 +28,10 @@ open import bisimilarity.weak.properties C N penv
 ¬c→≈-always-true : ¬ C → ∀ {p q} → p ≈ q
 p⇒q (¬c→≈-always-true ¬c) {send c} _ = ⊥-elim (¬c c)
 p⇒q (¬c→≈-always-true ¬c) {recv c} _ = ⊥-elim (¬c c)
-p⇒q (¬c→≈-always-true ¬c) {tau} t = _ , tau self , ¬c→≈-always-true ¬c
+p⇒q (¬c→≈-always-true ¬c) {tau}    t = _ , tau self , ¬c→≈-always-true ¬c
 q⇒p (¬c→≈-always-true ¬c) {send c} _ = ⊥-elim (¬c c)
 q⇒p (¬c→≈-always-true ¬c) {recv c} _ = ⊥-elim (¬c c)
-q⇒p (¬c→≈-always-true ¬c) {tau} t = _ , tau self , ¬c→≈-always-true ¬c
+q⇒p (¬c→≈-always-true ¬c) {tau}    t = _ , tau self , ¬c→≈-always-true ¬c
 -- And thus ≈ is trivially a congruence
 ¬c→≈-cong : ¬ C → Cong _≈_
 ¬c→≈-cong ¬c _ = ¬c→≈-always-true ¬c

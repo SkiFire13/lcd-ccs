@@ -20,22 +20,22 @@ inv-conv-need-exists f with () ← f {tau vp.deadlock} {tau} {if true vp.deadloc
 inv-conv-act : ∀ {ca} → ∃[ a ] (ca ≡ conv-act a)
 inv-conv-act {send (conv-c c v)} = send c v , refl
 inv-conv-act {recv (conv-c c v)} = recv c v , refl
-inv-conv-act {tau} = tau , refl
+inv-conv-act {tau}               = tau , refl
 
 inv-flip-eq : ∀ {a} → ccs.flip-act (conv-act a) ≡ conv-act (vp.flip-act a)
 inv-flip-eq {send _ _} = refl
 inv-flip-eq {recv _ _} = refl
-inv-flip-eq {tau} = refl
+inv-flip-eq {tau}      = refl
 
 inv-rename-eq : ∀ {a a' f} → conv-act a ≡ ccs.map-act (conv-rename f) (conv-act a') → a ≡ vp.map-act f a'
 inv-rename-eq {send _ _} {send _ _} refl = refl
 inv-rename-eq {recv _ _} {recv _ _} refl = refl
-inv-rename-eq {tau} {tau} refl = refl
+inv-rename-eq {tau}      {tau}      refl = refl
 
 inv-filter-eq : ∀ {a f} → ccs.filter-act (conv-hide f) (conv-act a) ≡ vp.filter-act f a
 inv-filter-eq {send c _} = refl
 inv-filter-eq {recv c _} = refl
-inv-filter-eq {tau} = refl
+inv-filter-eq {tau}      = refl
 
 -- Prove the less-strong version of the previous (false) theorem, that is
 -- if a CCS VP process converted to CCS has a relation with another CCS process

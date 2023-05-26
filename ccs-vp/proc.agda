@@ -29,17 +29,17 @@ data Act : Set where
 flip-act : Act → Act
 flip-act (send c v) = recv c v
 flip-act (recv c v) = send c v
-flip-act tau = tau
+flip-act tau        = tau
 
 map-act : (C → C) → Act → Act
 map-act f (send c v) = send (f c) v
 map-act f (recv c v) = recv (f c) v
-map-act f tau = tau
+map-act f tau        = tau
 
 filter-act : (Filter C) → Filter Act
 filter-act f (send c _) = f c
 filter-act f (recv c _) = f c
-filter-act f tau = T
+filter-act f tau        = T
 
 PEnv : Set₁
 PEnv = (n : N) → (Args n) → Proc
