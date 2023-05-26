@@ -1,6 +1,6 @@
 open import Base
 
-module conv.proc (C N X V : Set) (n-fv : N → Filter X) where
+module conv.proc (C N X V : Set) (Args : N → Set) where
 
 -- The type of the channels (C) in the converted CCS
 record Conv-C : Set where
@@ -14,11 +14,11 @@ record Conv-N : Set where
   constructor conv-n
   field
     name : N
-    args : (x : X) → n-fv name x → V
+    args : Args name
 
 -- open import later to shadow `chan`
 open import ccs.proc Conv-C Conv-N as ccs
-open import ccs-vp.proc C N X V n-fv as vp
+open import ccs-vp.proc C N X V Args as vp
 
 -- Convert a CCS VP process to a normal CCS Process
 -- the implementation is below, after a couple of helper co-recursive functions
@@ -41,7 +41,7 @@ conv-proc (recv c f)   = indet (conv-recv c f)
 conv-proc (tau p)      = chan (tau) (conv-proc p)
 conv-proc (par p q)    = par (conv-proc p) (conv-proc q)
 conv-proc (indet f)    = indet (conv-indet f)
-conv-proc (const n xs) = const (conv-n n xs)
+conv-proc (const n args) = const (conv-n n args)
 conv-proc (rename f p) = rename (conv-rename f) (conv-proc p)
 conv-proc (hide f p)   = hide (conv-hide f) (conv-proc p)
 conv-proc (if b p)     = if b then (conv-proc p) else ccs.deadlock

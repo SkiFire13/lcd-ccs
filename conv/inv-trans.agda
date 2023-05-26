@@ -2,12 +2,12 @@ open import Base
 
 import ccs-vp.proc
 
-module conv.inv-trans (C N X V : Set) (n-fv : N → Filter X) (penv : ccs-vp.proc.PEnv C N X V n-fv) where
+module conv.inv-trans (C N X V : Set) (Args : N → Set) (penv : ccs-vp.proc.PEnv C N X V Args) where
 
-open import conv.proc C N X V n-fv
+open import conv.proc C N X V Args
 
 open import ccs.common Conv-C Conv-N (conv-penv penv) as ccs
-open import ccs-vp.common C N X V n-fv penv as vp
+open import ccs-vp.common C N X V Args penv as vp
 
 -- Prove that the converse of `conv-trans` is not true, that is if there's
 -- a transition relation between two CCS processes then it's not guaranteed that

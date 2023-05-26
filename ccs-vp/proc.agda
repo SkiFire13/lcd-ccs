@@ -1,6 +1,6 @@
 open import Base
 
-module ccs-vp.proc (C N X V : Set) (n-fv : N → Filter X) where
+module ccs-vp.proc (C N X V : Set) (Args : N → Set) where
 
 -- A CCS VP Process
 data Proc : Set₁ where
@@ -9,7 +9,7 @@ data Proc : Set₁ where
   tau    : Proc → Proc
   par    : Proc → Proc → Proc
   indet  : {S : Set} → (S → Proc) → Proc
-  const  : (n : N) → ((x : X) → n-fv n x → V) → Proc
+  const  : (n : N) → (Args n) → Proc
   rename : (C → C) → Proc → Proc
   hide   : (Filter C) → Proc → Proc
   if     : Bool → Proc → Proc
@@ -42,4 +42,4 @@ filter-act f (recv c _) = f c
 filter-act f tau = T
 
 PEnv : Set₁
-PEnv = (n : N) → ((x : X) → n-fv n x → V) → Proc
+PEnv = (n : N) → (Args n) → Proc
