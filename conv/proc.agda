@@ -20,27 +20,20 @@ record Conv-N : Set where
 open import ccs.proc Conv-C Conv-N as ccs
 open import ccs-vp.proc C N X V Args as vp
 
--- Convert a CCS VP process to a normal CCS Process
--- the implementation is below, after a couple of helper co-recursive functions
-conv-proc : vp.Proc → ccs.Proc
-
-conv-recv : C → (V → vp.Proc) → V → ccs.Proc
-conv-recv c f = λ v → chan (recv (conv-c c v)) (conv-proc (f v))
-
-conv-indet : {S : Set} → (S → vp.Proc) → S → ccs.Proc
-conv-indet f = λ s → conv-proc (f s)
-
 conv-rename : (C → C) → Conv-C → Conv-C
 conv-rename f = λ (conv-c c v) → conv-c (f c) v
 
 conv-hide : (Filter C) → Filter Conv-C
 conv-hide f = λ (conv-c c _) → f c
 
+-- Convert a CCS VP process to a normal CCS Process
+-- the implementation is below, after a couple of helper co-recursive functions
+conv-proc : vp.Proc → ccs.Proc
 conv-proc (send c v p) = chan (send (conv-c c v)) (conv-proc p)
-conv-proc (recv c f)   = indet (conv-recv c f)
+conv-proc (recv c f)   = indet (λ v → chan (recv (conv-c c v)) (conv-proc (f v)))
 conv-proc (tau p)      = chan (tau) (conv-proc p)
 conv-proc (par p q)    = par (conv-proc p) (conv-proc q)
-conv-proc (indet f)    = indet (conv-indet f)
+conv-proc (indet f)    = indet (λ s → conv-proc (f s))
 conv-proc (const n args) = const (conv-n n args)
 conv-proc (rename f p) = rename (conv-rename f) (conv-proc p)
 conv-proc (hide f p)   = hide (conv-hide f) (conv-proc p)
