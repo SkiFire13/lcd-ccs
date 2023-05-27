@@ -30,7 +30,7 @@ flip-act (send c v) = recv c v
 flip-act (recv c v) = send c v
 flip-act tau        = tau
 
-map-act : (C → C) → Act → Act
+map-act : (C → C) → (Act → Act)
 map-act f (send c v) = send (f c) v
 map-act f (recv c v) = recv (f c) v
 map-act f tau        = tau
