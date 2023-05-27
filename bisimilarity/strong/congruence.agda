@@ -28,18 +28,18 @@ p⇒q (par-respects-~ pl~ql pr~qr) (par-B tl tr) =
 
 -- Prove that ~ is a congruence
 cong : Cong _~_
-p⇒q (cong {chan a C} p~q) chan = subst C _ , chan , cong p~q
-cong {par-L C r} p~q = par-respects-~ (cong p~q) reflexive
-cong {par-R r C} p~q = par-respects-~ reflexive (cong p~q)
-p⇒q (cong {indet C r} p~q) (indet right t) = _ , indet right t , reflexive
-p⇒q (cong {indet C r} p~q) (indet left t) =
+p⇒q (cong {chan a C[]} p~q) chan = subst C[] _ , chan , cong p~q
+cong {par-L C[] r} p~q = par-respects-~ (cong p~q) reflexive
+cong {par-R r C[]} p~q = par-respects-~ reflexive (cong p~q)
+p⇒q (cong {indet C[] r} p~q) (indet right t) = _ , indet right t , reflexive
+p⇒q (cong {indet C[] r} p~q) (indet left t) =
   let q' , t' , p'~q' = cong p~q .p⇒q t
   in  q' , indet left t' , p'~q'
-p⇒q (cong {rename f C} p~q) (rename t) =
-  let q' , t' , p'~q' = (cong {C} p~q) .p⇒q t
+p⇒q (cong {rename f C[]} p~q) (rename t) =
+  let q' , t' , p'~q' = (cong {C[]} p~q) .p⇒q t
   in  rename f q' , rename t' , cong p'~q'
-p⇒q (cong {hide f C} p~q) (hide z t) =
-  let q' , t' , p'~q' = (cong {C} p~q) .p⇒q t
+p⇒q (cong {hide f C[]} p~q) (hide z t) =
+  let q' , t' , p'~q' = (cong {C[]} p~q) .p⇒q t
   in  hide f q' , hide z t' , cong p'~q'
 p⇒q (cong {hole} p~q) = p~q .p⇒q
 q⇒p (cong p~q) = p⇒q (cong (sym p~q))

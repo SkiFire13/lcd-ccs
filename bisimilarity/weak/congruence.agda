@@ -7,12 +7,12 @@ import ccs.proc
 module bisimilarity.weak.congruence (C N : Set) (penv : ccs.proc.PEnv C N) where
 
 open import ccs.common C N penv as ccs
-open import bisimilarity.context C N penv as ctx
+open import bisimilarity.context C N penv as C[]
 open import bisimilarity.weak.base C N penv
 open import bisimilarity.weak.properties C N penv
 
 -- Prove that ≈ is not a congruence, assuming that C is inhabited
-¬≈-cong : C → ¬ ∀ {C p q} → p ≈ q → subst C p ≈ subst C q
+¬≈-cong : C → ¬ ∀ {C[] p q} → p ≈ q → subst C[] p ≈ subst C[] q
 ¬≈-cong c cong with cong {h+cd} τd≈d .p⇒q (indet left chan)
   where
   h+cd = indet hole (chan (send c) ccs.deadlock)
@@ -26,7 +26,7 @@ open import bisimilarity.weak.properties C N penv
 
 -- Prove that an instance of C is not actually needed, just a proof that
 -- C cannot be empty
-¬≈-cong' : ¬ ¬ C → ¬ ∀ {C p q} → p ≈ q → subst C p ≈ subst C q
+¬≈-cong' : ¬ ¬ C → ¬ ∀ {C[] p q} → p ≈ q → subst C[] p ≈ subst C[] q
 ¬≈-cong' ¬¬C cong = ¬¬C (λ c → ¬≈-cong c cong)
 
 -- Proof that if C is not inhabited then ≈ is always inhabited

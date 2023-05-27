@@ -14,23 +14,24 @@ open import bisimilarity.weak.base C N penv
 open import bisimilarity.weak.properties C N penv renaming (sym to ≈-sym; trans to ≈-trans)
 
 -- Prove that observational congruence defined by limiting self τ transitions
--- implies observational congruence defined as closure of bisimilarity over contexts. 
+-- implies observational congruence defined as the contextual closure of weak bisimilarity.
 ≈ₒ→̂≈ : ∀ {p q} → p ≈ₒ q → p ̂≈ q
 ≈ₒ→̂≈ p≈ₒq = ≈-cong→̂≈ ≈ₒ→≈ ≈ₒ-cong p≈ₒq
 
--- (Try to) prove that observational congruence defined as closure of bisimilarity over
--- contexts implies observational congruence defined by limiting self τ transitions.
+-- (Try to) prove that observational congruence defined as the contextual closure of weak
+-- bisimilarity implies observational congruence defined by limiting self τ transitions,
+-- assuming C is inhabited.
 -- The exercise only requires ≈ₒ→̂≈, with ̂≈→≈ₒ as an optional part because the given
 -- hole is supposedly very difficult to fill (both in Agda and on paper)
 ̂≈→≈ₒ : (c : C) → ∀ {p q} → p ̂≈ q → p ≈ₒ q
-p⇒q (̂≈→≈ₒ c (C[p]≈C[q])) {a = send _} t with C[p]≈C[q] Ctx .p⇒q (indet left t)
-  where Ctx = indet hole ccs.deadlock
+p⇒q (̂≈→≈ₒ c (C[p]≈C[q])) {a = send _} t with C[p]≈C[q] C[] .p⇒q (indet left t)
+  where C[] = indet hole ccs.deadlock
 ... | q' , send self (indet left tq) s₂ , p'≈q' = q' , obs-o self tq s₂ , p'≈q'
 ... | _ , send self (indet right (indet () _)) _ , _
 ... | q' , send (cons (indet left tq) s₁) tq' s₂ , p'≈q' = q' , obs-o (cons tq s₁) tq' s₂ , p'≈q'
 ... | _ , send (cons (indet right (indet () _)) _) _ _ , _
-p⇒q (̂≈→≈ₒ c (C[p]≈C[q])) {a = recv _} t with C[p]≈C[q] Ctx .p⇒q (indet left t)
-  where Ctx = indet hole ccs.deadlock
+p⇒q (̂≈→≈ₒ c (C[p]≈C[q])) {a = recv _} t with C[p]≈C[q] C[] .p⇒q (indet left t)
+  where C[] = indet hole ccs.deadlock
 ... | q' , recv self (indet left tq) s₂ , p'≈q' = q' , obs-o self tq s₂ , p'≈q'
 ... | _ , recv self (indet right (indet () _)) _ , _
 ... | q' , recv (cons (indet left tq) s₁) tq' s₂ , p'≈q' = q' , obs-o (cons tq s₁) tq' s₂ , p'≈q'
