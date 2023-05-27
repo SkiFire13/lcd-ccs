@@ -12,7 +12,7 @@ open import bisimilarity.strong.properties C N penv using () renaming (sym to ~-
 open import bisimilarity.weak.base C N penv
 open import bisimilarity.weak.string C N penv
 
--- Properties of weak bisimilarity
+-- Prove that ≈ is an equivalence
 
 reflexive : ∀ {p} → p ≈ p
 p⇒q (reflexive) t = _ , trans→weak t , reflexive

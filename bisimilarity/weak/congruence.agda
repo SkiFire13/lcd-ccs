@@ -12,8 +12,8 @@ open import bisimilarity.weak.base C N penv
 open import bisimilarity.weak.properties C N penv
 
 -- Prove that ≈ is not a congruence, assuming that C is inhabited
-¬≈-cong : C → ¬ ∀ {C[] p q} → p ≈ q → subst C[] p ≈ subst C[] q
-¬≈-cong c cong with cong {h+cd} τd≈d .p⇒q (indet left chan)
+C→¬≈-cong : C → ¬ ∀ {C[] p q} → p ≈ q → subst C[] p ≈ subst C[] q
+C→¬≈-cong c cong with cong {h+cd} τd≈d .p⇒q (indet left chan)
   where
   h+cd = indet hole (chan (send c) ccs.deadlock)
   τd≈d : chan τ ccs.deadlock ≈ ccs.deadlock
@@ -26,20 +26,20 @@ open import bisimilarity.weak.properties C N penv
 
 -- Prove that an instance of C is not actually needed, just a proof that
 -- C cannot be empty
-¬≈-cong' : ¬ ¬ C → ¬ ∀ {C[] p q} → p ≈ q → subst C[] p ≈ subst C[] q
-¬≈-cong' ¬¬C cong = ¬¬C (λ c → ¬≈-cong c cong)
+C→¬≈-cong' : ¬ ¬ C → ¬ ∀ {C[] p q} → p ≈ q → subst C[] p ≈ subst C[] q
+C→¬≈-cong' ¬¬C cong = ¬¬C (λ c → C→¬≈-cong c cong)
 
 -- Proof that if C is not inhabited then ≈ is always inhabited
-¬c→≈-always-true : ¬ C → ∀ {p q} → p ≈ q
-p⇒q (¬c→≈-always-true ¬c) {send c} _ = ⊥-elim (¬c c)
-p⇒q (¬c→≈-always-true ¬c) {recv c} _ = ⊥-elim (¬c c)
-p⇒q (¬c→≈-always-true ¬c) {τ}      t = _ , τ self , ¬c→≈-always-true ¬c
-q⇒p (¬c→≈-always-true ¬c) {send c} _ = ⊥-elim (¬c c)
-q⇒p (¬c→≈-always-true ¬c) {recv c} _ = ⊥-elim (¬c c)
-q⇒p (¬c→≈-always-true ¬c) {τ}      t = _ , τ self , ¬c→≈-always-true ¬c
+¬C→≈-always-true : ¬ C → ∀ {p q} → p ≈ q
+p⇒q (¬C→≈-always-true ¬C) {send c} _ = ⊥-elim (¬C c)
+p⇒q (¬C→≈-always-true ¬C) {recv c} _ = ⊥-elim (¬C c)
+p⇒q (¬C→≈-always-true ¬C) {τ}      t = _ , τ self , ¬C→≈-always-true ¬C
+q⇒p (¬C→≈-always-true ¬C) {send c} _ = ⊥-elim (¬C c)
+q⇒p (¬C→≈-always-true ¬C) {recv c} _ = ⊥-elim (¬C c)
+q⇒p (¬C→≈-always-true ¬C) {τ}      t = _ , τ self , ¬C→≈-always-true ¬C
 -- And thus ≈ is trivially a congruence
-¬c→≈-cong : ¬ C → Cong _≈_
-¬c→≈-cong ¬c _ = ¬c→≈-always-true ¬c
+¬C→≈-cong : ¬ C → Cong _≈_
+¬C→≈-cong ¬C _ = ¬C→≈-always-true ¬C
 
 -- Prove that all the contexts except indet respects ≈
 

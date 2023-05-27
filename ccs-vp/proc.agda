@@ -28,7 +28,7 @@ data Act : Set where
 flip-act : Act → Act
 flip-act (send c v) = recv c v
 flip-act (recv c v) = send c v
-flip-act τ        = τ
+flip-act τ          = τ
 
 map-act : (C → C) → (Act → Act)
 map-act f (send c v) = send (f c) v

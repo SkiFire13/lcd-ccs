@@ -9,7 +9,7 @@ module bisimilarity.strong.properties (C N : Set) (penv : ccs.proc.PEnv C N) whe
 open import ccs.common C N penv as ccs
 open import bisimilarity.strong.base C N penv
 
--- Properties of strong bisimilarity
+-- Prove that ~ is an equivalence
 
 reflexive : ∀ {p} → p ~ p
 p⇒q (reflexive) t = _ , t , reflexive
@@ -25,10 +25,3 @@ p⇒q (trans p~q q~s) tp =
       s' , ts , q'~s' = q~s .p⇒q tq
   in  s' , ts , trans p'~q' q'~s'
 q⇒p (trans p~q q~s) = p⇒q (trans (sym q~s) (sym p~q))
-
--- Useful property
-p~p+d : ∀ {p} → p ~ p + ccs.deadlock
-p⇒q p~p+d t = _ , indet left t , reflexive
-q⇒p p~p+d (indet right (indet () _))
-q⇒p p~p+d (indet left t) = _ , t , reflexive
- 

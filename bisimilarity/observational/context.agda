@@ -16,7 +16,7 @@ open import bisimilarity.weak.properties C N penv using (~→≈) renaming (refl
 
 -- Observational congruence defined as the contextual closure over weak bisimilarity
 _̂≈_ : Proc → Proc → Set₁
-_̂≈_ p q = (C[] : Context) → (subst C[] p) ≈ (subst C[] q)
+_̂≈_ p q = (C[] : Context) → subst C[] p ≈ subst C[] q
 
 -- Prove that ̂≈ is an equivalence
 
@@ -24,14 +24,14 @@ reflexive : ∀ {p} → p ̂≈ p
 reflexive = λ _ → ≈-refl
 
 sym : ∀ {p q} → p ̂≈ q → q ̂≈ p
-sym (C[p]≈C[q]) = λ C[] → ≈-sym (C[p]≈C[q] C[])
+sym C[p]≈C[q] = λ C[] → ≈-sym (C[p]≈C[q] C[])
 
 trans : ∀ {p q s} → p ̂≈ q → q ̂≈ s → p ̂≈ s
-trans (C[p]≈C[q]) (C[q]≈C[s]) = λ C[] → ≈-trans (C[p]≈C[q] C[]) (C[q]≈C[s] C[])
+trans C[p]≈C[q] C[q]≈C[s] = λ C[] → ≈-trans (C[p]≈C[q] C[]) (C[q]≈C[s] C[])
 
 -- Prove that ̂≈ implies ≈,
 ̂≈→≈ : ∀ {p q} → p ̂≈ q → p ≈ q
-̂≈→≈ (C[p]≈C[q]) = C[p]≈C[q] hole
+̂≈→≈ C[p]≈C[q] = C[p]≈C[q] hole
 
 -- Lemma to help prove `cong`
 -- Prove that `compose` is the same as composing `subst` under strong bisimilarity
@@ -40,10 +40,10 @@ ss~sc {chan a C[]} = ~-cong {chan a hole} (ss~sc {C[]})
 ss~sc {par-L C[] p} = ~-cong {par-L hole p} (ss~sc {C[]})
 ss~sc {par-R p C[]} = ~-cong {par-R p hole} (ss~sc {C[]})
 p⇒q (ss~sc {indet C[] _}) (indet s t) with s
-... | left = let q' , t' , p'~q' = ss~sc {C[]} .p⇒q t in q' , indet left t' , p'~q'
+... | left  = let q' , t' , p'~q' = ss~sc {C[]} .p⇒q t in q' , indet left t' , p'~q'
 ... | right = _ , indet right t , ~-refl
 q⇒p (ss~sc {indet C[] _}) (indet s t) with s
-... | left = let q' , t' , p'~q' = ss~sc {C[]} .q⇒p t in q' , indet left t' , p'~q'
+... | left  = let q' , t' , p'~q' = ss~sc {C[]} .q⇒p t in q' , indet left t' , p'~q'
 ... | right = _ , indet right t , ~-refl
 ss~sc {rename f C[]} = ~-cong {rename f hole} (ss~sc {C[]})
 ss~sc {hide f C[]} = ~-cong {hide f hole} (ss~sc {C[]})
@@ -51,7 +51,7 @@ ss~sc {hole} = ~-refl
 
 -- Prove that ̂≈ is a congruence
 cong : Cong _̂≈_
-cong {C[]} {p} {q} (C[p]≈C[q]) = λ C'[] →
+cong {C[]} {p} {q} C[p]≈C[q] = λ C'[] →
   let t₁ = ~→≈ (ss~sc {C'[]} {C[]} {p})
       t₂ = C[p]≈C[q] (compose C'[] C[])
       t₃ = ~→≈ (ss~sc {C'[]} {C[]} {q})

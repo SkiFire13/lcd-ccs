@@ -45,5 +45,3 @@ p⇒q (≈ₒ→≈ p≈ₒq) t =
 q⇒p (≈ₒ→≈ p≈ₒq) t = 
   let q' , t' , p'≈ₒq' = p≈ₒq .q⇒p t
   in  q' , t' , ≈ₒ→≈ (≈ₒ-sym p'≈ₒq')
-
-
