@@ -20,8 +20,8 @@ open import bisimilarity.weak.properties C N penv renaming (sym to ≈-sym; tran
 
 -- (Try to) prove that observational congruence defined as closure of bisimilarity over contexts
 -- implies observational congruence defined by limiting self tau transitions.
--- The exercise only requires ≈ₒ→̂≈, with ̂≈→≈ₒ as an optional part, but the given
--- hole is supposedly very difficult to fill (both in Agda and with intuition)
+-- The exercise only requires ≈ₒ→̂≈, with ̂≈→≈ₒ as an optional part because the given
+-- hole is supposedly very difficult to fill (both in Agda and on paper)
 ̂≈→≈ₒ : (c : C) → ∀ {p q} → p ̂≈ q → p ≈ₒ q
 p⇒q (̂≈→≈ₒ c (C[p]≈C[q])) {a = send _} t with C[p]≈C[q] Ctx .p⇒q (indet left t)
   where Ctx = indet hole ccs.deadlock
