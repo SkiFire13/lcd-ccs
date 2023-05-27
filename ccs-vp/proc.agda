@@ -1,6 +1,6 @@
 open import Base
 
-module ccs-vp.proc (C N X V : Set) (Args : N → Set) where
+module ccs-vp.proc (C N V : Set) (Args : N → Set) where
 
 -- A CCS Value-Passing (VP) Process
 data Proc : Set₁ where

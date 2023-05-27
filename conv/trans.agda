@@ -2,12 +2,12 @@ open import Base
 
 import ccs-vp.proc
 
-module conv.trans (C N X V : Set) (Args : N → Set) (penv : ccs-vp.proc.PEnv C N X V Args) where
+module conv.trans (C N V : Set) (Args : N → Set) (penv : ccs-vp.proc.PEnv C N V Args) where
 
-open import conv.proc C N X V Args
+open import conv.proc C N V Args
 
 open import ccs.common Conv-C Conv-N (conv-penv penv) as ccs
-open import ccs-vp.common C N X V Args penv as vp
+open import ccs-vp.common C N V Args penv as vp
 
 -- Convert a transition from CCS VP to CCS.
 -- Logically speaking this is proving that if there exist a transition

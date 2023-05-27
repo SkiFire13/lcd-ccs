@@ -1,6 +1,6 @@
 open import Base
 
-module conv.proc (C N X V : Set) (Args : N → Set) where
+module conv.proc (C N V : Set) (Args : N → Set) where
 
 -- The type of the channels (C) in the converted CCS
 record Conv-C : Set where
@@ -17,7 +17,7 @@ record Conv-N : Set where
     args : Args name
 
 open import ccs.proc Conv-C Conv-N as ccs
-open import ccs-vp.proc C N X V Args as vp
+open import ccs-vp.proc C N V Args as vp
 
 conv-rename : (C → C) → (Conv-C → Conv-C)
 conv-rename f = λ (conv-c c v) → conv-c (f c) v

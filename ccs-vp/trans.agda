@@ -2,9 +2,9 @@ open import Base
 
 import ccs-vp.proc
 
-module ccs-vp.trans (C N X V : Set) (Args : N → Set) (penv : ccs-vp.proc.PEnv C N X V Args) where
+module ccs-vp.trans (C N V : Set) (Args : N → Set) (penv : ccs-vp.proc.PEnv C N V Args) where
 
-open import ccs-vp.proc C N X V Args
+open import ccs-vp.proc C N V Args
 
 private
   variable
