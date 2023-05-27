@@ -13,7 +13,7 @@ data Context : Set₁ where
   par-R  : Proc → Context → Context
   indet  : Context → Proc → Context
   rename : (C → C) → Context → Context
-  hide   : (Filter C) → Context → Context
+  hide   : Filter C → Context → Context
   hole   : Context
 
 -- Replaces a context hole with a process

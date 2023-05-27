@@ -9,9 +9,9 @@ data Proc : Set₁ where
   tau    : Proc → Proc
   par    : Proc → Proc → Proc
   indet  : {S : Set} → (S → Proc) → Proc
-  const  : (n : N) → (Args n) → Proc
+  const  : (n : N) → Args n → Proc
   rename : (C → C) → Proc → Proc
-  hide   : (Filter C) → Proc → Proc
+  hide   : Filter C → Proc → Proc
   if     : Bool → Proc → Proc
 
 -- The desugaring of the deadlock CCS VP Process
@@ -35,11 +35,11 @@ map-act f (send c v) = send (f c) v
 map-act f (recv c v) = recv (f c) v
 map-act f tau        = tau
 
-filter-act : (Filter C) → Filter Act
+filter-act : Filter C → Filter Act
 filter-act f (send c _) = f c
 filter-act f (recv c _) = f c
 filter-act f tau        = T
 
 -- The type of a process environment
 PEnv : Set₁
-PEnv = (n : N) → (Args n) → Proc
+PEnv = (n : N) → Args n → Proc
