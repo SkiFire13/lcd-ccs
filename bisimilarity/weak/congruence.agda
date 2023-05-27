@@ -16,11 +16,11 @@ open import bisimilarity.weak.properties C N penv
 ¬≈-cong c cong with cong {h+cd} τd≈d .p⇒q (indet left chan)
   where
   h+cd = indet hole (chan (send c) ccs.deadlock)
-  τd≈d : chan tau ccs.deadlock ≈ ccs.deadlock
-  p⇒q τd≈d chan = ccs.deadlock , tau self , reflexive
+  τd≈d : chan τ ccs.deadlock ≈ ccs.deadlock
+  p⇒q τd≈d chan = ccs.deadlock , τ self , reflexive
   q⇒p τd≈d (indet () _)
-... | _ , tau (cons (indet left (indet () _)) _) , _
-... | _ , tau self , d≈C[d] with d≈C[d] .q⇒p (indet right chan)
+... | _ , τ (cons (indet left (indet () _)) _) , _
+... | _ , τ self , d≈C[d] with d≈C[d] .q⇒p (indet right chan)
 ...   | _ , send self (indet () _) _ , _
 ...   | _ , send (cons (indet () _) _) _ _ , _
 
@@ -33,10 +33,10 @@ open import bisimilarity.weak.properties C N penv
 ¬c→≈-always-true : ¬ C → ∀ {p q} → p ≈ q
 p⇒q (¬c→≈-always-true ¬c) {send c} _ = ⊥-elim (¬c c)
 p⇒q (¬c→≈-always-true ¬c) {recv c} _ = ⊥-elim (¬c c)
-p⇒q (¬c→≈-always-true ¬c) {tau}    t = _ , tau self , ¬c→≈-always-true ¬c
+p⇒q (¬c→≈-always-true ¬c) {τ}      t = _ , τ self , ¬c→≈-always-true ¬c
 q⇒p (¬c→≈-always-true ¬c) {send c} _ = ⊥-elim (¬c c)
 q⇒p (¬c→≈-always-true ¬c) {recv c} _ = ⊥-elim (¬c c)
-q⇒p (¬c→≈-always-true ¬c) {tau}    t = _ , tau self , ¬c→≈-always-true ¬c
+q⇒p (¬c→≈-always-true ¬c) {τ}      t = _ , τ self , ¬c→≈-always-true ¬c
 -- And thus ≈ is trivially a congruence
 ¬c→≈-cong : ¬ C → Cong _≈_
 ¬c→≈-cong ¬c _ = ¬c→≈-always-true ¬c

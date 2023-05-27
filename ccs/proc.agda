@@ -6,7 +6,7 @@ module ccs.proc (C N : Set) where
 data Act : Set where
   send  : C → Act
   recv  : C → Act
-  tau   : Act
+  τ   : Act
 
 -- A CCS Process
 data Proc : Set₁ where
@@ -20,7 +20,7 @@ data Proc : Set₁ where
 -- The desugaring of the deadlock CCS Process
 deadlock = indet ⊥-elim
 
--- A non-deterministic choice with 2 options
+-- A non-deterministic choice with 2 possible choices
 
 data Indet₂ : Set where
   left right : Indet₂
@@ -35,17 +35,17 @@ infixl 6 _+_
 flip-act : Act → Act
 flip-act (send c) = recv c
 flip-act (recv c) = send c
-flip-act tau      = tau
+flip-act τ        = τ
 
 map-act : (C → C) → (Act → Act)
 map-act f (send c) = send (f c)
 map-act f (recv c) = recv (f c)
-map-act f tau      = tau
+map-act f τ        = τ
 
 filter-act : Filter C → Filter Act
 filter-act f (send c) = f c
 filter-act f (recv c) = f c
-filter-act f tau      = T
+filter-act f τ        = T
 
 -- The type of a process environment
 PEnv : Set₁

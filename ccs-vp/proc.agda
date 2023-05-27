@@ -6,7 +6,7 @@ module ccs-vp.proc (C N V : Set) (Args : N → Set) where
 data Proc : Set₁ where
   send   : C → V → Proc → Proc
   recv   : C → (V → Proc) → Proc
-  tau    : Proc → Proc
+  τ      : Proc → Proc
   par    : Proc → Proc → Proc
   indet  : {S : Set} → (S → Proc) → Proc
   const  : (n : N) → Args n → Proc
@@ -21,24 +21,24 @@ deadlock = indet ⊥-elim
 data Act : Set where
   send : C → V → Act
   recv : C → V → Act
-  tau  : Act
+  τ    : Act
 
 -- Utility functions used for transitions
 
 flip-act : Act → Act
 flip-act (send c v) = recv c v
 flip-act (recv c v) = send c v
-flip-act tau        = tau
+flip-act τ        = τ
 
 map-act : (C → C) → (Act → Act)
 map-act f (send c v) = send (f c) v
 map-act f (recv c v) = recv (f c) v
-map-act f tau        = tau
+map-act f τ          = τ
 
 filter-act : Filter C → Filter Act
 filter-act f (send c _) = f c
 filter-act f (recv c _) = f c
-filter-act f tau        = T
+filter-act f τ          = T
 
 -- The type of a process environment
 PEnv : Set₁

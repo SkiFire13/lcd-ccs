@@ -14,14 +14,14 @@ open import bisimilarity.weak.properties C N penv using () renaming (reflexive t
 open import bisimilarity.weak.string C N penv
 
 -- An "observable" weak transition
--- This is like a weak transition, but without allowing self tau transitions
+-- This is like a weak transition, but without allowing self τ transitions
 record _=[_]⇒ₒ_ (p₁ : Proc) (a : Act) (p₄ : Proc) : Set₁ where
   constructor obs-o
   field
     {p₂ p₃} : Proc
-    s₁ : p₁ -[tau]→* p₂
+    s₁ : p₁ -[τ]→* p₂
     t  : p₂ -[ a ]→ p₃
-    s₂ : p₃ -[tau]→* p₄
+    s₂ : p₃ -[τ]→* p₄
 
 -- Lemmas for conversions to/from observable weak transitions
 
@@ -29,18 +29,18 @@ trans→obs : ∀ {p a q} → (p -[ a ]→ q) → (p =[ a ]⇒ₒ q)
 trans→obs t = obs-o self t self
 
 obs→weak : ∀ {p a q} → (p =[ a ]⇒ₒ q) → (p =[ a ]⇒ q)
-obs→weak (obs-o s₁ t s₂) = join-w (tau s₁) (trans→weak t) (tau s₂)
+obs→weak (obs-o s₁ t s₂) = join-w (τ s₁) (trans→weak t) (τ s₂)
 
-merge-weak-tau-l : ∀ {p₁ p₂ p₃ a} → (p₁ =[ tau ]⇒ₒ p₂) → (p₂ =[ a ]⇒ p₃) → (p₁ =[ a ]⇒ₒ p₃)
-merge-weak-tau-l (obs-o s₁ t s₂) (send s₃ t' s₄) = obs-o (join-s s₁ (cons t (join-s s₂ s₃))) t' s₄
-merge-weak-tau-l (obs-o s₁ t s₂) (recv s₃ t' s₄) = obs-o (join-s s₁ (cons t (join-s s₂ s₃))) t' s₄
-merge-weak-tau-l (obs-o s₁ t s₂) (tau s₃)        = obs-o s₁ t (join-s s₂ s₃)
+merge-weak-τ-l : ∀ {p₁ p₂ p₃ a} → (p₁ =[ τ ]⇒ₒ p₂) → (p₂ =[ a ]⇒ p₃) → (p₁ =[ a ]⇒ₒ p₃)
+merge-weak-τ-l (obs-o s₁ t s₂) (send s₃ t' s₄) = obs-o (join-s s₁ (cons t (join-s s₂ s₃))) t' s₄
+merge-weak-τ-l (obs-o s₁ t s₂) (recv s₃ t' s₄) = obs-o (join-s s₁ (cons t (join-s s₂ s₃))) t' s₄
+merge-weak-τ-l (obs-o s₁ t s₂) (τ s₃)          = obs-o s₁ t (join-s s₂ s₃)
 
-merge-weak-tau-r : ∀ {p₁ p₂ p₃ a} → (p₁ =[ a ]⇒ₒ p₂) → (p₂ =[ tau ]⇒ p₃) → (p₁ =[ a ]⇒ₒ p₃)
-merge-weak-tau-r (obs-o s₁ t s₂) (tau s₃) = obs-o s₁ t (join-s s₂ s₃)
+merge-weak-τ-r : ∀ {p₁ p₂ p₃ a} → (p₁ =[ a ]⇒ₒ p₂) → (p₂ =[ τ ]⇒ p₃) → (p₁ =[ a ]⇒ₒ p₃)
+merge-weak-τ-r (obs-o s₁ t s₂) (τ s₃) = obs-o s₁ t (join-s s₂ s₃)
 
 -- Observational congruence defined like weak bisimilarity
--- but without allowing a self tau transition
+-- but without allowing a self τ transition
 record _≈ₒ_ (p : Proc) (q : Proc) : Set₁ where
   field
     p⇒q : ∀ {a p'} → (p -[ a ]→ p') → ∃[ q' ] (q =[ a ]⇒ₒ q' × p' ≈ q')
@@ -71,12 +71,12 @@ trans : ∀ {p q s} → p ≈ₒ q → q ≈ₒ s → p ≈ₒ s
 p⇒q (trans p≈ₒq q≈ₒs) t with p≈ₒq .p⇒q t
 ... | q' , obs-o self tq s , p'≈q' =
   let s' , ts , q''≈s' = q≈ₒs .p⇒q tq
-      s'' , ts' , q'≈s'' = p⇒q-tau q''≈s' s
-  in  s'' , merge-weak-tau-r ts ts' , ≈-trans p'≈q' q'≈s''
+      s'' , ts' , q'≈s'' = p⇒q-τ q''≈s' s
+  in  s'' , merge-weak-τ-r ts ts' , ≈-trans p'≈q' q'≈s''
 ... | q' , obs-o (cons tq s₁) tq' s₂ , p'≈q' =
   let s' , ts , q''≈s' = q≈ₒs .p⇒q tq
       s'' , ts' , q'≈s'' = p⇒q-weak q''≈s' (obs→weak (obs-o s₁ tq' s₂))
-  in  s'' , merge-weak-tau-l ts ts' , ≈-trans p'≈q' q'≈s''
+  in  s'' , merge-weak-τ-l ts ts' , ≈-trans p'≈q' q'≈s''
 q⇒p (trans p≈ₒq q≈ₒs) = p⇒q (trans (sym q≈ₒs) (sym p≈ₒq))
 
 -- Prove that ≈ₒ is a congruence

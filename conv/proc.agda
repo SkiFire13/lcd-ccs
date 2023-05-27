@@ -29,7 +29,7 @@ conv-hide f = λ (conv-c c _) → f c
 conv-proc : vp.Proc → ccs.Proc
 conv-proc (send c v p)   = chan (send (conv-c c v)) (conv-proc p)
 conv-proc (recv c f)     = indet (λ v → chan (recv (conv-c c v)) (conv-proc (f v)))
-conv-proc (tau p)        = chan (tau) (conv-proc p)
+conv-proc (τ p)          = chan (τ) (conv-proc p)
 conv-proc (par p q)      = par (conv-proc p) (conv-proc q)
 conv-proc (indet f)      = indet (λ s → conv-proc (f s))
 conv-proc (const n args) = const (conv-n n args)
@@ -41,7 +41,7 @@ conv-proc (if b p)       = if b then (conv-proc p) else ccs.deadlock
 conv-act : vp.Act → ccs.Act
 conv-act (send c v) = send (conv-c c v)
 conv-act (recv c v) = recv (conv-c c v)
-conv-act tau        = tau
+conv-act τ          = τ
 
 -- Convert a CCS VP process environment to a normal CCS process environment
 conv-penv : vp.PEnv → ccs.PEnv

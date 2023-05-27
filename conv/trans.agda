@@ -16,21 +16,21 @@ open import ccs-vp.common C N V Args penv as vp
 conv-trans : ∀ {p₁ a p₂} → (p₁ -[ a ]→ᵥ p₂) → (conv-proc p₁ -[ conv-act a ]→ conv-proc p₂)
 conv-trans send        = chan
 conv-trans recv        = indet _ chan
-conv-trans tau         = chan
+conv-trans τ           = chan
 conv-trans (par-L t)   = par-L (conv-trans t)
 conv-trans (par-R t)   = par-R (conv-trans t)
 conv-trans (par-B {a = a} tl tr) with a
 ... | send _ _         = par-B (conv-trans tl) (conv-trans tr)
 ... | recv _ _         = par-B (conv-trans tl) (conv-trans tr)
-... | tau              = par-B (conv-trans tl) (conv-trans tr)
+... | τ                = par-B (conv-trans tl) (conv-trans tr)
 conv-trans (indet s t) = indet s (conv-trans t)
 conv-trans (const t)   = const (conv-trans t)
 conv-trans (rename {a = a} t) with a
 ... | send _ _         = rename (conv-trans t)
 ... | recv _ _         = rename (conv-trans t)
-... | tau              = rename (conv-trans t)
+... | τ                = rename (conv-trans t)
 conv-trans (hide {a = a} z t) with a
 ... | send _ _         = hide z (conv-trans t)
 ... | recv _ _         = hide z (conv-trans t)
-... | tau              = hide z (conv-trans t)
+... | τ                = hide z (conv-trans t)
 conv-trans (if t)      = conv-trans t
