@@ -28,12 +28,12 @@ infixl 5 _≈ᵣ_
 
 -- Weak bisimilarity (defined with a relation) implies weak bisimilarity (coinductive with the correct order)
 ≈ᵣ→≈ₒ : ∀ {p q} → p ≈ᵣ q → p ≈ₒ q
-p⇒q (≈ᵣ→≈ₒ (bisimilar R r)) t =
-  let q' , t' , r' = R .p⇒q r t
-  in  q' , t' , ≈ᵣ→≈ₒ (bisimilar R r')
-q⇒p (≈ᵣ→≈ₒ (bisimilar R r)) t =
-  let p' , t' , r' = R .q⇒p r t
-  in  p' , t' , ≈ᵣ→≈ₒ (bisimilar R r')
+p⇒q (≈ᵣ→≈ₒ (bisimilar B w)) t =
+  let q' , t' , w' = B .p⇒q w t
+  in  q' , t' , ≈ᵣ→≈ₒ (bisimilar B w')
+q⇒p (≈ᵣ→≈ₒ (bisimilar B w)) t =
+  let p' , t' , w' = B .q⇒p w t
+  in  p' , t' , ≈ᵣ→≈ₒ (bisimilar B w')
 
 -- Weak bisimilarity (coinductive with the correct order) implies weak bisimilarity (defined with a relation)
 ≈ₒ→≈ᵣ : ∀ {p q} → p ≈ₒ q → p ≈ᵣ q
