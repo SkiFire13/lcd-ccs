@@ -6,10 +6,10 @@ open import ccs.proc C N
 
 private
   variable
-    {p q p'} : Proc
-    {pl pr pl' pr'} : Proc
-    {a} : Act
-    {n} : N
+    p q p' : Proc
+    pl pr pl' pr' : Proc
+    a : Act
+    n : N
 
 -- A (strong) transition between two CCS processes through an action.
 data _-[_]→_ : Proc → Act → Proc → Set₁ where

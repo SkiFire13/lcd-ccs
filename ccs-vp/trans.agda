@@ -8,12 +8,12 @@ open import ccs-vp.proc C N X V Args
 
 private
   variable
-    {p q p'} : Proc
-    {pl pr pl' pr'} : Proc
-    {a} : Act
-    {c} : C
-    {n} : N
-    {v} : V
+    p q p' : Proc
+    pl pr pl' pr' : Proc
+    a : Act
+    c : C
+    n : N
+    v : V
 
 -- A (strong) transition between two CCS VP processes through an action.
 data _-[_]→ᵥ_ : Proc → Act → Proc → Set₁ where

@@ -9,11 +9,11 @@ open import ccs.trans C N penv
 
 private
   variable
-    {p q r} : Proc
-    {p₁ p₂ p₃ p₄} : Proc
-    {pl pr ql qr} : Proc
-    {a} : Act
-    {c} : C
+    p q r : Proc
+    p₁ p₂ p₃ p₄ : Proc
+    pl pr ql qr : Proc
+    a : Act
+    c : C
 
 -- A (potentially empty) sequence of strong tau transitions
 data _-[tau]→*_ : Proc → Proc → Set₁ where
