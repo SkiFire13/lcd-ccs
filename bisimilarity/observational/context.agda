@@ -15,33 +15,48 @@ open import bisimilarity.weak.base C N penv
 open import bisimilarity.weak.properties C N penv using (~→≈) renaming (reflexive to ≈-refl; sym to ≈-sym; trans to ≈-trans)
 
 -- Observational congruence defined as a closure over weak bisimilarity in contexts
-record _̂≈_ (p : Proc) (q : Proc) : Set₁ where
-  constructor obs-c
-  field
-    closure : (C[] : Context) → (subst C[] p) ≈ (subst C[] q)
-open _̂≈_ public
+_̂≈_ : Proc → Proc → Set₁
+_̂≈_ p q = (C : Context) → (subst C p) ≈ (subst C q)
 
 -- Prove that ̂≈ is an equivalence
+
 reflexive : ∀ {p} → p ̂≈ p
-reflexive = obs-c λ _ → ≈-refl
+reflexive = λ _ → ≈-refl
 
 sym : ∀ {p q} → p ̂≈ q → q ̂≈ p
-sym (obs-c C[p]≈C[q]) = obs-c λ C[] → ≈-sym (C[p]≈C[q] C[])
+sym (C[p]≈C[q]) = λ C → ≈-sym (C[p]≈C[q] C)
 
 trans : ∀ {p q s} → p ̂≈ q → q ̂≈ s → p ̂≈ s
-trans (obs-c C[p]≈C[q]) (obs-c C[q]≈C[s]) = obs-c λ C[] → ≈-trans (C[p]≈C[q] C[]) (C[q]≈C[s] C[])
+trans (C[p]≈C[q]) (C[q]≈C[s]) = λ C → ≈-trans (C[p]≈C[q] C) (C[q]≈C[s] C)
 
--- Prove that ̂≈ implies ≈, even though it is pretty obvious
+-- Prove that ̂≈ implies ≈,
 ̂≈→≈ : ∀ {p q} → p ̂≈ q → p ≈ q
-̂≈→≈ (obs-c C[p]≈C[q]) = C[p]≈C[q] replace
+̂≈→≈ (C[p]≈C[q]) = C[p]≈C[q] hole
+
+-- Lemma to help prove `cong`
+-- Prove that `compose` is the same as composing `subst` under strong bisimilarity
+ss~sc : ∀ {C₁ C₂ p} → subst C₁ (subst C₂ p) ~ subst (compose C₁ C₂) p
+ss~sc {chan a C} = ~-cong {chan a hole} (ss~sc {C})
+ss~sc {par-L C p} = ~-cong {par-L hole p} (ss~sc {C})
+ss~sc {par-R p C} = ~-cong {par-R p hole} (ss~sc {C})
+p⇒q (ss~sc {indet C _}) (indet s t) with s
+... | left = let q' , t' , p'~q' = ss~sc {C} .p⇒q t in q' , indet left t' , p'~q'
+... | right = _ , indet right t , ~-refl
+q⇒p (ss~sc {indet C _}) (indet s t) with s
+... | left = let q' , t' , p'~q' = ss~sc {C} .q⇒p t in q' , indet left t' , p'~q'
+... | right = _ , indet right t , ~-refl
+ss~sc {rename f C} = ~-cong {rename f hole} (ss~sc {C})
+ss~sc {hide f C} = ~-cong {hide f hole} (ss~sc {C})
+ss~sc {hole} = ~-refl
 
 -- Prove that ̂≈ is a congruence
 cong : Cong _̂≈_
-cong {C[]} {p} {q} (obs-c C[p]≈C[q]) = obs-c λ C'[] →
-  let t₁ = ~→≈ (ss~sc {C'[]} {C[]} {p})
-      t₂ = C[p]≈C[q] (compose C'[] C[])
-      t₃ = ~→≈ (ss~sc {C'[]} {C[]} {q})
-  in ≈-trans (≈-trans t₁ t₂) (≈-sym t₃)
+cong {C} {p} {q} (C[p]≈C[q]) = λ C' →
+  let t₁ = ~→≈ (ss~sc {C'} {C} {p})
+      t₂ = C[p]≈C[q] (compose C' C)
+      t₃ = ~→≈ (ss~sc {C'} {C} {q})
+  in  ≈-trans (≈-trans t₁ t₂) (≈-sym t₃)
 
+-- Prove that any subset of weak bisimilarity that is also a congruence imply observational congruence
 ≈-cong→̂≈ : ∀ {_≈ₓ_ p q} → (∀ {p' q'} → p' ≈ₓ q' → p' ≈ q') → Cong _≈ₓ_ → p ≈ₓ q → p ̂≈ q
-≈-cong→̂≈ ≈ₓ→≈ Cong≈ₓ p≈ₓq = obs-c λ _ → ≈ₓ→≈ (Cong≈ₓ p≈ₓq)
+≈-cong→̂≈ ≈ₓ→≈ Cong≈ₓ p≈ₓq = λ _ → ≈ₓ→≈ (Cong≈ₓ p≈ₓq)

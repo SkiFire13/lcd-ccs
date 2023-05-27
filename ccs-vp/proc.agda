@@ -2,7 +2,7 @@ open import Base
 
 module ccs-vp.proc (C N X V : Set) (Args : N → Set) where
 
--- A CCS VP Process
+-- A CCS Value-Passing (VP) Process
 data Proc : Set₁ where
   send   : C → V → Proc → Proc
   recv   : C → (V → Proc) → Proc
@@ -14,18 +14,17 @@ data Proc : Set₁ where
   hide   : (Filter C) → Proc → Proc
   if     : Bool → Proc → Proc
 
--- The "desugaring" of the deadlock CCS VP Process
+-- The desugaring of the deadlock CCS VP Process
 deadlock = indet ⊥-elim
 
--- A CCS VP action. This is a bit different than the CCS's Act
--- in that Processes don't contain channel operations (they are codified in different ways)
--- and this is only used in `Trans`.
+-- A CCS VP action
 data Act : Set where
   send : C → V → Act
   recv : C → V → Act
   tau  : Act
 
--- Utility functions used in `Trans`
+-- Utility functions used for transitions
+
 flip-act : Act → Act
 flip-act (send c v) = recv c v
 flip-act (recv c v) = send c v
@@ -41,5 +40,6 @@ filter-act f (send c _) = f c
 filter-act f (recv c _) = f c
 filter-act f tau        = T
 
+-- The type of a process environment
 PEnv : Set₁
 PEnv = (n : N) → (Args n) → Proc

@@ -11,7 +11,7 @@ private
     {a} : Act
     {n} : N
 
--- A transition between two CCS processes with through an action.
+-- A (strong) transition between two CCS processes through an action.
 data _-[_]→_ : Proc → Act → Proc → Set₁ where
   chan    : chan a p -[ a ]→ p
   par-L   : (pl -[ a ]→ p') → (par pl pr -[ a ]→ par p' pr)

@@ -12,22 +12,23 @@ open import bisimilarity.strong.base C N penv
 -- Properties of strong bisimilarity
 
 reflexive : ∀ {p} → p ~ p
-p⇒q (reflexive {p}) {p' = p'} t = p' , t , reflexive
-q⇒p (reflexive {p}) {p' = p'} t = p' , t , reflexive
+p⇒q (reflexive) t = _ , t , reflexive
+q⇒p (reflexive) t = _ , t , reflexive
 
 sym : ∀ {p q} → p ~ q → q ~ p
-p⇒q (sym {p} {q} p~q) = p~q .q⇒p
-q⇒p (sym {p} {q} p~q) = p~q .p⇒q
+p⇒q (sym p~q) = p~q .q⇒p
+q⇒p (sym p~q) = p~q .p⇒q
 
 trans : ∀ {p q s} → p ~ q → q ~ s → p ~ s
-p⇒q (trans {p} {q} {s} p~q q~s) tp =
+p⇒q (trans p~q q~s) tp =
   let q' , tq , p'~q' = p~q .p⇒q tp
       s' , ts , q'~s' = q~s .p⇒q tq
-  in s' , ts , trans p'~q' q'~s'
-q⇒p (trans {p} {q} {s} p~q q~s) = p⇒q (trans (sym q~s) (sym p~q))
+  in  s' , ts , trans p'~q' q'~s'
+q⇒p (trans p~q q~s) = p⇒q (trans (sym q~s) (sym p~q))
 
 -- Useful property
 p~p+d : ∀ {p} → p ~ p + ccs.deadlock
 p⇒q p~p+d t = _ , indet left t , reflexive
 q⇒p p~p+d (indet right (indet () _))
 q⇒p p~p+d (indet left t) = _ , t , reflexive
+ 

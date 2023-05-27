@@ -9,9 +9,10 @@ open import conv.proc C N X V Args
 open import ccs.common Conv-C Conv-N (conv-penv penv) as ccs
 open import ccs-vp.common C N X V Args penv as vp
 
--- Convert a transition from CCS VP to CCS, or in other words,
--- prove that if there's a transition between two CCS VP processes
--- then there's a corresponding transition between the converted processes too.
+-- Convert a transition from CCS VP to CCS.
+-- Logically speaking this is proving that if there exist a transition
+-- between two CCS VP processes then there exist also a corresponding
+-- transition between the converted CCS processes.
 conv-trans : ∀ {p₁ a p₂} → (p₁ -[ a ]→ᵥ p₂) → (conv-proc p₁ -[ conv-act a ]→ conv-proc p₂)
 conv-trans send        = chan
 conv-trans recv        = indet _ chan

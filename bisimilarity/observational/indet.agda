@@ -14,7 +14,7 @@ open import bisimilarity.strong.congruence C N penv renaming (cong to ~-cong)
 open import bisimilarity.strong.properties C N penv using () renaming (reflexive to ~-refl)
 open import bisimilarity.weak.base C N penv
 open import bisimilarity.weak.congruence C N penv
-open import bisimilarity.weak.properties C N penv using (p≈p+d) renaming (reflexive to ≈-refl; sym to ≈-sym; trans to ≈-trans)
+open import bisimilarity.weak.properties C N penv renaming (reflexive to ≈-refl; sym to ≈-sym; trans to ≈-trans)
 
 -- Observational congruence defined as a closure over weak bisimilarity in contexts
 record _≈ᵢ_ (p : Proc) (q : Proc) : Set₁ where
@@ -24,6 +24,7 @@ record _≈ᵢ_ (p : Proc) (q : Proc) : Set₁ where
 open _≈ᵢ_ public
 
 -- Prove that ≈ᵢ is an equivalence
+
 reflexive : ∀ {p} → p ≈ᵢ p
 reflexive = obs-i λ _ → ≈-refl
 
@@ -34,21 +35,29 @@ trans : ∀ {p q s} → p ≈ᵢ q → q ≈ᵢ s → p ≈ᵢ s
 trans (obs-i p+r≈q+r) (obs-i q+r≈s+r) = obs-i λ r → ≈-trans (p+r≈q+r r) (q+r≈s+r r)
 
 -- Prove that ≈ᵢ implies ≈, even though it is pretty obvious
+
+p≈p+d : ∀ {p} → p ≈ p + ccs.deadlock
+p⇒q (p≈p+d) t = _ , trans→weak (indet left t) , ≈-refl
+q⇒p (p≈p+d) (indet left t) = _ , trans→weak t , ≈-refl
+q⇒p (p≈p+d) (indet right (indet () _))
+
 ≈ᵢ→≈ : ∀ {p q} → p ≈ᵢ q → p ≈ q
 ≈ᵢ→≈ (obs-i p+r≈q+r) = ≈-trans (≈-trans p≈p+d (p+r≈q+r ccs.deadlock)) (≈-sym p≈p+d)
+
+-- Prove that ≈ᵢ is a congruence
 
 cong : Cong _≈ᵢ_
 p⇒q (closure (cong p≈ᵢq) r) (indet {q = r'} right t) =
   r' , trans→weak (indet right t) , ≈-refl
-p⇒q (closure (cong {chan c C[]} {q = q} p≈ᵢq) r) (indet left chan) =
-  subst C[] q , trans→weak (indet left chan) , ≈ᵢ→≈ (cong p≈ᵢq)
-p⇒q (closure (cong {par-L C[] pc} {q = q} p≈ᵢq) r) (indet left t) with t
+p⇒q (closure (cong {chan c C} {q = q} p≈ᵢq) r) (indet left chan) =
+  subst C q , trans→weak (indet left chan) , ≈ᵢ→≈ (cong p≈ᵢq)
+p⇒q (closure (cong {par-L C pc} {q = q} p≈ᵢq) r) (indet left t) with t
 ... | par-L tl = {!   !}
 ... | par-R {p' = pc'} tr =
-  par (subst C[] q) pc' , trans→weak (indet left (par-R tr)) , par-respects-≈ (≈ᵢ→≈ (cong {C[]} p≈ᵢq)) ≈-refl
+  par (subst C q) pc' , trans→weak (indet left (par-R tr)) , par-respects-≈ (≈ᵢ→≈ (cong {C} p≈ᵢq)) ≈-refl
 ... | par-B tl tr = {!   !}
-p⇒q (closure (cong {par-R pc C[]} p≈ᵢq) r) (indet left t) = {!   !}
-p⇒q (closure (cong {indet C[] pc} p≈ᵢq) r) t =
+p⇒q (closure (cong {par-R pc C} p≈ᵢq) r) (indet left t) = {!   !}
+p⇒q (closure (cong {indet C pc} p≈ᵢq) r) t =
   ≈-trans (≈-trans helper (cong p≈ᵢq .closure (pc + r))) (≈-sym helper) .p⇒q t
   where
   helper : ∀ {p₁ p₂ p₃} → (p₁ + p₂) + p₃ ≈ p₁ + (p₂ + p₃)
@@ -58,25 +67,7 @@ p⇒q (closure (cong {indet C[] pc} p≈ᵢq) r) t =
   q⇒p helper (indet left t) = _ , trans→weak (indet left (indet left t)) , ≈-refl
   q⇒p helper (indet right (indet left t)) = _ , trans→weak (indet left (indet right t)) , ≈-refl
   q⇒p helper (indet right (indet right t)) = _ , trans→weak (indet right t), ≈-refl
-p⇒q (closure (cong {rename f C[]} p≈ᵢq) r) (indet left t) = {!   !}
-p⇒q (closure (cong {hide f C[]} p≈ᵢq) r) (indet left (hide z t)) with
-  cong {C[]} p≈ᵢq .closure ccs.deadlock .p⇒q (indet left t)
-... | foo = {!   !}
--- ... | q' , send self (indet left tq) s₂ , p'≈q' =
---   hide f q' , send self (indet (hide z tq)) (s-map hide s₂), hide-respects-≈ p'≈q'
--- ... | _ , send self (indet right (indet () _)) _ , _
--- ... | q' , send (cons (indet left tq) s₁) tq' s₂ , p'≈q' =
---   hide f q' , send (cons (indet (hide tq)) (s-map hide s₁)) (hide z tq') (s-map hide s₂), hide-respects-≈ p'≈q'
--- ... | _ , send (cons (indet right (indet () _)) _) _ _ , _
--- ... | q' , recv self (indet left tq) s₂ , p'≈q' =
---   hide f q' , recv self (indet (hide z tq)) (s-map hide s₂), hide-respects-≈ p'≈q'
--- ... | _ , recv self (indet right (indet () _)) _ , _
--- ... | q' , recv (cons (indet left tq) s₁) tq' s₂ , p'≈q' =
---   hide f q' , recv (cons (indet (hide tq)) (s-map hide s₁)) (hide z tq') (s-map hide s₂), hide-respects-≈ p'≈q'
--- ... | _ , recv (cons (indet right (indet () _)) _) _ _ , _
--- ... | q' , tau (cons (indet left tq) s) , p'≈q' =
---   hide f q' , tau (cons (indet (hide tq)) (s-map hide s)) , hide-respects-≈ p'≈q'
--- ... | _ , tau (cons (indet right (indet () _)) _) , _
--- ... | q' , tau self , p'≈q' = {!   !}
-p⇒q (closure (cong {replace} p≈ᵢq) r) (indet left t) = p≈ᵢq .closure r .p⇒q (indet left t)
+p⇒q (closure (cong {rename f C} p≈ᵢq) r) (indet left t) = {!   !}
+p⇒q (closure (cong {hide f C} p≈ᵢq) r) (indet left (hide z t)) = {!   !}
+p⇒q (closure (cong {hole} p≈ᵢq) r) (indet left t) = p≈ᵢq .closure r .p⇒q (indet left t)
 q⇒p (closure (cong p≈ᵢq) r) = cong (sym p≈ᵢq) .closure r .p⇒q

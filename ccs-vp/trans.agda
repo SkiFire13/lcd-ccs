@@ -15,7 +15,7 @@ private
     {n} : N
     {v} : V
 
--- A transition between two CCS VP processes through an action.
+-- A (strong) transition between two CCS VP processes through an action.
 data _-[_]→ᵥ_ : Proc → Act → Proc → Set₁ where
   send   : send c v p -[ send c v ]→ᵥ p
   recv   : ∀ {f} → (recv c f -[ recv c v ]→ᵥ f v)

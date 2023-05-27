@@ -5,17 +5,16 @@ import ccs-vp.proc
 module conv.inv-trans (C N X V : Set) (Args : N → Set) (penv : ccs-vp.proc.PEnv C N X V Args) where
 
 open import conv.proc C N X V Args
-
 open import ccs.common Conv-C Conv-N (conv-penv penv) as ccs
 open import ccs-vp.common C N X V Args penv as vp
 
--- Prove that the converse of `conv-trans` is not true, that is if there's
--- a transition relation between two CCS processes then it's not guaranteed that
--- there's a transition between CCS VP processes that can be converted into them. 
-inv-conv-need-exists : ¬ (∀ {p₁ a p₂} → (conv-proc p₁ -[ conv-act a ]→ conv-proc p₂) → (p₁ -[ a ]→ᵥ p₂))
-inv-conv-need-exists f with () ← f {tau vp.deadlock} {tau} {if true vp.deadlock} chan
+-- Prove that the converse of `conv-trans` is not true, that is if there exist
+-- a transition between two CCS processes then it's not guaranteed that there
+-- exist also a transition between two CCS VP processes that can be converted into them.
+¬converse-conv-trans : ¬ (∀ {p₁ a p₂} → (conv-proc p₁ -[ conv-act a ]→ conv-proc p₂) → (p₁ -[ a ]→ᵥ p₂))
+¬converse-conv-trans f with () ← f {tau vp.deadlock} {tau} {if true vp.deadlock} chan
 
--- Prove some guarantees about composing functions on channel/transition operation that Agda can't prove.
+-- Prove some lemma about helper functions on channel/actions that are not obvious to Agda.
 
 inv-conv-act : ∀ {ca} → ∃[ a ] (ca ≡ conv-act a)
 inv-conv-act {send (conv-c c v)} = send c v , refl
@@ -37,21 +36,28 @@ inv-filter-eq {send c _} = refl
 inv-filter-eq {recv c _} = refl
 inv-filter-eq {tau}      = refl
 
--- Prove the less-strong version of the previous (false) theorem, that is
--- if a CCS VP process converted to CCS has a relation with another CCS process
--- then there exists a corresponding relation between the initial CCS VP process
--- and some other CCS VP process that can be converted in the initial second CCS process.
-inv-conv-trans' : ∀ {p₁ a cp₂}
-                  → conv-proc p₁ -[ conv-act a ]→ cp₂
+-- Prove a less-strong version of the converse of `conv-trans`, that is
+-- if the conversion of a CCS VP process to CCS can make a transition to another CCS process
+-- then there exists a corresponding transition between the initial CCS VP process
+-- and some other CCS VP process that can be converted to the second CCS process.
+inv-conv-trans' : ∀ {p₁ a cp₂} → conv-proc p₁ -[ conv-act a ]→ cp₂
                   → ∃[ p₂ ] (cp₂ ≡ conv-proc p₂ × p₁ -[ a ]→ᵥ p₂)
-inv-conv-trans' {p₁} {a} t with {conv-proc p₁} | {conv-act a} | inspect conv-proc p₁ | inspect conv-act a
-inv-conv-trans' {send _ _ p} {send _ _} chan | [ refl ] | [ refl ] = p , refl , send
-inv-conv-trans' {recv _ f} {recv _ v} (indet _ chan) | [ refl ] | [ refl ] = f v , refl , recv
-inv-conv-trans' {tau p} {tau} chan | [ refl ] | [ refl ] = p , refl , tau
-inv-conv-trans' {par pl pr} (par-L tl) | [ refl ] | [ e₂ ] with refl ← e₂
-  with pl' , refl , tl' ← inv-conv-trans' tl = par pl' pr , refl , par-L tl'
-inv-conv-trans' {par pl pr} (par-R tr) | [ refl ] | [ e₂ ] with refl ← e₂
-  with pr' , refl , tr' ← inv-conv-trans' tr = par pl pr' , refl , par-R tr'
+inv-conv-trans' {p₁} {a} t
+  with {conv-proc p₁} | {conv-act a} | inspect conv-proc p₁ | inspect conv-act a
+inv-conv-trans' {send _ _ p} {send _ _} chan | [ refl ] | [ refl ]
+  = p , refl , send
+inv-conv-trans' {recv _ f} {recv _ v} (indet _ chan) | [ refl ] | [ refl ]
+  = f v , refl , recv
+inv-conv-trans' {tau p} {tau} chan | [ refl ] | [ refl ]
+  = p , refl , tau
+inv-conv-trans' {par pl pr} (par-L tl) | [ refl ] | [ e ]
+  with refl ← e
+  with pl' , refl , tl' ← inv-conv-trans' tl
+  = par pl' pr , refl , par-L tl'
+inv-conv-trans' {par pl pr} (par-R tr) | [ refl ] | [ e ]
+  with refl ← e
+  with pr' , refl , tr' ← inv-conv-trans' tr
+  = par pl pr' , refl , par-R tr'
 inv-conv-trans' {par pl pr} {tau} (par-B {a = ca} tl tr) | [ refl ] | [ refl ]
   with a , refl ← inv-conv-act {ca}
   rewrite inv-flip-eq {a}
@@ -59,16 +65,20 @@ inv-conv-trans' {par pl pr} {tau} (par-B {a = ca} tl tr) | [ refl ] | [ refl ]
   with pr' , refl , tr' ← inv-conv-trans' tr
   = par pl' pr' , refl , par-B tl' tr'
 inv-conv-trans' {indet f} {a} (indet s t) | [ refl ] | [ refl ]
-  with p' , refl , t' ← inv-conv-trans' t = p' , refl , indet s t'
+  with p' , refl , t' ← inv-conv-trans' t
+  = p' , refl , indet s t'
 inv-conv-trans' {const n args} (const t) | [ refl ] | [ refl ]
-  with p' , refl , t' ← inv-conv-trans' t = p' , refl , const t'
+  with p' , refl , t' ← inv-conv-trans' t
+  = p' , refl , const t'
 inv-conv-trans' {rename f p} (rename {a = ca} t) | [ refl ] | [ e ]
   with a , refl ← inv-conv-act {ca}
   rewrite inv-rename-eq e
-  with p' , refl , t' ← inv-conv-trans' t = rename f p' , refl , rename t'
+  with p' , refl , t' ← inv-conv-trans' t
+  = rename f p' , refl , rename t'
 inv-conv-trans' {hide f p} {a} (hide z t) | [ refl ] | [ refl ]
   rewrite inv-filter-eq {a} {f}
   with p' , refl , t' ← inv-conv-trans' t = hide f p' , refl , hide z t'
 inv-conv-trans' {if false _} (indet () _) | [ refl ] | [ refl ]
 inv-conv-trans' {if true p} t | [ refl ] | [ refl ]
-  with p' , refl , t' ← inv-conv-trans' t = p' , refl , if t'
+  with p' , refl , t' ← inv-conv-trans' t
+  = p' , refl , if t'

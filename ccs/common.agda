@@ -2,7 +2,7 @@ import ccs.proc
 
 -- C = Set of the Channels
 -- N = Set of the Names of the constant processes
--- penv = Function from process names to the actual process
+-- penv = "Process Environment" = Map from process names to the corresponding processes
 module ccs.common (C N : Set) (penv : ccs.proc.PEnv C N) where
 
 open import ccs.proc C N public
