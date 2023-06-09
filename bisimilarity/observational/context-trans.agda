@@ -28,20 +28,20 @@ NoUniversalProc = ∀ {p a} → ∃[ q ] ¬ (∃[ p' ] p =[ a ]⇒ p' × p' ≈ 
 ̂≈→≈ₒ : C → NoUniversalProc → ∀ {p q} → p ̂≈ q → p ≈ₒ q
 p⇒q (̂≈→≈ₒ c _ C[p]≈C[q]) {a = send _} t with C[p]≈C[q] C[] .p⇒q (indet left t)
   where C[] = indet hole ccs.deadlock
-... | q' , send self (indet left tq) s₂ , p'≈q' = q' , obs-o self tq s₂ , p'≈q'
+... | q' , send self (indet left tq) s₂ , p'≈q' = q' , obs self tq s₂ , p'≈q'
 ... | _ , send self (indet right (indet () _)) _ , _
-... | q' , send (cons (indet left tq) s₁) tq' s₂ , p'≈q' = q' , obs-o (cons tq s₁) tq' s₂ , p'≈q'
+... | q' , send (cons (indet left tq) s₁) tq' s₂ , p'≈q' = q' , obs (cons tq s₁) tq' s₂ , p'≈q'
 ... | _ , send (cons (indet right (indet () _)) _) _ _ , _
 p⇒q (̂≈→≈ₒ c _ C[p]≈C[q]) {a = recv _} t with C[p]≈C[q] C[] .p⇒q (indet left t)
   where C[] = indet hole ccs.deadlock
-... | q' , recv self (indet left tq) s₂ , p'≈q' = q' , obs-o self tq s₂ , p'≈q'
+... | q' , recv self (indet left tq) s₂ , p'≈q' = q' , obs self tq s₂ , p'≈q'
 ... | _ , recv self (indet right (indet () _)) _ , _
-... | q' , recv (cons (indet left tq) s₁) tq' s₂ , p'≈q' = q' , obs-o (cons tq s₁) tq' s₂ , p'≈q'
+... | q' , recv (cons (indet left tq) s₁) tq' s₂ , p'≈q' = q' , obs (cons tq s₁) tq' s₂ , p'≈q'
 ... | _ , recv (cons (indet right (indet () _)) _) _ _ , _
 p⇒q (̂≈→≈ₒ c ¬UProc C[p]≈C[q]) {a = τ} {p' = p'} t
   with r , ¬p'' ← ¬UProc {p'} {recv c}
   with C[p]≈C[q] (indet hole (chan (recv c) r)) .p⇒q (indet left t)
-... | q' , τ (cons (indet left tq) s) , p'≈q' = q' , obs-o self tq s , p'≈q'
+... | q' , τ (cons (indet left tq) s) , p'≈q' = q' , obs self tq s , p'≈q'
 ... | q' , τ self , p'≈q' =
   let p'' , tp' , r≈p'' = p'≈q' .q⇒p (indet right chan)
   in ⊥-elim (¬p'' (p'' , tp' , ≈-sym r≈p''))
@@ -53,5 +53,5 @@ q⇒p (̂≈→≈ₒ c ¬UProc C[p]≈C[q]) = ̂≈→≈ₒ c ¬UProc (̂≈-s
   where
   C[τd]≈C[d] : chan τ ccs.deadlock ̂≈ ccs.deadlock
   C[τd]≈C[d] = λ _ → ¬C→≈-always-true ¬C
-... | _ , obs-o self (indet () _) _ , _
-... | _ , obs-o (cons (indet () _) _) _ _ , _
+... | _ , obs self (indet () _) _ , _
+... | _ , obs (cons (indet () _) _) _ _ , _

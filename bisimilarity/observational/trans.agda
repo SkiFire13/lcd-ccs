@@ -16,7 +16,7 @@ open import bisimilarity.weak.string C N penv
 -- An "observable" weak transition
 -- This is like a weak transition, but without allowing self τ transitions
 record _=[_]⇒ₒ_ (p₁ : Proc) (a : Act) (p₄ : Proc) : Set₁ where
-  constructor obs-o
+  constructor obs
   field
     {p₂ p₃} : Proc
     s₁ : p₁ -[τ]→* p₂
@@ -26,18 +26,18 @@ record _=[_]⇒ₒ_ (p₁ : Proc) (a : Act) (p₄ : Proc) : Set₁ where
 -- Lemmas for conversions to/from observable weak transitions
 
 trans→obs : ∀ {p a q} → (p -[ a ]→ q) → (p =[ a ]⇒ₒ q)
-trans→obs t = obs-o self t self
+trans→obs t = obs self t self
 
 obs→weak : ∀ {p a q} → (p =[ a ]⇒ₒ q) → (p =[ a ]⇒ q)
-obs→weak (obs-o s₁ t s₂) = join-w (τ s₁) (trans→weak t) (τ s₂)
+obs→weak (obs s₁ t s₂) = join-w (τ s₁) (trans→weak t) (τ s₂)
 
 merge-weak-τ-l : ∀ {p₁ p₂ p₃ a} → (p₁ =[ τ ]⇒ₒ p₂) → (p₂ =[ a ]⇒ p₃) → (p₁ =[ a ]⇒ₒ p₃)
-merge-weak-τ-l (obs-o s₁ t s₂) (send s₃ t' s₄) = obs-o (join-s s₁ (cons t (join-s s₂ s₃))) t' s₄
-merge-weak-τ-l (obs-o s₁ t s₂) (recv s₃ t' s₄) = obs-o (join-s s₁ (cons t (join-s s₂ s₃))) t' s₄
-merge-weak-τ-l (obs-o s₁ t s₂) (τ s₃)          = obs-o s₁ t (join-s s₂ s₃)
+merge-weak-τ-l (obs s₁ t s₂) (send s₃ t' s₄) = obs (join-s s₁ (cons t (join-s s₂ s₃))) t' s₄
+merge-weak-τ-l (obs s₁ t s₂) (recv s₃ t' s₄) = obs (join-s s₁ (cons t (join-s s₂ s₃))) t' s₄
+merge-weak-τ-l (obs s₁ t s₂) (τ s₃)          = obs s₁ t (join-s s₂ s₃)
 
 merge-weak-τ-r : ∀ {p₁ p₂ p₃ a} → (p₁ =[ a ]⇒ₒ p₂) → (p₂ =[ τ ]⇒ p₃) → (p₁ =[ a ]⇒ₒ p₃)
-merge-weak-τ-r (obs-o s₁ t s₂) (τ s₃) = obs-o s₁ t (join-s s₂ s₃)
+merge-weak-τ-r (obs s₁ t s₂) (τ s₃) = obs s₁ t (join-s s₂ s₃)
 
 -- Observational congruence defined like weak bisimilarity
 -- but without allowing a self τ transition
@@ -69,13 +69,13 @@ q⇒p (sym p≈ₒq) = p≈ₒq .p⇒q
 
 trans : ∀ {p q s} → p ≈ₒ q → q ≈ₒ s → p ≈ₒ s
 p⇒q (trans p≈ₒq q≈ₒs) t with p≈ₒq .p⇒q t
-... | q' , obs-o self tq s , p'≈q' =
+... | q' , obs self tq s , p'≈q' =
   let s' , ts , q''≈s' = q≈ₒs .p⇒q tq
       s'' , ts' , q'≈s'' = p⇒q-τ q''≈s' s
   in  s'' , merge-weak-τ-r ts ts' , ≈-trans p'≈q' q'≈s''
-... | q' , obs-o (cons tq s₁) tq' s₂ , p'≈q' =
+... | q' , obs (cons tq s₁) tq' s₂ , p'≈q' =
   let s' , ts , q''≈s' = q≈ₒs .p⇒q tq
-      s'' , ts' , q'≈s'' = p⇒q-weak q''≈s' (obs→weak (obs-o s₁ tq' s₂))
+      s'' , ts' , q'≈s'' = p⇒q-weak q''≈s' (obs→weak (obs s₁ tq' s₂))
   in  s'' , merge-weak-τ-l ts ts' , ≈-trans p'≈q' q'≈s''
 q⇒p (trans p≈ₒq q≈ₒs) = p⇒q (trans (sym q≈ₒs) (sym p≈ₒq))
 
@@ -83,22 +83,22 @@ q⇒p (trans p≈ₒq q≈ₒs) = p⇒q (trans (sym q≈ₒs) (sym p≈ₒq))
 cong : Cong _≈ₒ_
 p⇒q (cong {chan a C[]} p≈ₒq) chan = subst C[] _ , trans→obs chan , ≈ₒ→≈ (cong p≈ₒq)
 p⇒q (cong {par C[] pc} p≈ₒq) (par-L t) =
-  let q' , obs-o s₁ tq s₂ , p'≈q' = cong {C[]} p≈ₒq .p⇒q t
-  in  par q' pc , obs-o (map-s par-L s₁) (par-L tq) (map-s par-L s₂) , par-respects-≈ p'≈q' ≈-refl
+  let q' , obs s₁ tq s₂ , p'≈q' = cong {C[]} p≈ₒq .p⇒q t
+  in  par q' pc , obs (map-s par-L s₁) (par-L tq) (map-s par-L s₂) , par-respects-≈ p'≈q' ≈-refl
 p⇒q (cong {par C[] pc} p≈ₒq) (par-R {p' = pc'} t) = 
   par (subst C[] _) pc' , trans→obs (par-R t) , par-respects-≈ (≈ₒ→≈ (cong {C[]} p≈ₒq)) ≈-refl
 p⇒q (cong {par C[] pc} p≈ₒq) (par-B {pr' = pc'} t₁ t₂) =
-  let q' , obs-o sq₁ tq sq₂ , p'≈q' = cong {C[]} p≈ₒq .p⇒q t₁
-  in  par q' pc' , obs-o (map-s par-L sq₁) (par-B tq t₂) (map-s par-L sq₂), par-respects-≈ p'≈q' ≈-refl
+  let q' , obs sq₁ tq sq₂ , p'≈q' = cong {C[]} p≈ₒq .p⇒q t₁
+  in  par q' pc' , obs (map-s par-L sq₁) (par-B tq t₂) (map-s par-L sq₂), par-respects-≈ p'≈q' ≈-refl
 p⇒q (cong {indet C[] pc} p≈ₒq) (indet right t) = _ , trans→obs (indet right t) , ≈-refl
 p⇒q (cong {indet C[] pc} p≈ₒq) (indet left t) with cong {C[]} p≈ₒq .p⇒q t
-... | q' , obs-o self tq s₂ , p'≈q' = q' , obs-o self (indet left tq) s₂ , p'≈q'
-... | q' , obs-o (cons ts s₁) tq s₂ , p'≈q' = q' , obs-o (cons (indet left ts) s₁) tq s₂ , p'≈q'
+... | q' , obs self tq s₂ , p'≈q' = q' , obs self (indet left tq) s₂ , p'≈q'
+... | q' , obs (cons ts s₁) tq s₂ , p'≈q' = q' , obs (cons (indet left ts) s₁) tq s₂ , p'≈q'
 p⇒q (cong {rename f C[]} p≈ₒq) (rename t) =
-  let q' , obs-o sq₁ tq sq₂ , p'≈q' = cong {C[]} p≈ₒq .p⇒q t
-  in  rename f q' , obs-o (map-s rename sq₁) (rename tq) (map-s rename sq₂) , rename-respects-≈ p'≈q'
+  let q' , obs sq₁ tq sq₂ , p'≈q' = cong {C[]} p≈ₒq .p⇒q t
+  in  rename f q' , obs (map-s rename sq₁) (rename tq) (map-s rename sq₂) , rename-respects-≈ p'≈q'
 p⇒q (cong {hide f C[]} p≈ₒq) (hide z t) =
-  let q' , obs-o s₁ tq s₂ , p'≈q' = cong {C[]} p≈ₒq .p⇒q t
-  in  hide f q' , obs-o (map-s (hide tt) s₁) (hide z tq) (map-s (hide tt) s₂) , hide-respects-≈ p'≈q'
+  let q' , obs s₁ tq s₂ , p'≈q' = cong {C[]} p≈ₒq .p⇒q t
+  in  hide f q' , obs (map-s (hide tt) s₁) (hide z tq) (map-s (hide tt) s₂) , hide-respects-≈ p'≈q'
 p⇒q (cong {hole} p≈ₒq) = p≈ₒq .p⇒q
 q⇒p (cong p≈ₒq) = cong (sym p≈ₒq) .p⇒q
