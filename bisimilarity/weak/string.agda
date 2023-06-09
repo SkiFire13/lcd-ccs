@@ -9,7 +9,7 @@ module bisimilarity.weak.string (C N : Set) (penv : ccs.proc.PEnv C N) where
 open import ccs.common C N penv
 open import bisimilarity.weak.base C N penv
 
--- Weak bisimilarity defined coinductively
+-- Weak string bisimilarity defined coinductively
 record _≈ₛ_ (p : Proc) (q : Proc) : Set₁ where
   coinductive
   field
