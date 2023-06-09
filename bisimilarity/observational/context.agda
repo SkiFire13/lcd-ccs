@@ -37,8 +37,7 @@ trans C[p]≈C[q] C[q]≈C[s] = λ C[] → ≈-trans (C[p]≈C[q] C[]) (C[q]≈C
 -- Prove that `compose` is the same as composing `subst` under strong bisimilarity
 ss~sc : ∀ {C₁[] C₂[] p} → subst C₁[] (subst C₂[] p) ~ subst (compose C₁[] C₂[]) p
 ss~sc {chan a C[]} = ~-cong {chan a hole} (ss~sc {C[]})
-ss~sc {par-L C[] p} = ~-cong {par-L hole p} (ss~sc {C[]})
-ss~sc {par-R p C[]} = ~-cong {par-R p hole} (ss~sc {C[]})
+ss~sc {par C[] p} = ~-cong {par hole p} (ss~sc {C[]})
 p⇒q (ss~sc {indet C[] _}) (indet s t) with s
 ... | left  = let q' , t' , p'~q' = ss~sc {C[]} .p⇒q t in q' , indet left t' , p'~q'
 ... | right = _ , indet right t , ~-refl

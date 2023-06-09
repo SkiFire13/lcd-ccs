@@ -9,8 +9,7 @@ open import ccs.common C N penv hiding (deadlock)
 -- A CCS process context with a single hole
 data Context : Set₁ where
   chan   : Act → Context → Context
-  par-L  : Context → Proc → Context
-  par-R  : Proc → Context → Context
+  par    : Context → Proc → Context
   indet  : Context → Proc → Context
   rename : (C → C) → Context → Context
   hide   : Filter C → Context → Context
@@ -19,8 +18,7 @@ data Context : Set₁ where
 -- Replaces a context hole with a process
 subst : Context → Proc → Proc
 subst (chan a C[])   p = chan a (subst C[] p)
-subst (par-L C[] q)  p = par (subst C[] p) q
-subst (par-R q C[])  p = par q (subst C[] p)
+subst (par C[] q)    p = par (subst C[] p) q
 subst (indet C[] q)  p = subst C[] p + q
 subst (rename f C[]) p = rename f (subst C[] p)
 subst (hide f C[])   p = hide f (subst C[] p)
@@ -29,8 +27,7 @@ subst hole           p = p
 -- Composes two contexts
 compose : Context → Context → Context
 compose (chan a C₁[])   C₂[] = chan a (compose C₁[] C₂[])
-compose (par-L C₁[] q)  C₂[] = par-L (compose C₁[] C₂[]) q
-compose (par-R q C₁[])  C₂[] = par-R q (compose C₁[] C₂[])
+compose (par C₁[] q)    C₂[] = par (compose C₁[] C₂[]) q
 compose (indet C₁[] q)  C₂[] = indet (compose C₁[] C₂[]) q
 compose (rename f C₁[]) C₂[] = rename f (compose C₁[] C₂[])
 compose (hide f C₁[])   C₂[] = hide f (compose C₁[] C₂[])
