@@ -19,26 +19,33 @@ open import bisimilarity.weak.congruence C N penv
 ≈ₒ→̂≈ : ∀ {p q} → p ≈ₒ q → p ̂≈ q
 ≈ₒ→̂≈ p≈ₒq = ≈-cong→̂≈ ≈ₒ→≈ ≈ₒ-cong p≈ₒq
 
+NoUniversalProc : Set₁
+NoUniversalProc = ∀ {p a} → ∃[ q ] ¬ (∃[ p' ] p =[ a ]⇒ p' × p' ≈ q)
+
 -- (Try to) prove that observational congruence defined as the contextual closure of weak
 -- bisimilarity implies observational congruence defined by limiting self τ transitions,
 -- assuming C is inhabited.
--- The exercise only requires ≈ₒ→̂≈, with ̂≈→≈ₒ as an optional part because the given
--- hole is supposedly very difficult to fill (both in Agda and on paper).
-̂≈→≈ₒ : C → ∀ {p q} → p ̂≈ q → p ≈ₒ q
-p⇒q (̂≈→≈ₒ c C[p]≈C[q]) {a = send _} t with C[p]≈C[q] C[] .p⇒q (indet left t)
+̂≈→≈ₒ : C → NoUniversalProc → ∀ {p q} → p ̂≈ q → p ≈ₒ q
+p⇒q (̂≈→≈ₒ c _ C[p]≈C[q]) {a = send _} t with C[p]≈C[q] C[] .p⇒q (indet left t)
   where C[] = indet hole ccs.deadlock
 ... | q' , send self (indet left tq) s₂ , p'≈q' = q' , obs-o self tq s₂ , p'≈q'
 ... | _ , send self (indet right (indet () _)) _ , _
 ... | q' , send (cons (indet left tq) s₁) tq' s₂ , p'≈q' = q' , obs-o (cons tq s₁) tq' s₂ , p'≈q'
 ... | _ , send (cons (indet right (indet () _)) _) _ _ , _
-p⇒q (̂≈→≈ₒ c C[p]≈C[q]) {a = recv _} t with C[p]≈C[q] C[] .p⇒q (indet left t)
+p⇒q (̂≈→≈ₒ c _ C[p]≈C[q]) {a = recv _} t with C[p]≈C[q] C[] .p⇒q (indet left t)
   where C[] = indet hole ccs.deadlock
 ... | q' , recv self (indet left tq) s₂ , p'≈q' = q' , obs-o self tq s₂ , p'≈q'
 ... | _ , recv self (indet right (indet () _)) _ , _
 ... | q' , recv (cons (indet left tq) s₁) tq' s₂ , p'≈q' = q' , obs-o (cons tq s₁) tq' s₂ , p'≈q'
 ... | _ , recv (cons (indet right (indet () _)) _) _ _ , _
-p⇒q (̂≈→≈ₒ c C[p]≈C[q]) {a = τ} t = {!   !}
-q⇒p (̂≈→≈ₒ c C[p]≈C[q]) = ̂≈→≈ₒ c (̂≈-sym C[p]≈C[q]) .p⇒q
+p⇒q (̂≈→≈ₒ c ¬UProc C[p]≈C[q]) {a = τ} {p' = p'} t
+  with r , ¬p'' ← ¬UProc {p'} {recv c}
+  with C[p]≈C[q] (indet hole (chan (recv c) r)) .p⇒q (indet left t)
+... | q' , τ (cons (indet left tq) s) , p'≈q' = q' , obs-o self tq s , p'≈q'
+... | q' , τ self , p'≈q' =
+  let p'' , tp' , r≈p'' = p'≈q' .q⇒p (indet right chan)
+  in ⊥-elim (¬p'' (p'' , tp' , ≈-sym r≈p''))
+q⇒p (̂≈→≈ₒ c ¬UProc C[p]≈C[q]) = ̂≈→≈ₒ c ¬UProc (̂≈-sym C[p]≈C[q]) .p⇒q
 
 -- Prove that the assumption that C is inhabited is required for the previous theorem.
 ¬C→¬̂≈→≈ₒ : ¬ C → ¬ ∀ {p q} → p ̂≈ q → p ≈ₒ q
