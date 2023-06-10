@@ -23,7 +23,6 @@ import bisimilarity.weak.properties
 import bisimilarity.weak.relation
 import bisimilarity.weak.string
 
--- import bisimilarity.observational.context-trans
+import bisimilarity.observational.context-trans
 import bisimilarity.observational.context
--- import bisimilarity.observational.indet
 import bisimilarity.observational.trans
