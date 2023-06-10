@@ -1,3 +1,5 @@
+{-# OPTIONS --safe #-}
+
 open import Base
 
 module ccs.proc (C N : Set) where

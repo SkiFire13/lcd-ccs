@@ -1,3 +1,5 @@
+{-# OPTIONS --safe --guardedness #-}
+
 import Base
 
 import ccs.common

@@ -1,3 +1,5 @@
+{-# OPTIONS --safe #-}
+
 open import Base
 
 module conv.proc (C N V : Set) (Args : N → Set) where

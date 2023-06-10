@@ -1,4 +1,4 @@
-{-# OPTIONS --guardedness #-}
+{-# OPTIONS --safe --guardedness #-}
 
 open import Base
 

@@ -1,3 +1,5 @@
+{-# OPTIONS --safe #-}
+
 import ccs.proc
 
 -- C = Set of the Channels

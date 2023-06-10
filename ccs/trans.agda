@@ -1,3 +1,5 @@
+{-# OPTIONS --safe #-}
+
 import ccs.proc
 
 module ccs.trans (C N : Set) (penv : ccs.proc.PEnv C N) where
