@@ -55,3 +55,18 @@ q⇒p (̂≈→≈ₒ c ¬UProc C[p]≈C[q]) = ̂≈→≈ₒ c ¬UProc (̂≈-s
   C[τd]≈C[d] = λ _ → ¬C→≈-always-true ¬C
 ... | _ , obs self (indet () _) _ , _
 ... | _ , obs (cons (indet () _) _) _ _ , _
+
+-- Prove that NoUniversalProc is false when C is not inhabited
+-- In particular when this happens every process is an universal process
+-- because they can always do a self τ transition and remain bisimilar to q
+¬C→¬NoUniversalProc : ¬ C → ¬ NoUniversalProc
+¬C→¬NoUniversalProc ¬C ¬UProc =
+  let q , ¬p' = ¬UProc {ccs.deadlock} {τ}
+  in ¬p' (ccs.deadlock , τ self , ¬C→≈-always-true ¬C)
+
+-- Prove that NoUniversalProc implies that C cannot possibly not be inhabited.
+-- Constructively though this doesn't get us a value of C.
+NoUniversalProc→¬¬C : NoUniversalProc → ¬ ¬ C
+NoUniversalProc→¬¬C ¬UProc ¬C = ¬C→¬NoUniversalProc ¬C ¬UProc
+
+-- It remains to be shown if C → NoUniversalProc...
