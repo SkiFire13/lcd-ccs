@@ -80,16 +80,16 @@ q⇒p (trans p≈ₒq q≈ₒs) = p⇒q (trans (sym q≈ₒs) (sym p≈ₒq))
 
 -- Prove that ≈ₒ is a congruence
 cong : Cong _≈ₒ_
-p⇒q (cong {chan a C[]} p≈ₒq) chan = subst C[] _ , strong→obs chan , ≈ₒ→≈ (cong p≈ₒq)
+p⇒q (cong {chan a C[]} {q = q} p≈ₒq) chan = subst C[] q , strong→obs chan , ≈ₒ→≈ (cong p≈ₒq)
 p⇒q (cong {par C[] pc} p≈ₒq) (par-L t) =
   let q' , obs s₁ tq s₂ , p'≈q' = cong {C[]} p≈ₒq .p⇒q t
   in  par q' pc , obs (map-s par-L s₁) (par-L tq) (map-s par-L s₂) , par-respects-≈ p'≈q' ≈-refl
-p⇒q (cong {par C[] pc} p≈ₒq) (par-R {p' = pc'} t) = 
-  par (subst C[] _) pc' , strong→obs (par-R t) , par-respects-≈ (≈ₒ→≈ (cong {C[]} p≈ₒq)) ≈-refl
+p⇒q (cong {par C[] pc} {q = q} p≈ₒq) (par-R {p' = pc'} t) = 
+  par (subst C[] q) pc' , strong→obs (par-R t) , par-respects-≈ (≈ₒ→≈ (cong {C[]} p≈ₒq)) ≈-refl
 p⇒q (cong {par C[] pc} p≈ₒq) (par-B {pr' = pc'} t₁ t₂) =
   let q' , obs sq₁ tq sq₂ , p'≈q' = cong {C[]} p≈ₒq .p⇒q t₁
   in  par q' pc' , obs (map-s par-L sq₁) (par-B tq t₂) (map-s par-L sq₂), par-respects-≈ p'≈q' ≈-refl
-p⇒q (cong {indet C[] pc} p≈ₒq) (indet right t) = _ , strong→obs (indet right t) , ≈-refl
+p⇒q (cong {indet C[] pc} p≈ₒq) {p' = pc'} (indet right t) = pc' , strong→obs (indet right t) , ≈-refl
 p⇒q (cong {indet C[] pc} p≈ₒq) (indet left t) with cong {C[]} p≈ₒq .p⇒q t
 ... | q' , obs self tq s₂ , p'≈q' = q' , obs self (indet left tq) s₂ , p'≈q'
 ... | q' , obs (cons ts s₁) tq s₂ , p'≈q' = q' , obs (cons (indet left ts) s₁) tq s₂ , p'≈q'
