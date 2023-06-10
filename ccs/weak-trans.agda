@@ -29,10 +29,10 @@ data _=[_]⇒_ : Proc → Act → Proc → Set₁ where
   τ    : (p₁ -[τ]→* p₂) → (p₁ =[ τ ]⇒ p₂)
 
 -- Convert a normal transition to a weak transition
-trans→weak : (p -[ a ]→ q) → (p =[ a ]⇒ q)
-trans→weak {a = send c} t = send self t self
-trans→weak {a = recv c} t = recv self t self
-trans→weak {a = τ}      t = τ (cons t self)
+strong→weak : (p -[ a ]→ q) → (p =[ a ]⇒ q)
+strong→weak {a = send c} t = send self t self
+strong→weak {a = recv c} t = recv self t self
+strong→weak {a = τ}      t = τ (cons t self)
 
 -- Joins two sequences of strong τ transitions
 join-s : (p₁ -[τ]→* p₂) → (p₂ -[τ]→* p₃) → (p₁ -[τ]→* p₃)

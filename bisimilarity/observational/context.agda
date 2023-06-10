@@ -14,7 +14,7 @@ open import bisimilarity.strong.properties C N penv using () renaming (reflexive
 open import bisimilarity.weak.base C N penv
 open import bisimilarity.weak.properties C N penv using (~→≈) renaming (reflexive to ≈-refl; sym to ≈-sym; trans to ≈-trans)
 
--- Observational congruence defined as the contextual closure over weak bisimilarity
+-- Contextual closure over weak bisimilarity
 _̂≈_ : Proc → Proc → Set₁
 _̂≈_ p q = (C[] : Context) → subst C[] p ≈ subst C[] q
 
@@ -56,6 +56,8 @@ cong {C[]} {p} {q} C[p]≈C[q] = λ C'[] →
       t₃ = ~→≈ (ss~sc {C'[]} {C[]} {q})
   in  ≈-trans (≈-trans t₁ t₂) (≈-sym t₃)
 
--- Prove that any subset of weak bisimilarity that is also a congruence imply observational congruence
-≈-cong→̂≈ : ∀ {_≈ₓ_ p q} → (∀ {p' q'} → p' ≈ₓ q' → p' ≈ q') → Cong _≈ₓ_ → p ≈ₓ q → p ̂≈ q
-≈-cong→̂≈ ≈ₓ→≈ Cong≈ₓ p≈ₓq = λ _ → ≈ₓ→≈ (Cong≈ₓ p≈ₓq)
+-- Prove that any subset of weak bisimilarity that is also a congruence implies observational congruence.
+-- In other words, the contextual closure over weak bisimilarity is the largest congruence that
+-- included in weak bisimilarity.
+≈+cong→̂≈ : ∀ {_≈ₓ_ p q} → (∀ {p' q'} → p' ≈ₓ q' → p' ≈ q') → Cong _≈ₓ_ → p ≈ₓ q → p ̂≈ q
+≈+cong→̂≈ ≈ₓ→≈ Cong≈ₓ p≈ₓq = λ _ → ≈ₓ→≈ (Cong≈ₓ p≈ₓq)

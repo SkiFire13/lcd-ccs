@@ -15,8 +15,8 @@ open import bisimilarity.weak.string C N penv
 -- Prove that ≈ is an equivalence
 
 reflexive : ∀ {p} → p ≈ p
-p⇒q (reflexive) t = _ , trans→weak t , reflexive
-q⇒p (reflexive) t = _ , trans→weak t , reflexive
+p⇒q (reflexive) t = _ , strong→weak t , reflexive
+q⇒p (reflexive) t = _ , strong→weak t , reflexive
 
 sym : ∀ {p q} → p ≈ q → q ≈ p
 p⇒q (sym p≈q) = p≈q .q⇒p
@@ -33,5 +33,5 @@ q⇒p (trans p≈q q≈s) = p⇒q (trans (sym q≈s) (sym p≈q))
 ~→≈ : ∀ {p q} → p ~ q → p ≈ q
 p⇒q (~→≈ p~q) t =
   let q' , t' , p'~q' = p~q .p⇒q t
-  in  q' , trans→weak t' , ~→≈ p'~q'
+  in  q' , strong→weak t' , ~→≈ p'~q'
 q⇒p (~→≈ p~q) = p⇒q (~→≈ (~-sym p~q))

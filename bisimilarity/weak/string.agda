@@ -42,10 +42,10 @@ p⇒q-weak p≈q (τ s)          = p⇒q-τ p≈q s
 -- Weak string bisimilarity implies weak bisimilarity
 ≈ₛ→≈ : ∀ {p q} → p ≈ₛ q → p ≈ q
 p⇒q (≈ₛ→≈ p≈ₛq) t =
-  let q' , t' , p'≈ₛq' = p≈ₛq .p⇒q (trans→weak t)
+  let q' , t' , p'≈ₛq' = p≈ₛq .p⇒q (strong→weak t)
   in  q' , t' , ≈ₛ→≈ p'≈ₛq'
 q⇒p (≈ₛ→≈ p≈ₛq) t =
-  let p' , t' , q'≈ₛp' = p≈ₛq .q⇒p (trans→weak t)
+  let p' , t' , q'≈ₛp' = p≈ₛq .q⇒p (strong→weak t)
   in  p' , t' , ≈ₛ→≈ q'≈ₛp'
 
 -- Weak bisimilarity implies weak string bisimilarity

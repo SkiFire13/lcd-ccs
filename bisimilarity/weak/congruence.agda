@@ -44,8 +44,8 @@ q⇒p (¬C→≈-always-true ¬C) {τ}      t = _ , τ self , ¬C→≈-always-t
 -- Prove that all the contexts except indet respects ≈
 
 chan-respects-≈ : ∀ {a p q} → p ≈ q → chan a p ≈ chan a q
-p⇒q (chan-respects-≈ {q = q} p≈q) chan = q , trans→weak chan , p≈q
-q⇒p (chan-respects-≈ {p = p} p≈q) chan = p , trans→weak chan , sym p≈q
+p⇒q (chan-respects-≈ {q = q} p≈q) chan = q , strong→weak chan , p≈q
+q⇒p (chan-respects-≈ {p = p} p≈q) chan = p , strong→weak chan , sym p≈q
 
 par-respects-≈ : ∀ {pl ql pr qr} → pl ≈ ql → pr ≈ qr → par pl pr ≈ par ql qr
 p⇒q (par-respects-≈ {qr = qr} pl~ql pr~qr) (par-L t) =

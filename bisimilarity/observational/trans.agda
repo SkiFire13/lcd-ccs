@@ -25,11 +25,11 @@ record _=[_]⇒ₒ_ (p₁ : Proc) (a : Act) (p₄ : Proc) : Set₁ where
 
 -- Lemmas for conversions to/from observable weak transitions
 
-trans→obs : ∀ {p a q} → (p -[ a ]→ q) → (p =[ a ]⇒ₒ q)
-trans→obs t = obs self t self
+strong→obs : ∀ {p a q} → (p -[ a ]→ q) → (p =[ a ]⇒ₒ q)
+strong→obs t = obs self t self
 
 obs→weak : ∀ {p a q} → (p =[ a ]⇒ₒ q) → (p =[ a ]⇒ q)
-obs→weak (obs s₁ t s₂) = join-w (τ s₁) (trans→weak t) (τ s₂)
+obs→weak (obs s₁ t s₂) = join-w (τ s₁) (strong→weak t) (τ s₂)
 
 merge-weak-τ-l : ∀ {p₁ p₂ p₃ a} → (p₁ =[ τ ]⇒ₒ p₂) → (p₂ =[ a ]⇒ p₃) → (p₁ =[ a ]⇒ₒ p₃)
 merge-weak-τ-l (obs s₁ t s₂) (send s₃ t' s₄) = obs (join-s s₁ (cons t (join-s s₂ s₃))) t' s₄
@@ -39,8 +39,7 @@ merge-weak-τ-l (obs s₁ t s₂) (τ s₃)          = obs s₁ t (join-s s₂ s
 merge-weak-τ-r : ∀ {p₁ p₂ p₃ a} → (p₁ =[ a ]⇒ₒ p₂) → (p₂ =[ τ ]⇒ p₃) → (p₁ =[ a ]⇒ₒ p₃)
 merge-weak-τ-r (obs s₁ t s₂) (τ s₃) = obs s₁ t (join-s s₂ s₃)
 
--- Observational congruence defined like weak bisimilarity
--- but without allowing a self τ transition
+-- Observational congruence
 record _≈ₒ_ (p : Proc) (q : Proc) : Set₁ where
   field
     p⇒q : ∀ {a p'} → (p -[ a ]→ p') → ∃[ q' ] (q =[ a ]⇒ₒ q' × p' ≈ q')
@@ -60,8 +59,8 @@ q⇒p (≈ₒ→≈ p≈ₒq) t =
 -- Prove that ≈ₒ is an equivalence
 
 reflexive : ∀ {p} → p ≈ₒ p
-p⇒q reflexive t = _ , trans→obs t , ≈-refl
-q⇒p reflexive t = _ , trans→obs t , ≈-refl
+p⇒q reflexive t = _ , strong→obs t , ≈-refl
+q⇒p reflexive t = _ , strong→obs t , ≈-refl
 
 sym : ∀ {p q} → p ≈ₒ q → q ≈ₒ p
 p⇒q (sym p≈ₒq) = p≈ₒq .q⇒p
@@ -81,16 +80,16 @@ q⇒p (trans p≈ₒq q≈ₒs) = p⇒q (trans (sym q≈ₒs) (sym p≈ₒq))
 
 -- Prove that ≈ₒ is a congruence
 cong : Cong _≈ₒ_
-p⇒q (cong {chan a C[]} p≈ₒq) chan = subst C[] _ , trans→obs chan , ≈ₒ→≈ (cong p≈ₒq)
+p⇒q (cong {chan a C[]} p≈ₒq) chan = subst C[] _ , strong→obs chan , ≈ₒ→≈ (cong p≈ₒq)
 p⇒q (cong {par C[] pc} p≈ₒq) (par-L t) =
   let q' , obs s₁ tq s₂ , p'≈q' = cong {C[]} p≈ₒq .p⇒q t
   in  par q' pc , obs (map-s par-L s₁) (par-L tq) (map-s par-L s₂) , par-respects-≈ p'≈q' ≈-refl
 p⇒q (cong {par C[] pc} p≈ₒq) (par-R {p' = pc'} t) = 
-  par (subst C[] _) pc' , trans→obs (par-R t) , par-respects-≈ (≈ₒ→≈ (cong {C[]} p≈ₒq)) ≈-refl
+  par (subst C[] _) pc' , strong→obs (par-R t) , par-respects-≈ (≈ₒ→≈ (cong {C[]} p≈ₒq)) ≈-refl
 p⇒q (cong {par C[] pc} p≈ₒq) (par-B {pr' = pc'} t₁ t₂) =
   let q' , obs sq₁ tq sq₂ , p'≈q' = cong {C[]} p≈ₒq .p⇒q t₁
   in  par q' pc' , obs (map-s par-L sq₁) (par-B tq t₂) (map-s par-L sq₂), par-respects-≈ p'≈q' ≈-refl
-p⇒q (cong {indet C[] pc} p≈ₒq) (indet right t) = _ , trans→obs (indet right t) , ≈-refl
+p⇒q (cong {indet C[] pc} p≈ₒq) (indet right t) = _ , strong→obs (indet right t) , ≈-refl
 p⇒q (cong {indet C[] pc} p≈ₒq) (indet left t) with cong {C[]} p≈ₒq .p⇒q t
 ... | q' , obs self tq s₂ , p'≈q' = q' , obs self (indet left tq) s₂ , p'≈q'
 ... | q' , obs (cons ts s₁) tq s₂ , p'≈q' = q' , obs (cons (indet left ts) s₁) tq s₂ , p'≈q'

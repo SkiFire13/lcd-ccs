@@ -17,7 +17,7 @@ open import bisimilarity.weak.congruence C N penv
 -- Prove that observational congruence defined by limiting self τ transitions
 -- implies observational congruence defined as the contextual closure of weak bisimilarity.
 ≈ₒ→̂≈ : ∀ {p q} → p ≈ₒ q → p ̂≈ q
-≈ₒ→̂≈ p≈ₒq = ≈-cong→̂≈ ≈ₒ→≈ ≈ₒ-cong p≈ₒq
+≈ₒ→̂≈ p≈ₒq = ≈+cong→̂≈ ≈ₒ→≈ ≈ₒ-cong p≈ₒq
 
 NoUniversalProc : Set₁
 NoUniversalProc = ∀ {p a} → ∃[ q ] ¬ (∃[ p' ] p =[ a ]⇒ p' × p' ≈ q)
