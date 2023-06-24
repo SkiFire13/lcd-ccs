@@ -69,4 +69,4 @@ q⇒p (̂≈→≈ₒ c ¬UProc C[p]≈C[q]) = ̂≈→≈ₒ c ¬UProc (̂≈-s
 NoUniversalProc→¬¬C : NoUniversalProc → ¬ ¬ C
 NoUniversalProc→¬¬C ¬UProc ¬C = ¬C→¬NoUniversalProc ¬C ¬UProc
 
--- It remains to be shown if C → NoUniversalProc...
+-- It remains to be shown if C → NoUniversalProc or if ¬NoUniversalProc → ¬ ∀ {p q} → p ̂≈ q → p ≈ₒ q
