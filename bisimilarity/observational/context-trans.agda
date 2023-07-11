@@ -26,13 +26,13 @@ NoUniversalProc = ∀ {p a} → ∃[ q ] ¬ (∃[ p' ] p =[ a ]⇒ p' × p' ≈ 
 -- bisimilarity implies observational congruence defined by limiting self τ transitions,
 -- assuming C is inhabited.
 ̂≈→≈ₒ : C → NoUniversalProc → ∀ {p q} → p ̂≈ q → p ≈ₒ q
-p⇒q (̂≈→≈ₒ c _ C[p]≈C[q]) {a = send _} t with C[p]≈C[q] C[] .p⇒q (indet left t)
+p⇒q (̂≈→≈ₒ _ _ C[p]≈C[q]) {a = send _} t with C[p]≈C[q] C[] .p⇒q (indet left t)
   where C[] = indet hole ccs.deadlock
 ... | q' , send self (indet left tq) s₂ , p'≈q' = q' , obs self tq s₂ , p'≈q'
 ... | _ , send self (indet right (indet () _)) _ , _
 ... | q' , send (cons (indet left tq) s₁) tq' s₂ , p'≈q' = q' , obs (cons tq s₁) tq' s₂ , p'≈q'
 ... | _ , send (cons (indet right (indet () _)) _) _ _ , _
-p⇒q (̂≈→≈ₒ c _ C[p]≈C[q]) {a = recv _} t with C[p]≈C[q] C[] .p⇒q (indet left t)
+p⇒q (̂≈→≈ₒ _ _ C[p]≈C[q]) {a = recv _} t with C[p]≈C[q] C[] .p⇒q (indet left t)
   where C[] = indet hole ccs.deadlock
 ... | q' , recv self (indet left tq) s₂ , p'≈q' = q' , obs self tq s₂ , p'≈q'
 ... | _ , recv self (indet right (indet () _)) _ , _

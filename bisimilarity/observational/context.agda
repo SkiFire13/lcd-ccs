@@ -60,4 +60,4 @@ cong {C[]} {p} {q} C[p]≈C[q] = λ C'[] →
 -- In other words, the contextual closure over weak bisimilarity is the largest congruence that
 -- included in weak bisimilarity.
 ≈+cong→̂≈ : ∀ {_≈ₓ_ p q} → (∀ {p' q'} → p' ≈ₓ q' → p' ≈ q') → Cong _≈ₓ_ → p ≈ₓ q → p ̂≈ q
-≈+cong→̂≈ ≈ₓ→≈ Cong≈ₓ p≈ₓq = λ _ → ≈ₓ→≈ (Cong≈ₓ p≈ₓq)
+≈+cong→̂≈ ≈ₓ→≈ Cong≈ₓ p≈ₓq = λ C[] → ≈ₓ→≈ (Cong≈ₓ {C[]} p≈ₓq)
