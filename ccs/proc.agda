@@ -8,7 +8,7 @@ module ccs.proc (C N : Set) where
 data Act : Set where
   send  : C → Act
   recv  : C → Act
-  τ   : Act
+  τ     : Act
 
 -- A CCS Process
 data Proc : Set₁ where
