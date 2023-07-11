@@ -16,9 +16,9 @@ open import ccs-vp.common C N V Args penv as vp
 -- between two CCS VP processes then there exist also a corresponding
 -- transition between the converted CCS processes.
 conv-trans : ∀ {p₁ a p₂} → (p₁ -[ a ]→ᵥ p₂) → (conv-proc p₁ -[ conv-act a ]→ conv-proc p₂)
-conv-trans send        = chan
-conv-trans recv        = indet _ chan
-conv-trans τ           = chan
+conv-trans send        = act
+conv-trans recv        = indet _ act
+conv-trans τ           = act
 conv-trans (par-L t)   = par-L (conv-trans t)
 conv-trans (par-R t)   = par-R (conv-trans t)
 conv-trans (par-B {a = a} tl tr) with a

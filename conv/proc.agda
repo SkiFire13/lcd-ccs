@@ -8,7 +8,7 @@ module conv.proc (C N V : Set) (Args : N → Set) where
 record Conv-C : Set where
   constructor conv-c
   field
-    chan : C
+    chan  : C
     value : V
 
 -- The type of the program names in the converted CCS
@@ -29,9 +29,9 @@ conv-hide f = λ (conv-c c _) → f c
 
 -- Convert a CCS VP process to a normal CCS Process
 conv-proc : vp.Proc → ccs.Proc
-conv-proc (send c v p)   = chan (send (conv-c c v)) (conv-proc p)
-conv-proc (recv c f)     = indet (λ v → chan (recv (conv-c c v)) (conv-proc (f v)))
-conv-proc (τ p)          = chan (τ) (conv-proc p)
+conv-proc (send c v p)   = act (send (conv-c c v)) (conv-proc p)
+conv-proc (recv c f)     = indet (λ v → act (recv (conv-c c v)) (conv-proc (f v)))
+conv-proc (τ p)          = act τ (conv-proc p)
 conv-proc (par p q)      = par (conv-proc p) (conv-proc q)
 conv-proc (indet f)      = indet (λ s → conv-proc (f s))
 conv-proc (const n args) = const (conv-n n args)

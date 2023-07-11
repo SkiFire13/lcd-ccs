@@ -13,14 +13,14 @@ open import bisimilarity.weak.properties C N penv
 
 -- Prove that ≈ is not a congruence, assuming that C is inhabited
 C→¬≈-cong : C → ¬ ∀ {C[] p q} → p ≈ q → subst C[] p ≈ subst C[] q
-C→¬≈-cong c cong with cong {h+cd} τd≈d .p⇒q (indet left chan)
+C→¬≈-cong c cong with cong {h+cd} τd≈d .p⇒q (indet left act)
   where
-  h+cd = indet hole (chan (send c) ccs.deadlock)
-  τd≈d : chan τ ccs.deadlock ≈ ccs.deadlock
-  p⇒q τd≈d chan = ccs.deadlock , τ self , reflexive
+  h+cd = indet hole (act (send c) ccs.deadlock)
+  τd≈d : act τ ccs.deadlock ≈ ccs.deadlock
+  p⇒q τd≈d act = ccs.deadlock , τ self , reflexive
   q⇒p τd≈d (indet () _)
 ... | _ , τ (cons (indet left (indet () _)) _) , _
-... | _ , τ self , d≈C[d] with d≈C[d] .q⇒p (indet right chan)
+... | _ , τ self , d≈C[d] with d≈C[d] .q⇒p (indet right act)
 ...   | _ , send self (indet () _) _ , _
 ...   | _ , send (cons (indet () _) _) _ _ , _
 
@@ -43,9 +43,9 @@ q⇒p (¬C→≈-always-true ¬C) {τ}      t = _ , τ self , ¬C→≈-always-t
 
 -- Prove that all the contexts except indet respects ≈
 
-chan-respects-≈ : ∀ {a p q} → p ≈ q → chan a p ≈ chan a q
-p⇒q (chan-respects-≈ {q = q} p≈q) chan = q , strong→weak chan , p≈q
-q⇒p (chan-respects-≈ {p = p} p≈q) chan = p , strong→weak chan , sym p≈q
+act-respects-≈ : ∀ {a p q} → p ≈ q → act a p ≈ act a q
+p⇒q (act-respects-≈ {q = q} p≈q) act = q , strong→weak act , p≈q
+q⇒p (act-respects-≈ {p = p} p≈q) act = p , strong→weak act , sym p≈q
 
 par-respects-≈ : ∀ {pl ql pr qr} → pl ≈ ql → pr ≈ qr → par pl pr ≈ par ql qr
 p⇒q (par-respects-≈ {qr = qr} pl~ql pr~qr) (par-L t) =

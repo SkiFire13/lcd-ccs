@@ -14,7 +14,7 @@ open import ccs-vp.common C N V Args penv as vp
 -- a transition between two CCS processes then it's not guaranteed that there
 -- exist also a transition between two CCS VP processes that can be converted into them.
 ¬converse-conv-trans : ¬ (∀ {p₁ a p₂} → (conv-proc p₁ -[ conv-act a ]→ conv-proc p₂) → (p₁ -[ a ]→ᵥ p₂))
-¬converse-conv-trans f with () ← f {τ vp.deadlock} {τ} {if true vp.deadlock} chan
+¬converse-conv-trans f with () ← f {τ vp.deadlock} {τ} {if true vp.deadlock} act
 
 -- Prove some lemma about helper functions on channel/actions that are not obvious to Agda.
 
@@ -45,11 +45,11 @@ inv-filter-eq {τ}        = refl
 inv-conv-trans' : ∀ {p₁ a cp₂} → conv-proc p₁ -[ conv-act a ]→ cp₂
                   → ∃[ p₂ ] (cp₂ ≡ conv-proc p₂ × p₁ -[ a ]→ᵥ p₂)
 inv-conv-trans' {p₁} {a} t with {conv-proc p₁} | {conv-act a} | inspect conv-proc p₁ | inspect conv-act a
-inv-conv-trans' {send _ _ p} {send _ _} chan | [ refl ] | [ refl ]
+inv-conv-trans' {send _ _ p} {send _ _} act | [ refl ] | [ refl ]
   = p , refl , send
-inv-conv-trans' {recv _ f} {recv _ v} (indet _ chan) | [ refl ] | [ refl ]
+inv-conv-trans' {recv _ f} {recv _ v} (indet _ act) | [ refl ] | [ refl ]
   = f v , refl , recv
-inv-conv-trans' {τ p} {τ} chan | [ refl ] | [ refl ]
+inv-conv-trans' {τ p} {τ} act | [ refl ] | [ refl ]
   = p , refl , τ
 inv-conv-trans' {par pl pr} (par-L tl) | [ refl ] | [ e ]
   with refl ← e

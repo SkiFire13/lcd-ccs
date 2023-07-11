@@ -40,18 +40,18 @@ p⇒q (̂≈→≈ₒ c _ C[p]≈C[q]) {a = recv _} t with C[p]≈C[q] C[] .p⇒
 ... | _ , recv (cons (indet right (indet () _)) _) _ _ , _
 p⇒q (̂≈→≈ₒ c ¬UProc C[p]≈C[q]) {a = τ} {p' = p'} t
   with r , ¬p'' ← ¬UProc {p'} {recv c}
-  with C[p]≈C[q] (indet hole (chan (recv c) r)) .p⇒q (indet left t)
+  with C[p]≈C[q] (indet hole (act (recv c) r)) .p⇒q (indet left t)
 ... | q' , τ (cons (indet left tq) s) , p'≈q' = q' , obs self tq s , p'≈q'
 ... | q' , τ self , p'≈q' =
-  let p'' , tp' , r≈p'' = p'≈q' .q⇒p (indet right chan)
+  let p'' , tp' , r≈p'' = p'≈q' .q⇒p (indet right act)
   in ⊥-elim (¬p'' (p'' , tp' , ≈-sym r≈p''))
 q⇒p (̂≈→≈ₒ c ¬UProc C[p]≈C[q]) = ̂≈→≈ₒ c ¬UProc (̂≈-sym C[p]≈C[q]) .p⇒q
 
 -- Prove that the assumption that C is inhabited is required for the previous theorem.
 ¬C→¬̂≈→≈ₒ : ¬ C → ¬ ∀ {p q} → p ̂≈ q → p ≈ₒ q
-¬C→¬̂≈→≈ₒ ¬C ̂≈→≈ₒ with ̂≈→≈ₒ C[τd]≈C[d] .p⇒q chan
+¬C→¬̂≈→≈ₒ ¬C ̂≈→≈ₒ with ̂≈→≈ₒ C[τd]≈C[d] .p⇒q act
   where
-  C[τd]≈C[d] : chan τ ccs.deadlock ̂≈ ccs.deadlock
+  C[τd]≈C[d] : act τ ccs.deadlock ̂≈ ccs.deadlock
   C[τd]≈C[d] = λ _ → ¬C→≈-always-true ¬C
 ... | _ , obs self (indet () _) _ , _
 ... | _ , obs (cons (indet () _) _) _ _ , _

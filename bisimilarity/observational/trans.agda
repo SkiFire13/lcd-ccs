@@ -80,7 +80,7 @@ q⇒p (trans p≈ₒq q≈ₒs) = p⇒q (trans (sym q≈ₒs) (sym p≈ₒq))
 
 -- Prove that ≈ₒ is a congruence
 cong : Cong _≈ₒ_
-p⇒q (cong {chan a C[]} {q = q} p≈ₒq) chan = subst C[] q , strong→obs chan , ≈ₒ→≈ (cong p≈ₒq)
+p⇒q (cong {act a C[]} {q = q} p≈ₒq) act = subst C[] q , strong→obs act , ≈ₒ→≈ (cong p≈ₒq)
 p⇒q (cong {par C[] pc} p≈ₒq) (par-L t) =
   let q' , obs s₁ tq s₂ , p'≈q' = cong {C[]} p≈ₒq .p⇒q t
   in  par q' pc , obs (map-s par-L s₁) (par-L tq) (map-s par-L s₂) , par-respects-≈ p'≈q' ≈-refl

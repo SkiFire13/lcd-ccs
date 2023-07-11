@@ -12,7 +12,7 @@ data Act : Set where
 
 -- A CCS Process
 data Proc : Set₁ where
-  chan    : Act → Proc → Proc
+  act     : Act → Proc → Proc
   par     : Proc → Proc → Proc
   indet   : {S : Set} → (S → Proc) → Proc
   const   : N → Proc
